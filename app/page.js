@@ -1096,13 +1096,189 @@ export default function App() {
               
               <div>
                 <label className="text-sm text-[#8E8E93] mb-2 block">{t.folderIcon}</label>
-                <Input
-                  value={folderIcon}
-                  onChange={(e) => setFolderIcon(e.target.value)}
-                  placeholder="📁"
-                  className="bg-black border-[#2C2C2E] rounded-2xl focus:border-[#007AFF]"
-                  maxLength={2}
-                />
+                <div className="space-y-3">
+                  <Input
+                    value={folderIcon}
+                    onChange={(e) => setFolderIcon(e.target.value)}
+                    placeholder="📁"
+                    className="bg-black border-[#2C2C2E] rounded-2xl focus:border-[#007AFF] text-center text-2xl"
+                    maxLength={2}
+                  />
+                  
+                  <div className="bg-black border border-[#2C2C2E] rounded-2xl p-3 max-h-48 overflow-y-auto">
+                    <div className="space-y-3">
+                      {/* Work & Professional */}
+                      <div>
+                        <p className="text-xs text-[#8E8E93] mb-2">💼 Work & Professional</p>
+                        <div className="flex flex-wrap gap-2">
+                          {['💼', '📊', '📈', '💻', '⚙️', '🔧', '📝', '📅', '📌', '🎯'].map(emoji => (
+                            <button
+                              key={emoji}
+                              onClick={() => setFolderIcon(emoji)}
+                              className="text-2xl hover:scale-125 transition-transform p-1"
+                              type="button"
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {/* Creative & Design */}
+                      <div>
+                        <p className="text-xs text-[#8E8E93] mb-2">🎨 Creative & Design</p>
+                        <div className="flex flex-wrap gap-2">
+                          {['🎨', '✏️', '🖌️', '🖍️', '📐', '📏', '🎭', '🎬', '📸', '🎥'].map(emoji => (
+                            <button
+                              key={emoji}
+                              onClick={() => setFolderIcon(emoji)}
+                              className="text-2xl hover:scale-125 transition-transform p-1"
+                              type="button"
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {/* Learning & Education */}
+                      <div>
+                        <p className="text-xs text-[#8E8E93] mb-2">📚 Learning & Education</p>
+                        <div className="flex flex-wrap gap-2">
+                          {['📚', '📖', '✍️', '🎓', '🧠', '💡', '🔬', '🧪', '📊', '📉'].map(emoji => (
+                            <button
+                              key={emoji}
+                              onClick={() => setFolderIcon(emoji)}
+                              className="text-2xl hover:scale-125 transition-transform p-1"
+                              type="button"
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {/* Personal & Lifestyle */}
+                      <div>
+                        <p className="text-xs text-[#8E8E93] mb-2">🏠 Personal & Lifestyle</p>
+                        <div className="flex flex-wrap gap-2">
+                          {['🏠', '👨‍👩‍👧', '❤️', '🎁', '🎉', '🎂', '☕', '🍕', '🛒', '💪'].map(emoji => (
+                            <button
+                              key={emoji}
+                              onClick={() => setFolderIcon(emoji)}
+                              className="text-2xl hover:scale-125 transition-transform p-1"
+                              type="button"
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {/* Travel & Adventure */}
+                      <div>
+                        <p className="text-xs text-[#8E8E93] mb-2">✈️ Travel & Adventure</p>
+                        <div className="flex flex-wrap gap-2">
+                          {['✈️', '🌍', '🗺️', '🏖️', '🏔️', '🏕️', '🚗', '🚂', '🎒', '📍'].map(emoji => (
+                            <button
+                              key={emoji}
+                              onClick={() => setFolderIcon(emoji)}
+                              className="text-2xl hover:scale-125 transition-transform p-1"
+                              type="button"
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {/* Health & Fitness */}
+                      <div>
+                        <p className="text-xs text-[#8E8E93] mb-2">💪 Health & Fitness</p>
+                        <div className="flex flex-wrap gap-2">
+                          {['💪', '🏃', '🧘', '🏋️', '🚴', '⚽', '🏊', '🥗', '🍎', '💊'].map(emoji => (
+                            <button
+                              key={emoji}
+                              onClick={() => setFolderIcon(emoji)}
+                              className="text-2xl hover:scale-125 transition-transform p-1"
+                              type="button"
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {/* Finance & Money */}
+                      <div>
+                        <p className="text-xs text-[#8E8E93] mb-2">💰 Finance & Money</p>
+                        <div className="flex flex-wrap gap-2">
+                          {['💰', '💵', '💳', '🏦', '📊', '💹', '🪙', '💸', '🤑', '💎'].map(emoji => (
+                            <button
+                              key={emoji}
+                              onClick={() => setFolderIcon(emoji)}
+                              className="text-2xl hover:scale-125 transition-transform p-1"
+                              type="button"
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {/* Tech & Dev */}
+                      <div>
+                        <p className="text-xs text-[#8E8E93] mb-2">⚡ Tech & Development</p>
+                        <div className="flex flex-wrap gap-2">
+                          {['⚡', '🔌', '🖥️', '⌨️', '🖱️', '📱', '💾', '🔒', '🌐', '🤖'].map(emoji => (
+                            <button
+                              key={emoji}
+                              onClick={() => setFolderIcon(emoji)}
+                              className="text-2xl hover:scale-125 transition-transform p-1"
+                              type="button"
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {/* Social & Communication */}
+                      <div>
+                        <p className="text-xs text-[#8E8E93] mb-2">💬 Social & Communication</p>
+                        <div className="flex flex-wrap gap-2">
+                          {['💬', '📧', '📞', '📱', '👥', '🗣️', '💭', '📢', '🎤', '📣'].map(emoji => (
+                            <button
+                              key={emoji}
+                              onClick={() => setFolderIcon(emoji)}
+                              className="text-2xl hover:scale-125 transition-transform p-1"
+                              type="button"
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {/* Projects & Tasks */}
+                      <div>
+                        <p className="text-xs text-[#8E8E93] mb-2">✅ Projects & Tasks</p>
+                        <div className="flex flex-wrap gap-2">
+                          {['✅', '📋', '📌', '🎯', '🏆', '⭐', '🔥', '⚡', '🚀', '🎪'].map(emoji => (
+                            <button
+                              key={emoji}
+                              onClick={() => setFolderIcon(emoji)}
+                              className="text-2xl hover:scale-125 transition-transform p-1"
+                              type="button"
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
               
               <div className="flex gap-2">
