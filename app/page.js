@@ -1133,6 +1133,24 @@ export default function App() {
                 </div>
               )}
               
+              {editingItem?.contentType === 'text' && (
+                <div>
+                  <label className="text-sm text-[#8E8E93] mb-2 block">{t.moveToFolder}</label>
+                  <Select value={editFolderId} onValueChange={setEditFolderId}>
+                    <SelectTrigger className="bg-black border-[#2C2C2E] rounded-2xl">
+                      <SelectValue placeholder={t.selectFolder} />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1C1C1E] border-[#2C2C2E]">
+                      {clipboardFolders.map(folder => (
+                        <SelectItem key={folder.id} value={folder.id}>
+                          {folder.icon} {folder.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              
               <div className="flex gap-2">
                 <Button 
                   onClick={() => setIsEditDialogOpen(false)}
