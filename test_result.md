@@ -118,11 +118,14 @@ backend:
     file: "app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "GET /api/links returns all links ordered by createdAt desc"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: GET /api/links successfully retrieved 8 items. API working correctly with proper JSON response format."
 
   - task: "Links API - POST new link/note"
     implemented: true
@@ -130,11 +133,14 @@ backend:
     file: "app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "POST /api/links creates new link or text note with contentType distinction"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: POST /api/links successfully creates both links (contentType='link') and notes (contentType='text'). Auto-scraping works for links, proper data structure for notes. Both return success response with created item data."
 
   - task: "Links API - PATCH update"
     implemented: true
@@ -142,11 +148,14 @@ backend:
     file: "app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "PATCH /api/links updates link/note properties"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: PATCH /api/links successfully updates item properties (tested title update). Returns updated item data with success response."
 
   - task: "Links API - DELETE"
     implemented: true
@@ -154,11 +163,14 @@ backend:
     file: "app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "DELETE /api/links?id=xxx deletes specified item"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: DELETE /api/links?id=xxx successfully deletes items. Returns success response. Tested with both link and note items."
 
   - task: "Folders API - GET with folderType filter"
     implemented: true
@@ -166,11 +178,14 @@ backend:
     file: "app/api/folders/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "GET /api/folders?folderType=link or folderType=text filters by type"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: GET /api/folders with folderType filter working correctly. ?folderType=link returns 2 link folders, ?folderType=text returns 1 text folder. Filtering logic properly implemented."
 
   - task: "Folders API - POST new folder"
     implemented: true
@@ -178,11 +193,14 @@ backend:
     file: "app/api/folders/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "POST /api/folders creates folder with folderType (link or text)"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: POST /api/folders successfully creates folders with both folderType='link' and folderType='text'. Returns success response with created folder data including proper folderType."
 
   - task: "Folders API - DELETE"
     implemented: true
@@ -190,11 +208,14 @@ backend:
     file: "app/api/folders/route.js"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "DELETE /api/folders?id=xxx deletes non-default folders"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: DELETE /api/folders successfully deletes non-default folders and properly protects default folders (returns error 'Cannot delete default folder'). Folder deletion working as expected."
 
 frontend:
   - task: "Clipboard Save Button"
