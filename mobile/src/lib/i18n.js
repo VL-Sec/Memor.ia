@@ -224,9 +224,18 @@ export const translations = {
     // Settings
     settings: 'Ajustes',
     language: 'Idioma',
-    backup: 'Copia de Seguridad',
+    backup: 'Copia en la Nube',
     backupInfo: 'Tus datos se guardan automáticamente',
     version: 'Versión',
+    
+    // Cloud Backup Card
+    cloudBackupTitle: 'Copia de Seguridad Automática',
+    cloudBackupSubtitle: 'Tus datos están seguros',
+    cloudBackupDescription: 'Todos tus enlaces, notas y ajustes se sincronizan automáticamente con la copia de seguridad en la nube de tu dispositivo.',
+    cloudBackupIOS: 'iCloud Backup',
+    cloudBackupAndroid: 'Google Backup',
+    cloudBackupEnabled: 'Activado',
+    cloudBackupTip: 'Asegúrate de que la copia de seguridad en la nube esté activada en los ajustes del dispositivo.',
     
     // Notifications - Weekly Summary
     notifications: 'Notificaciones',
