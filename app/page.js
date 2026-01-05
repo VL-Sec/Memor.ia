@@ -623,74 +623,113 @@ export default function App() {
     <div className="min-h-screen bg-black text-white flex">
       {/* Sidebar - Only on desktop and dashboard/clipboard tabs */}
       {(activeTab === 'dashboard' || activeTab === 'clipboard') && (
-        <aside className={`${
-          sidebarOpen ? 'md:flex' : 'hidden'
-        } md:w-64 border-r border-[#2C2C2E] bg-black flex-col`}>
-          <div className="p-4 border-b border-[#2C2C2E]">
-            <h2 className="text-lg font-semibold mb-4">{t.folders}</h2>
-            <Button
-              onClick={() => {
-                setEditingFolder(null)
-                setFolderName('')
-                setFolderIcon('📁')
-                setIsFolderDialogOpen(true)
-              }}
-              className="w-full rounded-2xl bg-[#007AFF] hover:bg-[#0051D5] text-sm"
-              size="sm"
-            >
-              <FolderPlus className="w-4 h-4 mr-2" />
-              {t.newFolder}
-            </Button>
+        <aside 
+          className={`
+            relative flex-col bg-black border-r border-[#2C2C2E]
+            transition-all duration-300 ease-in-out
+            ${sidebarOpen ? 'w-64' : 'w-0'}
+            ${sidebarOpen ? 'flex' : 'hidden md:flex'}
+          `}
+        >
+          {/* Sidebar Content */}
+          <div className={`
+            w-64 flex flex-col h-full
+            transition-opacity duration-300
+            ${sidebarOpen ? 'opacity-100' : 'opacity-0 md:opacity-100'}
+          `}>
+            <div className="p-4 border-b border-[#2C2C2E]">
+              <h2 className="text-lg font-semibold mb-4">{t.folders}</h2>
+              <Button
+                onClick={() => {
+                  setEditingFolder(null)
+                  setFolderName('')
+                  setFolderIcon('📁')
+                  setIsFolderDialogOpen(true)
+                }}
+                className="w-full rounded-2xl bg-[#007AFF] hover:bg-[#0051D5] text-sm"
+                size="sm"
+              >
+                <FolderPlus className="w-4 h-4 mr-2" />
+                {t.newFolder}
+              </Button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-2">
+              {(activeTab === 'dashboard' ? folders : clipboardFolders).map((folder) => (
+                <div
+                  key={folder.id}
+                  className={`group flex items-center justify-between p-3 rounded-2xl mb-1 cursor-pointer transition-all ${
+                    (activeTab === 'dashboard' ? selectedFolder : selectedClipboardFolder) === folder.id
+                      ? 'bg-[#007AFF] text-white'
+                      : 'hover:bg-[#1C1C1E] text-[#8E8E93] hover:text-white'
+                  }`}
+                  onClick={() => activeTab === 'dashboard' ? setSelectedFolder(folder.id) : setSelectedClipboardFolder(folder.id)}
+                >
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <span className="text-2xl flex-shrink-0">{folder.icon}</span>
+                    <span className="truncate font-semibold text-base">{folder.name}</span>
+                  </div>
+                  
+                  {!folder.isDefault && (
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 hover:bg-white/10"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setEditingFolder(folder)
+                          setFolderName(folder.name)
+                          setFolderIcon(folder.icon)
+                          setIsFolderDialogOpen(true)
+                        }}
+                      >
+                        <Edit2 className="w-3 h-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 hover:bg-red-500/10 text-red-500"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleDeleteFolder(folder.id)
+                        }}
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
           
-          <div className="flex-1 overflow-y-auto p-2">
-            {(activeTab === 'dashboard' ? folders : clipboardFolders).map((folder) => (
-              <div
-                key={folder.id}
-                className={`group flex items-center justify-between p-3 rounded-2xl mb-1 cursor-pointer transition-all ${
-                  (activeTab === 'dashboard' ? selectedFolder : selectedClipboardFolder) === folder.id
-                    ? 'bg-[#007AFF] text-white'
-                    : 'hover:bg-[#1C1C1E] text-[#8E8E93] hover:text-white'
-                }`}
-                onClick={() => activeTab === 'dashboard' ? setSelectedFolder(folder.id) : setSelectedClipboardFolder(folder.id)}
-              >
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <span className="text-2xl flex-shrink-0">{folder.icon}</span>
-                  <span className="truncate font-semibold text-base">{folder.name}</span>
-                </div>
-                
-                {!folder.isDefault && (
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 w-6 p-0 hover:bg-white/10"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setEditingFolder(folder)
-                        setFolderName(folder.name)
-                        setFolderIcon(folder.icon)
-                        setIsFolderDialogOpen(true)
-                      }}
-                    >
-                      <Edit2 className="w-3 h-3" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 w-6 p-0 hover:bg-red-500/10 text-red-500"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleDeleteFolder(folder.id)
-                      }}
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+          {/* Integrated Chevron Button - Always visible */}
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className={`
+              absolute top-1/2 -translate-y-1/2 
+              w-6 h-12 
+              bg-[#1C1C1E] hover:bg-[#2C2C2E]
+              border border-[#2C2C2E]
+              rounded-r-lg
+              flex items-center justify-center
+              transition-all duration-300 ease-in-out
+              ${sidebarOpen ? '-right-6' : 'right-0'}
+              z-50
+              cursor-pointer
+              group/toggle
+            `}
+            aria-label={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+          >
+            <div className="transition-transform duration-300 ease-in-out group-hover/toggle:scale-110">
+              {sidebarOpen ? (
+                <ChevronLeft className="w-4 h-4 text-[#8E8E93] group-hover/toggle:text-white" />
+              ) : (
+                <ChevronRight className="w-4 h-4 text-[#8E8E93] group-hover/toggle:text-white" />
+              )}
+            </div>
+          </button>
         </aside>
       )}
       
