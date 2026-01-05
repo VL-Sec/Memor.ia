@@ -473,11 +473,12 @@ export default function App() {
   // Delete folder
   const handleDeleteFolder = async (folderId) => {
     try {
-      const folder = folders.find(f => f.id === folderId)
+      // Check in both folders and clipboardFolders
+      const folder = folders.find(f => f.id === folderId) || clipboardFolders.find(f => f.id === folderId)
       if (folder?.isDefault) {
         toast({
           title: t.errorTitle,
-          description: 'Cannot delete default folder',
+          description: t.cannotDeleteDefault || 'Cannot delete default folder',
           variant: 'destructive'
         })
         return
@@ -491,9 +492,17 @@ export default function App() {
       
       if (!response.ok) throw new Error('Failed to delete folder')
       
-      setFolders(folders.filter(f => f.id !== folderId))
-      if (selectedFolder === folderId) {
-        setSelectedFolder(folders.find(f => f.isDefault)?.id || null)
+      // Update the correct state based on folder type
+      if (folder?.folderType === 'text') {
+        setClipboardFolders(clipboardFolders.filter(f => f.id !== folderId))
+        if (selectedClipboardFolder === folderId) {
+          setSelectedClipboardFolder('all')
+        }
+      } else {
+        setFolders(folders.filter(f => f.id !== folderId))
+        if (selectedFolder === folderId) {
+          setSelectedFolder('all')
+        }
       }
       
       toast({
