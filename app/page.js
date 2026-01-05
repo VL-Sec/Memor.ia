@@ -158,6 +158,18 @@ export default function App() {
         return
       }
       
+      // Determine folderId - use selected folder or default to "General"
+      let targetFolderId = null
+      if (selectedClipboardFolder && selectedClipboardFolder !== 'all') {
+        targetFolderId = selectedClipboardFolder
+      } else {
+        // Find the default clipboard folder
+        const defaultFolder = clipboardFolders.find(f => f.isDefault)
+        targetFolderId = defaultFolder?.id || null
+      }
+      
+      console.log('Saving clipboard item to folder:', targetFolderId)
+      
       const response = await fetch('/api/links', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -166,13 +178,18 @@ export default function App() {
           content: newContent,
           contentType: 'text',
           tags: [],
-          folderId: selectedClipboardFolder || clipboardFolders.find(f => f.isDefault)?.id
+          folderId: targetFolderId
         })
       })
       
-      if (!response.ok) throw new Error('Failed to add item')
+      if (!response.ok) {
+        const errorData = await response.json()
+        console.error('API Error:', errorData)
+        throw new Error('Failed to add item')
+      }
       
       const result = await response.json()
+      console.log('Saved item:', result.data)
       setLinks([result.data, ...links])
       
       // Clear input
