@@ -818,7 +818,7 @@ export default function App() {
                 {/* Only show Add button on dashboard and favorites tabs */}
                 {activeTab !== 'clipboard' && activeTab !== 'settings' && (
                   <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-                  <DialogTrigger asChild>
+                    <DialogTrigger asChild>
                     <Button 
                       className="rounded-full bg-[#007AFF] hover:bg-[#0051D5] transition-all duration-300 shadow-lg shadow-[#007AFF]/20"
                       size="sm"
