@@ -745,8 +745,8 @@ export default function App() {
                   )}
                 </div>
               ))}
+              </div>
             </div>
-          </div>
           </aside>
           
           {/* Integrated Chevron Button - Always visible, OUTSIDE sidebar */}
