@@ -54,7 +54,7 @@ export async function POST(request) {
       name,
       icon,
       isDefault: false,
-      // Don't include folderType until column is added to database
+      folderType: folderType, // Include folderType for proper separation
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }
@@ -67,13 +67,26 @@ export async function POST(request) {
     
     if (error) {
       console.error('Error creating folder:', error)
+      // If folderType column doesn't exist, try without it
+      if (error.message && error.message.includes('folderType')) {
+        delete newFolder.folderType
+        const { data: data2, error: error2 } = await supabase
+          .from('folders')
+          .insert([newFolder])
+          .select()
+          .single()
+        
+        if (error2) {
+          return NextResponse.json({ error: error2.message }, { status: 500 })
+        }
+        
+        // Add folderType to response for frontend compatibility
+        return NextResponse.json({ success: true, data: { ...data2, folderType } })
+      }
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
     
-    // Add folderType to response for frontend compatibility
-    const responseData = { ...data, folderType }
-    
-    return NextResponse.json({ success: true, data: responseData })
+    return NextResponse.json({ success: true, data })
   } catch (error) {
     console.error('API Error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
