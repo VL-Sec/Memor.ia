@@ -784,6 +784,18 @@ export default function App() {
                             onChange={(e) => setNewContent(e.target.value)}
                             className="bg-black border-[#2C2C2E] rounded-2xl min-h-[120px] focus:border-[#007AFF]"
                           />
+                          <Select value={newFolderId} onValueChange={setNewFolderId}>
+                            <SelectTrigger className="bg-black border-[#2C2C2E] rounded-2xl">
+                              <SelectValue placeholder={t.selectFolder} />
+                            </SelectTrigger>
+                            <SelectContent className="bg-[#1C1C1E] border-[#2C2C2E]">
+                              {clipboardFolders.map(folder => (
+                                <SelectItem key={folder.id} value={folder.id}>
+                                  {folder.icon} {folder.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </>
                       )}
                       
