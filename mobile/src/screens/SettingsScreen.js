@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,12 +7,22 @@ import {
   TextInput,
   StyleSheet,
   Modal,
-  Alert,
+  Switch,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { translations, languages, setLanguage as saveLanguage } from '../lib/i18n';
 import { activatePremium, getPremiumStatus } from '../lib/premium';
+import {
+  getWeeklySummarySettings,
+  saveWeeklySummarySettings,
+  requestNotificationPermissions,
+  DAYS_OF_WEEK,
+  getDayName,
+  formatTimeForLocale,
+} from '../lib/notifications';
 
 const API_URL = 'https://memor-clip.preview.emergentagent.com';
 
@@ -24,10 +34,30 @@ export default function SettingsScreen({
 }) {
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showActivationModal, setShowActivationModal] = useState(false);
+  const [showDayModal, setShowDayModal] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
   const [activationCode, setActivationCode] = useState('');
   const [activating, setActivating] = useState(false);
+  
+  // Weekly Summary State
+  const [summaryEnabled, setSummaryEnabled] = useState(false);
+  const [summaryDay, setSummaryDay] = useState(0);
+  const [summaryHour, setSummaryHour] = useState(19);
+  const [summaryMinute, setSummaryMinute] = useState(0);
 
   const t = translations[language] || translations.en;
+
+  // Load weekly summary settings on mount
+  useEffect(() => {
+    const loadSettings = async () => {
+      const settings = await getWeeklySummarySettings();
+      setSummaryEnabled(settings.enabled);
+      setSummaryDay(settings.dayOfWeek);
+      setSummaryHour(settings.hour);
+      setSummaryMinute(settings.minute);
+    };
+    loadSettings();
+  }, []);
 
   const handleLanguageChange = async (langCode) => {
     setLanguage(langCode);
@@ -69,9 +99,93 @@ export default function SettingsScreen({
     }
   };
 
+  const handleSummaryToggle = async (value) => {
+    if (value) {
+      // Check for notification permissions first
+      const hasPermission = await requestNotificationPermissions();
+      if (!hasPermission) {
+        Toast.show({
+          type: 'error',
+          text1: t.permissionRequired,
+          text2: t.permissionMessage,
+        });
+        return;
+      }
+    }
+    
+    setSummaryEnabled(value);
+    const success = await saveWeeklySummarySettings({
+      enabled: value,
+      dayOfWeek: summaryDay,
+      hour: summaryHour,
+      minute: summaryMinute,
+    });
+    
+    if (success) {
+      Toast.show({
+        type: 'success',
+        text1: value ? t.weeklySummaryEnabled : t.weeklySummaryDisabled,
+      });
+    }
+  };
+
+  const handleDayChange = async (dayValue) => {
+    setSummaryDay(dayValue);
+    setShowDayModal(false);
+    
+    if (summaryEnabled) {
+      await saveWeeklySummarySettings({
+        enabled: summaryEnabled,
+        dayOfWeek: dayValue,
+        hour: summaryHour,
+        minute: summaryMinute,
+      });
+    }
+  };
+
+  const handleTimeChange = async (event, selectedDate) => {
+    // On Android, the picker closes automatically after selection
+    if (Platform.OS === 'android') {
+      setShowTimePicker(false);
+    }
+    
+    if (event.type === 'dismissed') {
+      setShowTimePicker(false);
+      return;
+    }
+    
+    if (selectedDate) {
+      const newHour = selectedDate.getHours();
+      const newMinute = selectedDate.getMinutes();
+      
+      setSummaryHour(newHour);
+      setSummaryMinute(newMinute);
+      
+      // On iOS, we need a "Done" button to close
+      if (Platform.OS === 'ios') {
+        // Don't close yet, let user press Done
+      }
+      
+      if (summaryEnabled) {
+        await saveWeeklySummarySettings({
+          enabled: summaryEnabled,
+          dayOfWeek: summaryDay,
+          hour: newHour,
+          minute: newMinute,
+        });
+      }
+    }
+  };
+
   const getCurrentLanguage = () => {
     const lang = languages.find(l => l.code === language);
     return lang ? `${lang.flag} ${lang.name}` : 'English';
+  };
+
+  const getTimePickerDate = () => {
+    const date = new Date();
+    date.setHours(summaryHour, summaryMinute, 0, 0);
+    return date;
   };
 
   return (
@@ -118,6 +232,68 @@ export default function SettingsScreen({
           <Text style={styles.activateButtonText}>{t.enterActivationCode}</Text>
         </TouchableOpacity>
       )}
+
+      {/* Notifications Section */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{t.notifications}</Text>
+
+        {/* Weekly Summary Toggle */}
+        <View style={styles.settingItem}>
+          <View style={styles.settingLeft}>
+            <Ionicons name="calendar-outline" size={24} color="#007AFF" />
+            <View style={styles.settingTextContainer}>
+              <Text style={styles.settingLabel}>{t.weeklySummary}</Text>
+              <Text style={styles.settingDescription}>{t.weeklySummaryInfo}</Text>
+            </View>
+          </View>
+          <Switch
+            value={summaryEnabled}
+            onValueChange={handleSummaryToggle}
+            trackColor={{ false: '#3A3A3C', true: '#34C759' }}
+            thumbColor={'#FFFFFF'}
+            ios_backgroundColor="#3A3A3C"
+          />
+        </View>
+
+        {/* Day and Time selectors - only show when enabled */}
+        {summaryEnabled && (
+          <>
+            {/* Day Selector */}
+            <TouchableOpacity
+              style={styles.settingItem}
+              onPress={() => setShowDayModal(true)}
+            >
+              <View style={styles.settingLeft}>
+                <View style={styles.iconPlaceholder} />
+                <Text style={styles.settingLabel}>{t.dayOfWeek}</Text>
+              </View>
+              <View style={styles.settingRight}>
+                <Text style={styles.settingValue}>
+                  {getDayName(summaryDay, language)}
+                </Text>
+                <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
+              </View>
+            </TouchableOpacity>
+
+            {/* Time Selector */}
+            <TouchableOpacity
+              style={styles.settingItem}
+              onPress={() => setShowTimePicker(true)}
+            >
+              <View style={styles.settingLeft}>
+                <View style={styles.iconPlaceholder} />
+                <Text style={styles.settingLabel}>{t.time}</Text>
+              </View>
+              <View style={styles.settingRight}>
+                <Text style={styles.settingValue}>
+                  {formatTimeForLocale(summaryHour, summaryMinute)}
+                </Text>
+                <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
+              </View>
+            </TouchableOpacity>
+          </>
+        )}
+      </View>
 
       {/* Settings Section */}
       <View style={styles.section}>
@@ -196,6 +372,77 @@ export default function SettingsScreen({
           </View>
         </View>
       </Modal>
+
+      {/* Day Selection Modal */}
+      <Modal
+        visible={showDayModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowDayModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{t.selectDay}</Text>
+              <TouchableOpacity onPress={() => setShowDayModal(false)}>
+                <Ionicons name="close" size={28} color="#FFFFFF" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.dayList}>
+              {DAYS_OF_WEEK.map((day) => (
+                <TouchableOpacity
+                  key={day.value}
+                  style={[
+                    styles.dayOption,
+                    summaryDay === day.value && styles.dayOptionActive,
+                  ]}
+                  onPress={() => handleDayChange(day.value)}
+                >
+                  <Text style={styles.dayName}>{day[language] || day.en}</Text>
+                  {summaryDay === day.value && (
+                    <Ionicons name="checkmark" size={24} color="#007AFF" />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Time Picker - Native behavior respects system locale */}
+      {showTimePicker && (
+        <Modal
+          visible={showTimePicker}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setShowTimePicker(false)}
+        >
+          <View style={styles.timePickerOverlay}>
+            <View style={styles.timePickerContainer}>
+              {Platform.OS === 'ios' && (
+                <View style={styles.timePickerHeader}>
+                  <TouchableOpacity onPress={() => setShowTimePicker(false)}>
+                    <Text style={styles.timePickerCancel}>{t.cancel}</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.timePickerTitle}>{t.selectTime}</Text>
+                  <TouchableOpacity onPress={() => setShowTimePicker(false)}>
+                    <Text style={styles.timePickerDone}>OK</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              <DateTimePicker
+                value={getTimePickerDate()}
+                mode="time"
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                onChange={handleTimeChange}
+                textColor="#FFFFFF"
+                themeVariant="dark"
+                style={Platform.OS === 'ios' ? styles.iosTimePicker : undefined}
+              />
+            </View>
+          </View>
+        </Modal>
+      )}
 
       {/* Activation Code Modal */}
       <Modal
@@ -335,6 +582,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+    flex: 1,
+  },
+  settingTextContainer: {
+    flex: 1,
+  },
+  settingDescription: {
+    color: '#8E8E93',
+    fontSize: 12,
+    marginTop: 2,
   },
   settingRight: {
     flexDirection: 'row',
@@ -354,6 +610,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     paddingHorizontal: 16,
     paddingBottom: 12,
+  },
+  iconPlaceholder: {
+    width: 24,
   },
   modalOverlay: {
     flex: 1,
@@ -399,6 +658,61 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 18,
   },
+  dayList: {
+    maxHeight: 400,
+  },
+  dayOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#2C2C2E',
+  },
+  dayOptionActive: {
+    backgroundColor: 'rgba(0, 122, 255, 0.1)',
+  },
+  dayName: {
+    color: '#FFFFFF',
+    fontSize: 18,
+  },
+  timePickerOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'flex-end',
+  },
+  timePickerContainer: {
+    backgroundColor: '#1C1C1E',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingBottom: 40,
+  },
+  timePickerHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#2C2C2E',
+  },
+  timePickerTitle: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  timePickerCancel: {
+    color: '#8E8E93',
+    fontSize: 16,
+  },
+  timePickerDone: {
+    color: '#007AFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  iosTimePicker: {
+    height: 200,
+  },
   activationIconContainer: {
     alignItems: 'center',
     paddingVertical: 24,
@@ -410,7 +724,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     color: '#FFFFFF',
     fontSize: 20,
-    fontFamily: 'monospace',
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
     textAlign: 'center',
     letterSpacing: 2,
   },

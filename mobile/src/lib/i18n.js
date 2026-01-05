@@ -58,6 +58,19 @@ export const translations = {
     backupInfo: 'Your data is automatically backed up',
     version: 'Version',
     
+    // Notifications - Weekly Summary
+    notifications: 'Notifications',
+    weeklySummary: 'Weekly Summary',
+    weeklySummaryInfo: 'Receive a reminder to review your saved content',
+    dayOfWeek: 'Day',
+    time: 'Time',
+    selectDay: 'Select day',
+    selectTime: 'Select time',
+    weeklySummaryEnabled: 'Weekly summary enabled',
+    weeklySummaryDisabled: 'Weekly summary disabled',
+    permissionRequired: 'Permission required',
+    permissionMessage: 'Please enable notifications in settings',
+    
     // Messages
     copied: 'Copied!',
     saved: 'Saved!',
@@ -120,6 +133,19 @@ export const translations = {
     backup: 'Backup',
     backupInfo: 'Os teus dados são guardados automaticamente',
     version: 'Versão',
+    
+    // Notifications - Weekly Summary
+    notifications: 'Notificações',
+    weeklySummary: 'Resumo Semanal',
+    weeklySummaryInfo: 'Recebe um lembrete para rever o conteúdo guardado',
+    dayOfWeek: 'Dia',
+    time: 'Hora',
+    selectDay: 'Selecionar dia',
+    selectTime: 'Selecionar hora',
+    weeklySummaryEnabled: 'Resumo semanal ativado',
+    weeklySummaryDisabled: 'Resumo semanal desativado',
+    permissionRequired: 'Permissão necessária',
+    permissionMessage: 'Ativa as notificações nas definições',
     
     // Messages
     copied: 'Copiado!',
@@ -184,6 +210,19 @@ export const translations = {
     backupInfo: 'Tus datos se guardan automáticamente',
     version: 'Versión',
     
+    // Notifications - Weekly Summary
+    notifications: 'Notificaciones',
+    weeklySummary: 'Resumen Semanal',
+    weeklySummaryInfo: 'Recibe un recordatorio para revisar tu contenido guardado',
+    dayOfWeek: 'Día',
+    time: 'Hora',
+    selectDay: 'Seleccionar día',
+    selectTime: 'Seleccionar hora',
+    weeklySummaryEnabled: 'Resumen semanal activado',
+    weeklySummaryDisabled: 'Resumen semanal desactivado',
+    permissionRequired: 'Permiso requerido',
+    permissionMessage: 'Activa las notificaciones en ajustes',
+    
     // Messages
     copied: '¡Copiado!',
     saved: '¡Guardado!',
@@ -246,6 +285,19 @@ export const translations = {
     backup: 'Sauvegarde',
     backupInfo: 'Vos données sont sauvegardées automatiquement',
     version: 'Version',
+    
+    // Notifications - Weekly Summary
+    notifications: 'Notifications',
+    weeklySummary: 'Résumé Hebdomadaire',
+    weeklySummaryInfo: 'Recevez un rappel pour revoir votre contenu enregistré',
+    dayOfWeek: 'Jour',
+    time: 'Heure',
+    selectDay: 'Sélectionner le jour',
+    selectTime: 'Sélectionner l\'heure',
+    weeklySummaryEnabled: 'Résumé hebdomadaire activé',
+    weeklySummaryDisabled: 'Résumé hebdomadaire désactivé',
+    permissionRequired: 'Permission requise',
+    permissionMessage: 'Activez les notifications dans les paramètres',
     
     // Messages
     copied: 'Copié!',
