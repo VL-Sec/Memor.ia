@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Heart, Plus, X, Copy, Trash2, Link as LinkIcon, FileText, Settings as SettingsIcon, Search, Edit2, Clock, Globe, FolderPlus, Folder, MoreVertical } from 'lucide-react'
+import { Heart, Plus, X, Copy, Trash2, Link as LinkIcon, FileText, Settings as SettingsIcon, Search, Edit2, Clock, Globe, FolderPlus, Folder, MoreVertical, Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
