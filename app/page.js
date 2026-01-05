@@ -56,6 +56,13 @@ export default function App() {
   const [reminderDate, setReminderDate] = useState('')
   const [reminderTime, setReminderTime] = useState('')
   
+  // Smart Clipboard states
+  const [smartClipboardActive, setSmartClipboardActive] = useState(false)
+  const [smartClipboardTimeLeft, setSmartClipboardTimeLeft] = useState(0)
+  const [lastSavedContent, setLastSavedContent] = useState('')
+  const [showSmartClipboardInfo, setShowSmartClipboardInfo] = useState(false)
+  const [smartClipboardActivationCount, setSmartClipboardActivationCount] = useState(0)
+  
   const t = translations[currentLanguage] || translations.en
   
   // Helper function to detect if text contains a valid URL
