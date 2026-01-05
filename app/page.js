@@ -701,6 +701,27 @@ export default function App() {
             </div>
             
             <div className="flex-1 overflow-y-auto p-2">
+              {/* "All" option at the top */}
+              <div
+                className={`group flex items-center justify-between p-3 rounded-2xl mb-3 cursor-pointer transition-all ${
+                  (activeTab === 'dashboard' ? selectedFolder : selectedClipboardFolder) === 'all'
+                    ? 'bg-[#007AFF] text-white'
+                    : 'hover:bg-[#1C1C1E] text-[#8E8E93] hover:text-white'
+                }`}
+                onClick={() => activeTab === 'dashboard' ? setSelectedFolder('all') : setSelectedClipboardFolder('all')}
+              >
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <span className="text-2xl flex-shrink-0">📂</span>
+                  <span className="truncate font-bold text-base">
+                    {activeTab === 'dashboard' ? 'All Links' : 'All Clipboards'}
+                  </span>
+                </div>
+              </div>
+              
+              {/* Separator */}
+              <div className="border-t border-[#2C2C2E] mb-2"></div>
+              
+              {/* Folders list */}
               {(activeTab === 'dashboard' ? folders : clipboardFolders).map((folder) => (
                 <div
                   key={folder.id}
