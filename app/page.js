@@ -1514,6 +1514,87 @@ export default function App() {
             <div className="max-w-2xl mx-auto space-y-6">
               <h2 className="text-2xl font-bold mb-6">{t.settings}</h2>
               
+              {/* Premium Status Card */}
+              <div className={`rounded-3xl p-6 border ${
+                premiumStatus?.isPremiumActivated 
+                  ? 'bg-gradient-to-r from-[#FFD700]/20 to-[#FFA500]/20 border-[#FFD700]'
+                  : premiumStatus?.isTrialActive
+                    ? 'bg-gradient-to-r from-[#007AFF]/20 to-[#00D4FF]/20 border-[#007AFF]'
+                    : 'bg-red-500/10 border-red-500'
+              }`}>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className={`w-14 h-14 rounded-full flex items-center justify-center ${
+                    premiumStatus?.isPremiumActivated 
+                      ? 'bg-[#FFD700]/30'
+                      : premiumStatus?.isTrialActive
+                        ? 'bg-[#007AFF]/30'
+                        : 'bg-red-500/30'
+                  }`}>
+                    {premiumStatus?.isPremiumActivated ? (
+                      <Crown className="w-7 h-7 text-[#FFD700]" />
+                    ) : (
+                      <Sparkles className="w-7 h-7 text-[#007AFF]" />
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold">
+                      {premiumStatus?.isPremiumActivated 
+                        ? t.premiumActive
+                        : premiumStatus?.isTrialActive
+                          ? t.trialActive
+                          : t.trialExpired
+                      }
+                    </h3>
+                    <p className="text-sm text-[#8E8E93]">
+                      {premiumStatus?.isPremiumActivated 
+                        ? `${t.premiumActivatedWith}: ${premiumStatus.activatedCode}`
+                        : premiumStatus?.isTrialActive
+                          ? `${premiumStatus.trialDaysRemaining} ${t.trialDaysLeft}`
+                          : t.premiumFeatures
+                      }
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Activation Code Button - Only show if not premium */}
+                {!premiumStatus?.isPremiumActivated && (
+                  <Dialog open={isActivationDialogOpen} onOpenChange={setIsActivationDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="w-full rounded-2xl bg-[#007AFF] hover:bg-[#0051D5] h-12">
+                        <Ticket className="w-5 h-5 mr-2" />
+                        {t.enterActivationCode}
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-[#1C1C1E] border-[#2C2C2E] text-white rounded-3xl max-w-md">
+                      <DialogHeader>
+                        <DialogTitle className="text-center flex flex-col items-center gap-3">
+                          <div className="w-16 h-16 rounded-full bg-[#007AFF]/20 flex items-center justify-center">
+                            <Ticket className="w-8 h-8 text-[#007AFF]" />
+                          </div>
+                          {t.activationCode}
+                        </DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4 py-4">
+                        <Input
+                          value={activationCodeInput}
+                          onChange={(e) => setActivationCodeInput(e.target.value.toUpperCase())}
+                          placeholder="XXXX-XXXX-XXXX"
+                          className="bg-black border-[#2C2C2E] rounded-xl text-center font-mono text-lg tracking-wider h-14"
+                          maxLength={14}
+                        />
+                        <Button
+                          onClick={handleActivateCode}
+                          disabled={activatingCode || !activationCodeInput.trim()}
+                          className="w-full rounded-2xl bg-[#007AFF] hover:bg-[#0051D5] h-12"
+                        >
+                          {activatingCode ? 'A ativar...' : t.activateCode}
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                )}
+              </div>
+              
               <div className="bg-[#1C1C1E] rounded-3xl p-6 border border-[#2C2C2E]">
                 <div className="flex items-center gap-3 mb-4">
                   <Globe className="w-5 h-5 text-[#007AFF]" />
