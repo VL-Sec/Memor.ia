@@ -85,6 +85,22 @@ export const translations = {
     saved: 'Saved!',
     deleted: 'Deleted!',
     error: 'Error',
+    
+    // Reminders
+    reminder: 'Reminder',
+    setReminder: 'Set Reminder',
+    reminderDate: 'Date',
+    reminderTime: 'Time',
+    reminderLocation: 'Location',
+    reminderLocationPlaceholder: 'Add location (optional)',
+    reminderEnabled: 'Reminder enabled',
+    reminderDisabled: 'Reminder removed',
+    noDate: 'No date',
+    noTime: 'No time',
+    noLocation: 'No location',
+    clearReminder: 'Clear Reminder',
+    editItem: 'Edit',
+    moveToFolder: 'Move to folder',
   },
   
   pt: {
