@@ -10,10 +10,15 @@ import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { useToast } from '@/hooks/use-toast'
-import { Plus, Copy, LogOut, Ticket, CheckCircle, Trash2, Users, RefreshCw, Edit2, Save } from 'lucide-react'
+import { 
+  Plus, Copy, LogOut, Ticket, CheckCircle, Trash2, Users, RefreshCw, 
+  Edit2, Save, TrendingUp, Crown, Clock, XCircle, Activity, Shield,
+  BarChart3, Percent
+} from 'lucide-react'
 
 export default function AdminDashboard() {
   const [codes, setCodes] = useState([])
+  const [metrics, setMetrics] = useState(null)
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
   const [newInfluencerName, setNewInfluencerName] = useState('')
@@ -32,27 +37,39 @@ export default function AdminDashboard() {
         router.push('/admin')
         return
       }
-      fetchCodes()
+      fetchData()
     }
     checkAuth()
   }, [router])
 
-  // Fetch all codes
-  const fetchCodes = async () => {
+  // Fetch all data
+  const fetchData = async () => {
     setLoading(true)
     try {
-      const { data, error } = await supabase
+      // Fetch codes
+      const { data: codesData, error: codesError } = await supabase
         .from('activation_codes')
-        .select('*')
+        .select('id, code, influencer_name, notes, is_used, used_at, created_at')
         .order('created_at', { ascending: false })
 
-      if (error) throw error
-      setCodes(data || [])
+      if (codesError) throw codesError
+      setCodes(codesData || [])
+
+      // Fetch metrics
+      const { data: metricsData, error: metricsError } = await supabase
+        .from('app_metrics')
+        .select('*')
+        .eq('id', 'global')
+        .single()
+
+      if (!metricsError && metricsData) {
+        setMetrics(metricsData)
+      }
     } catch (error) {
-      console.error('Error fetching codes:', error)
+      console.error('Error fetching data:', error)
       toast({
         title: 'Erro',
-        description: 'Falha ao carregar códigos',
+        description: 'Falha ao carregar dados',
         variant: 'destructive'
       })
     } finally {
@@ -87,7 +104,7 @@ export default function AdminDashboard() {
       setNewInfluencerName('')
       setNewNote('')
       setIsCreateDialogOpen(false)
-      fetchCodes()
+      fetchData()
     } catch (error) {
       console.error('Error creating code:', error)
       toast({
@@ -117,12 +134,38 @@ export default function AdminDashboard() {
         description: 'Código apagado'
       })
       
-      fetchCodes()
+      fetchData()
     } catch (error) {
       console.error('Error deleting code:', error)
       toast({
         title: 'Erro',
         description: 'Falha ao apagar código',
+        variant: 'destructive'
+      })
+    }
+  }
+
+  // Deactivate code (mark as used without actual use)
+  const handleDeactivateCode = async (codeId) => {
+    try {
+      const { error } = await supabase
+        .from('activation_codes')
+        .update({ is_used: true, used_at: new Date().toISOString() })
+        .eq('id', codeId)
+
+      if (error) throw error
+
+      toast({
+        title: 'Sucesso',
+        description: 'Código desativado'
+      })
+      
+      fetchData()
+    } catch (error) {
+      console.error('Error deactivating code:', error)
+      toast({
+        title: 'Erro',
+        description: 'Falha ao desativar código',
         variant: 'destructive'
       })
     }
@@ -145,7 +188,7 @@ export default function AdminDashboard() {
       
       setEditingCodeId(null)
       setEditNote('')
-      fetchCodes()
+      fetchData()
     } catch (error) {
       console.error('Error saving note:', error)
       toast({
@@ -167,7 +210,7 @@ export default function AdminDashboard() {
     navigator.clipboard.writeText(code)
     toast({
       title: 'Copiado!',
-      description: 'Código copiado para a área de transferência'
+      description: 'Código copiado'
     })
   }
 
@@ -177,21 +220,33 @@ export default function AdminDashboard() {
     router.push('/admin')
   }
 
-  // Calculate metrics
+  // Calculate code metrics
   const totalCodes = codes.length
   const usedCodes = codes.filter(c => c.is_used).length
   const activeCodes = codes.filter(c => !c.is_used).length
+
+  // Calculate conversion rate
+  const conversionRate = metrics?.trials_started > 0 
+    ? ((metrics?.conversions_to_premium / metrics?.trials_started) * 100).toFixed(1)
+    : 0
+
+  const abandonRate = metrics?.trials_started > 0 
+    ? ((metrics?.trial_expired / metrics?.trials_started) * 100).toFixed(1)
+    : 0
 
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
       <header className="border-b border-[#2C2C2E] bg-black/95 backdrop-blur-xl sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-[#007AFF] to-[#00D4FF] bg-clip-text text-transparent">
-              Memor.ia Admin
-            </h1>
-            <p className="text-sm text-[#8E8E93]">Gestão de Códigos de Ativação</p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#007AFF] to-[#00D4FF] flex items-center justify-center">
+              <Shield className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold">Memor.ia Admin</h1>
+              <p className="text-xs text-[#8E8E93]">Dashboard Seguro • Dados Anónimos</p>
+            </div>
           </div>
           <Button
             variant="ghost"
@@ -205,229 +260,320 @@ export default function AdminDashboard() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        {/* Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="bg-[#1C1C1E] rounded-2xl p-6 border border-[#2C2C2E]">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-[#007AFF]/20 flex items-center justify-center">
-                <Ticket className="w-6 h-6 text-[#007AFF]" />
-              </div>
-              <div>
-                <p className="text-[#8E8E93] text-sm">Total de Códigos</p>
-                <p className="text-3xl font-bold">{totalCodes}</p>
-              </div>
-            </div>
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#007AFF]"></div>
           </div>
-
-          <div className="bg-[#1C1C1E] rounded-2xl p-6 border border-[#2C2C2E]">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-green-500" />
+        ) : (
+          <>
+            {/* Section: Visão Geral */}
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <BarChart3 className="w-5 h-5 text-[#007AFF]" />
+                <h2 className="text-lg font-semibold">Visão Geral</h2>
               </div>
-              <div>
-                <p className="text-[#8E8E93] text-sm">Códigos Usados</p>
-                <p className="text-3xl font-bold text-green-500">{usedCodes}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-[#1C1C1E] rounded-2xl p-6 border border-[#2C2C2E]">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-[#00D4FF]/20 flex items-center justify-center">
-                <Users className="w-6 h-6 text-[#00D4FF]" />
-              </div>
-              <div>
-                <p className="text-[#8E8E93] text-sm">Códigos Disponíveis</p>
-                <p className="text-3xl font-bold text-[#00D4FF]">{activeCodes}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold">Códigos de Ativação</h2>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={fetchCodes}
-              className="rounded-full border-[#2C2C2E]"
-            >
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Atualizar
-            </Button>
-            
-            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="rounded-full bg-[#007AFF] hover:bg-[#0051D5]">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Criar Código
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="bg-[#1C1C1E] border-[#2C2C2E] text-white rounded-3xl">
-                <DialogHeader>
-                  <DialogTitle>Criar Novo Código</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                  <div>
-                    <label className="block text-sm text-[#8E8E93] mb-2">
-                      Nome do Influencer (opcional)
-                    </label>
-                    <Input
-                      value={newInfluencerName}
-                      onChange={(e) => setNewInfluencerName(e.target.value)}
-                      placeholder="Ex: João Silva"
-                      className="bg-black border-[#2C2C2E] rounded-xl"
-                    />
+              
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div className="bg-[#1C1C1E] rounded-2xl p-4 border border-[#2C2C2E]">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Activity className="w-4 h-4 text-[#007AFF]" />
+                    <span className="text-xs text-[#8E8E93]">Instalações</span>
                   </div>
-                  <div>
-                    <label className="block text-sm text-[#8E8E93] mb-2">
-                      Nota (opcional)
-                    </label>
-                    <Textarea
-                      value={newNote}
-                      onChange={(e) => setNewNote(e.target.value)}
-                      placeholder="Ex: Parceria YouTube 2025, contacto via email..."
-                      className="bg-black border-[#2C2C2E] rounded-xl min-h-[80px]"
-                    />
-                  </div>
-                  <Button
-                    onClick={handleCreateCode}
-                    disabled={creating}
-                    className="w-full rounded-xl bg-[#007AFF] hover:bg-[#0051D5]"
-                  >
-                    {creating ? 'A criar...' : 'Gerar Código'}
-                  </Button>
+                  <p className="text-2xl font-bold">{metrics?.total_installations || 0}</p>
                 </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-        </div>
 
-        {/* Codes List */}
-        <div className="bg-[#1C1C1E] rounded-2xl border border-[#2C2C2E] overflow-hidden">
-          {loading ? (
-            <div className="p-8 text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#007AFF] mx-auto"></div>
-            </div>
-          ) : codes.length === 0 ? (
-            <div className="p-8 text-center text-[#8E8E93]">
-              <Ticket className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>Nenhum código criado ainda</p>
-            </div>
-          ) : (
-            <div className="divide-y divide-[#2C2C2E]">
-              {codes.map((code) => (
-                <div key={code.id} className="p-4 hover:bg-[#2C2C2E]/50">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        code.is_used ? 'bg-green-500/20' : 'bg-[#007AFF]/20'
-                      }`}>
-                        {code.is_used ? (
-                          <CheckCircle className="w-5 h-5 text-green-500" />
-                        ) : (
-                          <Ticket className="w-5 h-5 text-[#007AFF]" />
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-mono text-lg font-semibold">{code.code}</p>
-                        <div className="flex items-center gap-2 text-sm text-[#8E8E93]">
-                          {code.influencer_name && (
-                            <>
-                              <span>{code.influencer_name}</span>
-                              <span>•</span>
-                            </>
-                          )}
-                          <span>{new Date(code.created_at).toLocaleDateString('pt-PT')}</span>
-                          {code.is_used && code.used_at && (
-                            <>
-                              <span>•</span>
-                              <span className="text-green-500">Usado em {new Date(code.used_at).toLocaleDateString('pt-PT')}</span>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <Badge className={code.is_used 
-                        ? 'bg-green-500/20 text-green-500' 
-                        : 'bg-[#007AFF]/20 text-[#007AFF]'
-                      }>
-                        {code.is_used ? 'Usado' : 'Disponível'}
-                      </Badge>
-                      
-                      {!code.is_used && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => copyCode(code.code)}
-                          className="rounded-full hover:bg-[#007AFF]/10"
-                          title="Copiar código"
-                        >
-                          <Copy className="w-4 h-4" />
-                        </Button>
-                      )}
-                      
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => startEditNote(code)}
-                        className="rounded-full hover:bg-[#007AFF]/10 text-[#007AFF]"
-                        title="Editar nota"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </Button>
-                      
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDeleteCode(code.id, code.code)}
-                        className="rounded-full hover:bg-red-500/10 text-red-500"
-                        title="Apagar código"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
+                <div className="bg-[#1C1C1E] rounded-2xl p-4 border border-[#2C2C2E]">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Crown className="w-4 h-4 text-[#FFD700]" />
+                    <span className="text-xs text-[#8E8E93]">Premium Ativos</span>
                   </div>
+                  <p className="text-2xl font-bold text-[#FFD700]">{metrics?.premium_active || 0}</p>
+                </div>
+
+                <div className="bg-[#1C1C1E] rounded-2xl p-4 border border-[#2C2C2E]">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Ticket className="w-4 h-4 text-[#00D4FF]" />
+                    <span className="text-xs text-[#8E8E93]">Via Código</span>
+                  </div>
+                  <p className="text-2xl font-bold text-[#00D4FF]">{usedCodes}</p>
+                </div>
+
+                <div className="bg-[#1C1C1E] rounded-2xl p-4 border border-[#2C2C2E]">
+                  <div className="flex items-center gap-2 mb-2">
+                    <TrendingUp className="w-4 h-4 text-green-500" />
+                    <span className="text-xs text-[#8E8E93]">Compras</span>
+                  </div>
+                  <p className="text-2xl font-bold text-green-500">{metrics?.premium_via_purchase || 0}</p>
+                </div>
+
+                <div className="bg-[#1C1C1E] rounded-2xl p-4 border border-[#2C2C2E]">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Clock className="w-4 h-4 text-orange-500" />
+                    <span className="text-xs text-[#8E8E93]">Em Trial</span>
+                  </div>
+                  <p className="text-2xl font-bold text-orange-500">{metrics?.trial_active || 0}</p>
+                </div>
+
+                <div className="bg-[#1C1C1E] rounded-2xl p-4 border border-[#2C2C2E]">
+                  <div className="flex items-center gap-2 mb-2">
+                    <XCircle className="w-4 h-4 text-red-500" />
+                    <span className="text-xs text-[#8E8E93]">Trial Expirado</span>
+                  </div>
+                  <p className="text-2xl font-bold text-red-500">{metrics?.trial_expired || 0}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Section: Métricas de Conversão */}
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <Percent className="w-5 h-5 text-[#007AFF]" />
+                <h2 className="text-lg font-semibold">Métricas de Conversão</h2>
+              </div>
+              
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-[#1C1C1E] rounded-2xl p-4 border border-[#2C2C2E]">
+                  <p className="text-xs text-[#8E8E93] mb-1">Trials Iniciados</p>
+                  <p className="text-xl font-bold">{metrics?.trials_started || 0}</p>
+                </div>
+
+                <div className="bg-[#1C1C1E] rounded-2xl p-4 border border-[#2C2C2E]">
+                  <p className="text-xs text-[#8E8E93] mb-1">Trials Expirados</p>
+                  <p className="text-xl font-bold">{metrics?.trial_expired || 0}</p>
+                </div>
+
+                <div className="bg-[#1C1C1E] rounded-2xl p-4 border border-[#2C2C2E]">
+                  <p className="text-xs text-[#8E8E93] mb-1">Taxa de Conversão</p>
+                  <p className="text-xl font-bold text-green-500">{conversionRate}%</p>
+                </div>
+
+                <div className="bg-[#1C1C1E] rounded-2xl p-4 border border-[#2C2C2E]">
+                  <p className="text-xs text-[#8E8E93] mb-1">Taxa de Abandono</p>
+                  <p className="text-xl font-bold text-red-500">{abandonRate}%</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Section: Gestão de Códigos */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Ticket className="w-5 h-5 text-[#007AFF]" />
+                  <h2 className="text-lg font-semibold">Códigos de Influencers</h2>
+                </div>
+                
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={fetchData}
+                    size="sm"
+                    className="rounded-full border-[#2C2C2E]"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                  </Button>
                   
-                  {/* Note section */}
-                  {editingCodeId === code.id ? (
-                    <div className="mt-3 ml-14 flex gap-2">
-                      <Input
-                        value={editNote}
-                        onChange={(e) => setEditNote(e.target.value)}
-                        placeholder="Escrever nota..."
-                        className="bg-black border-[#2C2C2E] rounded-xl flex-1"
-                        autoFocus
-                      />
+                  <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button size="sm" className="rounded-full bg-[#007AFF] hover:bg-[#0051D5]">
+                        <Plus className="w-4 h-4 mr-1" />
+                        Criar Código
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-[#1C1C1E] border-[#2C2C2E] text-white rounded-3xl">
+                      <DialogHeader>
+                        <DialogTitle>Criar Código de Influencer</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4 py-4">
+                        <div>
+                          <label className="block text-sm text-[#8E8E93] mb-2">
+                            Nome do Influencer
+                          </label>
+                          <Input
+                            value={newInfluencerName}
+                            onChange={(e) => setNewInfluencerName(e.target.value)}
+                            placeholder="Ex: João Silva"
+                            className="bg-black border-[#2C2C2E] rounded-xl"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm text-[#8E8E93] mb-2">
+                            Nota (opcional)
+                          </label>
+                          <Textarea
+                            value={newNote}
+                            onChange={(e) => setNewNote(e.target.value)}
+                            placeholder="Ex: Parceria YouTube 2025..."
+                            className="bg-black border-[#2C2C2E] rounded-xl min-h-[80px]"
+                          />
+                        </div>
+                        <Button
+                          onClick={handleCreateCode}
+                          disabled={creating || !newInfluencerName.trim()}
+                          className="w-full rounded-xl bg-[#007AFF] hover:bg-[#0051D5]"
+                        >
+                          {creating ? 'A criar...' : 'Gerar Código'}
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </div>
+
+              {/* Codes Summary */}
+              <div className="grid grid-cols-3 gap-4 mb-4">
+                <div className="bg-[#2C2C2E]/50 rounded-xl p-3 text-center">
+                  <p className="text-2xl font-bold">{totalCodes}</p>
+                  <p className="text-xs text-[#8E8E93]">Total</p>
+                </div>
+                <div className="bg-[#007AFF]/10 rounded-xl p-3 text-center">
+                  <p className="text-2xl font-bold text-[#007AFF]">{activeCodes}</p>
+                  <p className="text-xs text-[#8E8E93]">Ativos</p>
+                </div>
+                <div className="bg-green-500/10 rounded-xl p-3 text-center">
+                  <p className="text-2xl font-bold text-green-500">{usedCodes}</p>
+                  <p className="text-xs text-[#8E8E93]">Usados</p>
+                </div>
+              </div>
+
+              {/* Codes Table */}
+              <div className="bg-[#1C1C1E] rounded-2xl border border-[#2C2C2E] overflow-hidden">
+                {codes.length === 0 ? (
+                  <div className="p-8 text-center text-[#8E8E93]">
+                    <Ticket className="w-10 h-10 mx-auto mb-3 opacity-50" />
+                    <p>Nenhum código criado</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-[#2C2C2E]/50">
+                        <tr>
+                          <th className="text-left text-xs text-[#8E8E93] font-medium px-4 py-3">Código</th>
+                          <th className="text-left text-xs text-[#8E8E93] font-medium px-4 py-3">Influencer</th>
+                          <th className="text-left text-xs text-[#8E8E93] font-medium px-4 py-3">Estado</th>
+                          <th className="text-left text-xs text-[#8E8E93] font-medium px-4 py-3">Data</th>
+                          <th className="text-right text-xs text-[#8E8E93] font-medium px-4 py-3">Ações</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#2C2C2E]">
+                        {codes.map((code) => (
+                          <tr key={code.id} className="hover:bg-[#2C2C2E]/30">
+                            <td className="px-4 py-3">
+                              <span className="font-mono font-semibold">{code.code}</span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className="text-sm">{code.influencer_name || '-'}</span>
+                              {code.notes && (
+                                <p className="text-xs text-[#8E8E93] mt-1">📝 {code.notes}</p>
+                              )}
+                            </td>
+                            <td className="px-4 py-3">
+                              <Badge className={code.is_used 
+                                ? 'bg-green-500/20 text-green-500' 
+                                : 'bg-[#007AFF]/20 text-[#007AFF]'
+                              }>
+                                {code.is_used ? 'Usado' : 'Ativo'}
+                              </Badge>
+                            </td>
+                            <td className="px-4 py-3 text-sm text-[#8E8E93]">
+                              {code.is_used && code.used_at 
+                                ? new Date(code.used_at).toLocaleDateString('pt-PT')
+                                : new Date(code.created_at).toLocaleDateString('pt-PT')
+                              }
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="flex items-center justify-end gap-1">
+                                {!code.is_used && (
+                                  <>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => copyCode(code.code)}
+                                      className="h-8 w-8 p-0 rounded-full hover:bg-[#007AFF]/10"
+                                      title="Copiar"
+                                    >
+                                      <Copy className="w-4 h-4" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleDeactivateCode(code.id)}
+                                      className="h-8 w-8 p-0 rounded-full hover:bg-orange-500/10 text-orange-500"
+                                      title="Desativar"
+                                    >
+                                      <XCircle className="w-4 h-4" />
+                                    </Button>
+                                  </>
+                                )}
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => startEditNote(code)}
+                                  className="h-8 w-8 p-0 rounded-full hover:bg-[#007AFF]/10 text-[#007AFF]"
+                                  title="Editar nota"
+                                >
+                                  <Edit2 className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleDeleteCode(code.id, code.code)}
+                                  className="h-8 w-8 p-0 rounded-full hover:bg-red-500/10 text-red-500"
+                                  title="Apagar"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
+              {/* Edit Note Dialog */}
+              {editingCodeId && (
+                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+                  <div className="bg-[#1C1C1E] rounded-3xl p-6 w-full max-w-md border border-[#2C2C2E]">
+                    <h3 className="text-lg font-semibold mb-4">Editar Nota</h3>
+                    <Textarea
+                      value={editNote}
+                      onChange={(e) => setEditNote(e.target.value)}
+                      placeholder="Escrever nota..."
+                      className="bg-black border-[#2C2C2E] rounded-xl min-h-[100px] mb-4"
+                      autoFocus
+                    />
+                    <div className="flex gap-2">
                       <Button
-                        onClick={() => handleSaveNote(code.id)}
-                        size="sm"
-                        className="rounded-xl bg-[#007AFF] hover:bg-[#0051D5]"
+                        onClick={() => handleSaveNote(editingCodeId)}
+                        className="flex-1 rounded-xl bg-[#007AFF] hover:bg-[#0051D5]"
                       >
-                        <Save className="w-4 h-4" />
+                        <Save className="w-4 h-4 mr-2" />
+                        Guardar
                       </Button>
                       <Button
                         onClick={() => setEditingCodeId(null)}
-                        variant="ghost"
-                        size="sm"
-                        className="rounded-xl"
+                        variant="outline"
+                        className="rounded-xl border-[#2C2C2E]"
                       >
                         Cancelar
                       </Button>
                     </div>
-                  ) : code.notes ? (
-                    <div className="mt-2 ml-14 text-sm text-[#8E8E93] bg-[#2C2C2E]/50 rounded-lg p-2">
-                      📝 {code.notes}
-                    </div>
-                  ) : null}
+                  </div>
                 </div>
-              ))}
+              )}
             </div>
-          )}
-        </div>
+
+            {/* Privacy Notice */}
+            <div className="bg-[#1C1C1E] rounded-2xl p-4 border border-[#2C2C2E]">
+              <div className="flex items-center gap-2 text-sm text-[#8E8E93]">
+                <Shield className="w-4 h-4 text-green-500" />
+                <span>Dashboard seguro • Sem dados pessoais • Apenas métricas anónimas agregadas</span>
+              </div>
+            </div>
+          </>
+        )}
       </main>
     </div>
   )
