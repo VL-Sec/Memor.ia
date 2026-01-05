@@ -42,6 +42,7 @@ export default function App() {
   // Edit states
   const [editingItem, setEditingItem] = useState(null)
   const [editTitle, setEditTitle] = useState('')
+  const [editUrl, setEditUrl] = useState('')
   const [editTags, setEditTags] = useState('')
   const [editFolderId, setEditFolderId] = useState('')
   
