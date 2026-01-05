@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Heart, Plus, X, Copy, Trash2, Link as LinkIcon, FileText, Settings as SettingsIcon, Search, Edit2, Clock, Globe, FolderPlus, Folder, MoreVertical, Menu, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Heart, Plus, X, Copy, Trash2, Link as LinkIcon, FileText, Settings as SettingsIcon, Search, Edit2, Clock, Globe, FolderPlus, Folder, MoreVertical, Menu, ChevronLeft, ChevronRight, Ticket, Crown, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast'
 import { translations, languages, detectLanguage, setLanguage } from '@/lib/i18n'
 import { requestNotificationPermission, scheduleReminder, removeReminder, getReminder, initializeReminders, scheduleWeeklyRecap, getSettings, saveSettings } from '@/lib/reminders'
+import { getPremiumStatus, activatePremium, getDeviceId, hasPremiumAccess } from '@/lib/premium'
 
 export default function App() {
   const [links, setLinks] = useState([])
