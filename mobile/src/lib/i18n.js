@@ -287,6 +287,22 @@ export const translations = {
     saved: '¡Guardado!',
     deleted: '¡Eliminado!',
     error: 'Error',
+    
+    // Reminders
+    reminder: 'Recordatorio',
+    setReminder: 'Definir Recordatorio',
+    reminderDate: 'Fecha',
+    reminderTime: 'Hora',
+    reminderLocation: 'Ubicación',
+    reminderLocationPlaceholder: 'Añadir ubicación (opcional)',
+    reminderEnabled: 'Recordatorio activado',
+    reminderDisabled: 'Recordatorio eliminado',
+    noDate: 'Sin fecha',
+    noTime: 'Sin hora',
+    noLocation: 'Sin ubicación',
+    clearReminder: 'Borrar Recordatorio',
+    editItem: 'Editar',
+    moveToFolder: 'Mover a carpeta',
   },
   
   fr: {
