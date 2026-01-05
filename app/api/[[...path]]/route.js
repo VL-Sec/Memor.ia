@@ -136,13 +136,13 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const body = await request.json()
-    let { url, title, content, contentType = 'link', tags = [] } = body
+    let { url, title, content, contentType = 'link', tags = [], folderId } = body
     
     // Normalize URL if it's a link
     if (contentType === 'link' && url) {
-      if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        url = 'https://' + url
-      }
+      // Remove www. if present and add https://
+      url = url.replace(/^(https?:\/\/)?(www\.)?/, '')
+      url = 'https://' + url
     }
     
     // For links, scrape metadata
