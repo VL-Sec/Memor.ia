@@ -111,18 +111,10 @@ export default function App() {
           setClipboardFolders([newClipboardFolder])
           setSelectedClipboardFolder(newClipboardFolder.id)
         }
-      } else {
-        // Set default clipboard folder as selected if none selected
-        if (!selectedClipboardFolder) {
-          setSelectedClipboardFolder(clipboardFolders[0].id)
-        }
       }
       
-      // Set default link folder as selected if none selected
-      if (!selectedFolder && linkFolders.length > 0) {
-        const defaultFolder = linkFolders.find(f => f.isDefault)
-        if (defaultFolder) setSelectedFolder(defaultFolder.id)
-      }
+      // Default to "all" - no folder selected
+      // Users can click on folders to filter
     } catch (error) {
       console.error('Error fetching folders:', error)
     }
