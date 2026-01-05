@@ -54,9 +54,18 @@ export const translations = {
     // Settings
     settings: 'Settings',
     language: 'Language',
-    backup: 'Backup',
+    backup: 'Cloud Backup',
     backupInfo: 'Your data is automatically backed up',
     version: 'Version',
+    
+    // Cloud Backup Card
+    cloudBackupTitle: 'Automatic Backup',
+    cloudBackupSubtitle: 'Your data is safe',
+    cloudBackupDescription: 'All your links, notes and settings are automatically synced with your device\'s cloud backup.',
+    cloudBackupIOS: 'iCloud Backup',
+    cloudBackupAndroid: 'Google Backup',
+    cloudBackupEnabled: 'Enabled',
+    cloudBackupTip: 'Make sure cloud backup is enabled in your device settings.',
     
     // Notifications - Weekly Summary
     notifications: 'Notifications',
