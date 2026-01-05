@@ -1126,9 +1126,9 @@ export default function App() {
               ) : filteredLinks.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="text-6xl mb-4">📋</div>
-                  <h3 className="text-xl font-semibold mb-2">No clipboard items</h3>
+                  <h3 className="text-xl font-semibold mb-2">{t.noClipboardItems}</h3>
                   <p className="text-[#8E8E93]">
-                    Paste text or emojis above to get started
+                    {t.clipboardHint}
                   </p>
                 </div>
               ) : (
