@@ -641,10 +641,10 @@ export default function App() {
     if (activeTab === 'settings') return false
     
     // Folder filter
-    if (activeTab === 'dashboard' && selectedFolder) {
+    if (activeTab === 'dashboard' && selectedFolder && selectedFolder !== 'all') {
       if (link.folderId !== selectedFolder) return false
     }
-    if (activeTab === 'clipboard' && selectedClipboardFolder) {
+    if (activeTab === 'clipboard' && selectedClipboardFolder && selectedClipboardFolder !== 'all') {
       if (link.folderId !== selectedClipboardFolder) return false
     }
     
