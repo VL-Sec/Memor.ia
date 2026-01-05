@@ -746,9 +746,9 @@ export default function App() {
                 </div>
               ))}
             </div>
-          </div>
+          </aside>
           
-          {/* Integrated Chevron Button - Always visible */}
+          {/* Integrated Chevron Button - Always visible, OUTSIDE sidebar */}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className={`
@@ -759,7 +759,7 @@ export default function App() {
               rounded-r-lg
               flex items-center justify-center
               transition-all duration-300 ease-in-out
-              ${sidebarOpen ? '-right-6' : 'right-0'}
+              ${sidebarOpen ? 'left-64' : 'left-0'}
               z-50
               cursor-pointer
               group/toggle
@@ -774,7 +774,7 @@ export default function App() {
               )}
             </div>
           </button>
-        </aside>
+        </div>
       )}
       
       {/* Main content */}
