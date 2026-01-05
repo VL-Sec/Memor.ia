@@ -912,7 +912,121 @@ export default function App() {
         
         {/* Main content area */}
         <main className="flex-1 container mx-auto px-4 py-6 pb-24 overflow-y-auto">
-          {activeTab === 'settings' ? (
+          {activeTab === 'clipboard' ? (
+            // Pure Clipboard Manager - Text + Emojis Only
+            <div className="max-w-3xl mx-auto space-y-6">
+              {/* Quick Add Input */}
+              <div className="bg-[#1C1C1E] rounded-3xl p-6 border border-[#2C2C2E]">
+                <Textarea
+                  placeholder="Paste text or emojis here... 📋✨"
+                  value={newContent}
+                  onChange={(e) => setNewContent(e.target.value)}
+                  className="bg-black border-[#2C2C2E] rounded-2xl min-h-[120px] focus:border-[#007AFF] mb-4 text-base resize-none"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                      handleQuickSaveClipboard()
+                    }
+                  }}
+                />
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-[#8E8E93]">
+                    {newContent.length} characters • Cmd/Ctrl + Enter to save
+                  </span>
+                  <Button
+                    onClick={handleQuickSaveClipboard}
+                    disabled={!newContent.trim()}
+                    className="rounded-2xl bg-[#007AFF] hover:bg-[#0051D5] disabled:opacity-50"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Save
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Search */}
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#8E8E93]" />
+                <Input
+                  placeholder="Search clipboard..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-12 bg-[#1C1C1E] border-[#2C2C2E] rounded-2xl focus:border-[#007AFF]"
+                />
+              </div>
+              
+              {/* Clipboard Items */}
+              {loading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#007AFF]"></div>
+                </div>
+              ) : filteredLinks.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="text-6xl mb-4">📋</div>
+                  <h3 className="text-xl font-semibold mb-2">No clipboard items</h3>
+                  <p className="text-[#8E8E93]">
+                    Paste text or emojis above to get started
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {filteredLinks.map((item) => (
+                    <div
+                      key={item.id}
+                      className="group bg-[#1C1C1E] rounded-2xl p-4 border border-[#2C2C2E] hover:border-[#007AFF]/50 transition-all"
+                    >
+                      <div className="flex items-start gap-3">
+                        {/* Content Preview */}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-base break-words whitespace-pre-wrap line-clamp-3">
+                            {item.content}
+                          </p>
+                          <div className="flex items-center gap-3 mt-2">
+                            <span className="text-xs text-[#8E8E93]">
+                              {item.content?.length || 0} chars
+                            </span>
+                            {item.tags && item.tags.length > 0 && (
+                              <div className="flex gap-1">
+                                {item.tags.slice(0, 2).map((tag, idx) => (
+                                  <Badge
+                                    key={idx}
+                                    className="bg-[#007AFF]/10 text-[#007AFF] text-xs rounded-full px-2 py-0"
+                                  >
+                                    {tag}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        
+                        {/* Actions */}
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          {/* Copy Button - Primary Action */}
+                          <Button
+                            onClick={() => handleCopy(item.content)}
+                            className="rounded-full bg-[#007AFF] hover:bg-[#0051D5] h-10 px-4"
+                          >
+                            <Copy className="w-4 h-4 mr-2" />
+                            Copy
+                          </Button>
+                          
+                          {/* Delete Button */}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDelete(item.id)}
+                            className="rounded-full hover:bg-red-500/10 text-red-500 h-10 w-10 p-0"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : activeTab === 'settings' ? (
             <div className="max-w-2xl mx-auto space-y-6">
               <h2 className="text-2xl font-bold mb-6">{t.settings}</h2>
               
