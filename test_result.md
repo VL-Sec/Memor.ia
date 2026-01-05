@@ -101,3 +101,180 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: |
+  Build a premium link and snippet manager app called "Memor.ia" with:
+  - Link management with auto-scraping for title/image
+  - Folder system to organize links and notes separately
+  - Clipboard/Notes section for text snippets with emoji support
+  - Multi-language support (EN, PT, ES, FR)
+  - Premium Apple-style dark mode UI
+  - Supabase backend
+
+backend:
+  - task: "Links API - GET all links"
+    implemented: true
+    working: true
+    file: "app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "GET /api/links returns all links ordered by createdAt desc"
+
+  - task: "Links API - POST new link/note"
+    implemented: true
+    working: true
+    file: "app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "POST /api/links creates new link or text note with contentType distinction"
+
+  - task: "Links API - PATCH update"
+    implemented: true
+    working: true
+    file: "app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "PATCH /api/links updates link/note properties"
+
+  - task: "Links API - DELETE"
+    implemented: true
+    working: true
+    file: "app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "DELETE /api/links?id=xxx deletes specified item"
+
+  - task: "Folders API - GET with folderType filter"
+    implemented: true
+    working: true
+    file: "app/api/folders/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "GET /api/folders?folderType=link or folderType=text filters by type"
+
+  - task: "Folders API - POST new folder"
+    implemented: true
+    working: true
+    file: "app/api/folders/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "POST /api/folders creates folder with folderType (link or text)"
+
+  - task: "Folders API - DELETE"
+    implemented: true
+    working: true
+    file: "app/api/folders/route.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "DELETE /api/folders?id=xxx deletes non-default folders"
+
+frontend:
+  - task: "Clipboard Save Button"
+    implemented: true
+    working: true
+    file: "app/page.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "User reported Save button not working"
+      - working: true
+        agent: "main"
+        comment: "Fixed handleQuickSaveClipboard to handle 'all' selectedClipboardFolder correctly"
+
+  - task: "Data Separation Links vs Clipboard"
+    implemented: true
+    working: true
+    file: "app/page.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "User reported clipboard folders appearing in links sidebar"
+      - working: true
+        agent: "main"
+        comment: "Cleaned database of incorrectly typed folders, API correctly filters by folderType"
+
+  - task: "Folder Selector in Clipboard"
+    implemented: true
+    working: true
+    file: "app/page.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Added folder dropdown selector in Clipboard save area"
+
+  - task: "Sidebar Collapse Toggle"
+    implemented: true
+    working: "NA"
+    file: "app/page.js"
+    stuck_count: 2
+    priority: "low"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "user"
+        comment: "User reported toggle sometimes inconsistent"
+      - working: "NA"
+        agent: "main"
+        comment: "Needs manual testing - toggle arrow outside sidebar"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Links API - POST new link/note"
+    - "Folders API - GET with folderType filter"
+  stuck_tasks: []
+  test_all: true
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: |
+      Fixed 3 critical bugs:
+      1. Clipboard Save button now works - was not handling 'all' folder selection
+      2. Data separation between Links and Clipboard - cleaned database and API filters correctly
+      3. Added folder selector dropdown in Clipboard section
+      
+      Please test all backend APIs to ensure they work correctly.
+      Frontend was manually verified via screenshots showing Save working.
