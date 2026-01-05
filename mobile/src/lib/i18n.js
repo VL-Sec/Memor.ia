@@ -186,6 +186,22 @@ export const translations = {
     saved: 'Guardado!',
     deleted: 'Apagado!',
     error: 'Erro',
+    
+    // Reminders
+    reminder: 'Lembrete',
+    setReminder: 'Definir Lembrete',
+    reminderDate: 'Data',
+    reminderTime: 'Hora',
+    reminderLocation: 'Local',
+    reminderLocationPlaceholder: 'Adicionar local (opcional)',
+    reminderEnabled: 'Lembrete ativado',
+    reminderDisabled: 'Lembrete removido',
+    noDate: 'Sem data',
+    noTime: 'Sem hora',
+    noLocation: 'Sem local',
+    clearReminder: 'Limpar Lembrete',
+    editItem: 'Editar',
+    moveToFolder: 'Mover para pasta',
   },
   
   es: {
