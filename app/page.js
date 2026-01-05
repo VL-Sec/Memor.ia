@@ -649,38 +649,35 @@ export default function App() {
     <div className="min-h-screen bg-black text-white flex">
       {/* Sidebar - Only on desktop and dashboard/clipboard tabs */}
       {(activeTab === 'dashboard' || activeTab === 'clipboard') && (
-        <aside 
-          className={`
-            relative flex-col bg-black border-r border-[#2C2C2E]
-            transition-all duration-300 ease-in-out
-            ${sidebarOpen ? 'w-64' : 'w-0'}
-            ${sidebarOpen ? 'flex' : 'hidden md:flex'}
-          `}
-        >
-          {/* Sidebar Content */}
-          <div className={`
-            w-64 flex flex-col h-full
-            transition-opacity duration-300
-            ${sidebarOpen ? 'opacity-100' : 'opacity-0 md:opacity-100'}
-          `}>
-            <div className="p-4 border-b border-[#2C2C2E]">
-              <h2 className="text-lg font-semibold mb-4">{t.folders}</h2>
-              <Button
-                onClick={() => {
-                  setEditingFolder(null)
-                  setFolderName('')
-                  setFolderIcon('📁')
-                  setIsFolderDialogOpen(true)
-                }}
-                className="w-full rounded-2xl bg-[#007AFF] hover:bg-[#0051D5] text-sm"
-                size="sm"
-              >
-                <FolderPlus className="w-4 h-4 mr-2" />
-                {t.newFolder}
-              </Button>
-            </div>
-            
-            <div className="flex-1 overflow-y-auto p-2">
+        <div className="relative flex">
+          <aside 
+            className={`
+              flex flex-col bg-black border-r border-[#2C2C2E]
+              transition-all duration-300 ease-in-out
+              ${sidebarOpen ? 'w-64' : 'w-0'}
+              overflow-hidden
+            `}
+          >
+            {/* Sidebar Content */}
+            <div className="w-64 flex flex-col h-full">
+              <div className="p-4 border-b border-[#2C2C2E]">
+                <h2 className="text-lg font-semibold mb-4">{t.folders}</h2>
+                <Button
+                  onClick={() => {
+                    setEditingFolder(null)
+                    setFolderName('')
+                    setFolderIcon('📁')
+                    setIsFolderDialogOpen(true)
+                  }}
+                  className="w-full rounded-2xl bg-[#007AFF] hover:bg-[#0051D5] text-sm"
+                  size="sm"
+                >
+                  <FolderPlus className="w-4 h-4 mr-2" />
+                  {t.newFolder}
+                </Button>
+              </div>
+              
+              <div className="flex-1 overflow-y-auto p-2">
               {/* "All" option at the top */}
               <div
                 className={`group flex items-center justify-between p-3 rounded-2xl mb-3 cursor-pointer transition-all ${
