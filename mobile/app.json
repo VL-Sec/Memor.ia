@@ -38,12 +38,23 @@
       "versionCode": 1,
       "allowBackup": true,
       "permissions": [
-        "INTERNET"
+        "INTERNET",
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE",
+        "SCHEDULE_EXACT_ALARM"
       ]
     },
     "plugins": [
       "expo-secure-store",
-      "expo-localization"
+      "expo-localization",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#007AFF",
+          "sounds": []
+        }
+      ]
     ],
     "extra": {
       "eas": {
