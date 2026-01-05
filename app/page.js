@@ -82,7 +82,26 @@ export default function App() {
       // Fetch clipboard folders
       const clipboardResponse = await fetch('/api/folders?folderType=text')
       if (!clipboardResponse.ok) throw new Error('Failed to fetch clipboard folders')
-      const clipboardData = await clipboardResponse.json()
+      let clipboardData = await clipboardResponse.json()
+      
+      // Create default clipboard folder if none exist
+      if (clipboardData.length === 0) {
+        const createResponse = await fetch('/api/folders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: 'General Clipboard',
+            icon: '📋',
+            folderType: 'text'
+          })
+        })
+        
+        if (createResponse.ok) {
+          const result = await createResponse.json()
+          clipboardData = [result.data]
+        }
+      }
+      
       setClipboardFolders(clipboardData)
       
       // Set default folder as selected if none selected
@@ -92,7 +111,7 @@ export default function App() {
       }
       
       if (!selectedClipboardFolder && clipboardData.length > 0) {
-        const defaultClipboardFolder = clipboardData.find(f => f.isDefault)
+        const defaultClipboardFolder = clipboardData.find(f => f.isDefault) || clipboardData[0]
         if (defaultClipboardFolder) setSelectedClipboardFolder(defaultClipboardFolder.id)
       }
     } catch (error) {
