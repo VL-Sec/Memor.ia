@@ -198,6 +198,7 @@ export default function App() {
   const openEditDialog = (item) => {
     setEditingItem(item)
     setEditTitle(item.title)
+    setEditUrl(item.url || '')
     setEditTags(item.tags?.join(', ') || '')
     setEditFolderId(item.folderId || '')
     setIsEditDialogOpen(true)
