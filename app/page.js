@@ -1112,13 +1112,13 @@ export default function App() {
                     setEditingFolder(null)
                   }}
                   variant="outline"
-                  className="flex-1 rounded-2xl border-[#2C2C2E]"
+                  className="flex-1 rounded-2xl border-[#2C2C2E] text-white bg-transparent hover:bg-[#2C2C2E]"
                 >
                   {t.cancel}
                 </Button>
                 <Button 
                   onClick={handleSaveFolder}
-                  className="flex-1 rounded-2xl bg-[#007AFF] hover:bg-[#0051D5]"
+                  className="flex-1 rounded-2xl bg-[#007AFF] hover:bg-[#0051D5] text-white"
                 >
                   {editingFolder ? t.update : t.save}
                 </Button>
