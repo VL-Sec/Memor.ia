@@ -1059,13 +1059,13 @@ export default function App() {
                 <Button 
                   onClick={() => setIsEditDialogOpen(false)}
                   variant="outline"
-                  className="flex-1 rounded-2xl border-[#2C2C2E]"
+                  className="flex-1 rounded-2xl border-[#2C2C2E] text-white bg-transparent hover:bg-[#2C2C2E]"
                 >
                   {t.cancel}
                 </Button>
                 <Button 
                   onClick={handleEdit}
-                  className="flex-1 rounded-2xl bg-[#007AFF] hover:bg-[#0051D5]"
+                  className="flex-1 rounded-2xl bg-[#007AFF] hover:bg-[#0051D5] text-white"
                 >
                   {t.update}
                 </Button>
