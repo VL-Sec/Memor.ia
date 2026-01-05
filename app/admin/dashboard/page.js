@@ -318,48 +318,111 @@ export default function AdminDashboard() {
           ) : (
             <div className="divide-y divide-[#2C2C2E]">
               {codes.map((code) => (
-                <div key={code.id} className="p-4 flex items-center justify-between hover:bg-[#2C2C2E]/50">
-                  <div className="flex items-center gap-4">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      code.is_used ? 'bg-green-500/20' : 'bg-[#007AFF]/20'
-                    }`}>
-                      {code.is_used ? (
-                        <CheckCircle className="w-5 h-5 text-green-500" />
-                      ) : (
-                        <Ticket className="w-5 h-5 text-[#007AFF]" />
-                      )}
-                    </div>
-                    <div>
-                      <p className="font-mono text-lg font-semibold">{code.code}</p>
-                      <div className="flex items-center gap-2 text-sm text-[#8E8E93]">
-                        {code.influencer_name && (
-                          <span>{code.influencer_name}</span>
+                <div key={code.id} className="p-4 hover:bg-[#2C2C2E]/50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        code.is_used ? 'bg-green-500/20' : 'bg-[#007AFF]/20'
+                      }`}>
+                        {code.is_used ? (
+                          <CheckCircle className="w-5 h-5 text-green-500" />
+                        ) : (
+                          <Ticket className="w-5 h-5 text-[#007AFF]" />
                         )}
-                        <span>•</span>
-                        <span>{new Date(code.created_at).toLocaleDateString('pt-PT')}</span>
+                      </div>
+                      <div>
+                        <p className="font-mono text-lg font-semibold">{code.code}</p>
+                        <div className="flex items-center gap-2 text-sm text-[#8E8E93]">
+                          {code.influencer_name && (
+                            <>
+                              <span>{code.influencer_name}</span>
+                              <span>•</span>
+                            </>
+                          )}
+                          <span>{new Date(code.created_at).toLocaleDateString('pt-PT')}</span>
+                          {code.is_used && code.used_at && (
+                            <>
+                              <span>•</span>
+                              <span className="text-green-500">Usado em {new Date(code.used_at).toLocaleDateString('pt-PT')}</span>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-3">
-                    <Badge className={code.is_used 
-                      ? 'bg-green-500/20 text-green-500' 
-                      : 'bg-[#007AFF]/20 text-[#007AFF]'
-                    }>
-                      {code.is_used ? 'Usado' : 'Disponível'}
-                    </Badge>
                     
-                    {!code.is_used && (
+                    <div className="flex items-center gap-2">
+                      <Badge className={code.is_used 
+                        ? 'bg-green-500/20 text-green-500' 
+                        : 'bg-[#007AFF]/20 text-[#007AFF]'
+                      }>
+                        {code.is_used ? 'Usado' : 'Disponível'}
+                      </Badge>
+                      
+                      {!code.is_used && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => copyCode(code.code)}
+                          className="rounded-full hover:bg-[#007AFF]/10"
+                          title="Copiar código"
+                        >
+                          <Copy className="w-4 h-4" />
+                        </Button>
+                      )}
+                      
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => copyCode(code.code)}
-                        className="rounded-full hover:bg-[#007AFF]/10"
+                        onClick={() => startEditNote(code)}
+                        className="rounded-full hover:bg-[#007AFF]/10 text-[#007AFF]"
+                        title="Editar nota"
                       >
-                        <Copy className="w-4 h-4" />
+                        <Edit2 className="w-4 h-4" />
                       </Button>
-                    )}
+                      
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteCode(code.id, code.code)}
+                        className="rounded-full hover:bg-red-500/10 text-red-500"
+                        title="Apagar código"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
+                  
+                  {/* Note section */}
+                  {editingCodeId === code.id ? (
+                    <div className="mt-3 ml-14 flex gap-2">
+                      <Input
+                        value={editNote}
+                        onChange={(e) => setEditNote(e.target.value)}
+                        placeholder="Escrever nota..."
+                        className="bg-black border-[#2C2C2E] rounded-xl flex-1"
+                        autoFocus
+                      />
+                      <Button
+                        onClick={() => handleSaveNote(code.id)}
+                        size="sm"
+                        className="rounded-xl bg-[#007AFF] hover:bg-[#0051D5]"
+                      >
+                        <Save className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        onClick={() => setEditingCodeId(null)}
+                        variant="ghost"
+                        size="sm"
+                        className="rounded-xl"
+                      >
+                        Cancelar
+                      </Button>
+                    </div>
+                  ) : code.notes ? (
+                    <div className="mt-2 ml-14 text-sm text-[#8E8E93] bg-[#2C2C2E]/50 rounded-lg p-2">
+                      📝 {code.notes}
+                    </div>
+                  ) : null}
                 </div>
               ))}
             </div>
