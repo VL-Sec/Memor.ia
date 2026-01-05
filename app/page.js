@@ -583,9 +583,11 @@ export default function App() {
   
   return (
     <div className="min-h-screen bg-black text-white flex">
-      {/* Sidebar - Only on desktop and dashboard tab */}
-      {activeTab === 'dashboard' && (
-        <aside className="hidden md:flex md:w-64 border-r border-[#2C2C2E] bg-black flex-col">
+      {/* Sidebar - Only on desktop and dashboard/clipboard tabs */}
+      {(activeTab === 'dashboard' || activeTab === 'clipboard') && (
+        <aside className={`${
+          sidebarOpen ? 'md:flex' : 'hidden'
+        } md:w-64 border-r border-[#2C2C2E] bg-black flex-col`}>
           <div className="p-4 border-b border-[#2C2C2E]">
             <h2 className="text-lg font-semibold mb-4">{t.folders}</h2>
             <Button
@@ -604,15 +606,15 @@ export default function App() {
           </div>
           
           <div className="flex-1 overflow-y-auto p-2">
-            {folders.map((folder) => (
+            {(activeTab === 'dashboard' ? folders : clipboardFolders).map((folder) => (
               <div
                 key={folder.id}
                 className={`group flex items-center justify-between p-3 rounded-2xl mb-1 cursor-pointer transition-all ${
-                  selectedFolder === folder.id
+                  (activeTab === 'dashboard' ? selectedFolder : selectedClipboardFolder) === folder.id
                     ? 'bg-[#007AFF] text-white'
                     : 'hover:bg-[#1C1C1E] text-[#8E8E93] hover:text-white'
                 }`}
-                onClick={() => setSelectedFolder(folder.id)}
+                onClick={() => activeTab === 'dashboard' ? setSelectedFolder(folder.id) : setSelectedClipboardFolder(folder.id)}
               >
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   <span className="text-2xl flex-shrink-0">{folder.icon}</span>
