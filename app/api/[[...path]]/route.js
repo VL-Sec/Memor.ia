@@ -173,6 +173,7 @@ export async function POST(request) {
       isFavorite: false,
       contentType: contentType,
       content: content || null,
+      folderId: folderId || null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }
