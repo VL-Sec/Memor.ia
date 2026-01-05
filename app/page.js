@@ -1024,19 +1024,38 @@ export default function App() {
                     }
                   }}
                 />
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#8E8E93]">
-                    {newContent.length} characters • Cmd/Ctrl + Enter to save
-                  </span>
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3 flex-1">
+                    <span className="text-xs text-[#8E8E93] whitespace-nowrap">
+                      {newContent.length} chars
+                    </span>
+                    {/* Folder selector for clipboard */}
+                    <Select 
+                      value={selectedClipboardFolder === 'all' ? '' : selectedClipboardFolder} 
+                      onValueChange={(val) => setSelectedClipboardFolder(val)}
+                    >
+                      <SelectTrigger className="w-[180px] bg-black border-[#2C2C2E] rounded-xl h-9 text-sm">
+                        <SelectValue placeholder={t.selectFolder || "Select folder"} />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#1C1C1E] border-[#2C2C2E]">
+                        {clipboardFolders.map(folder => (
+                          <SelectItem key={folder.id} value={folder.id}>
+                            {folder.icon} {folder.isDefault ? t.generalFolder : folder.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <Button
                     onClick={handleQuickSaveClipboard}
                     disabled={!newContent.trim()}
                     className="rounded-2xl bg-[#007AFF] hover:bg-[#0051D5] disabled:opacity-50"
                   >
                     <Plus className="w-4 h-4 mr-2" />
-                    Save
+                    {t.save || "Save"}
                   </Button>
                 </div>
+                <p className="text-xs text-[#8E8E93] mt-2">Cmd/Ctrl + Enter to save</p>
               </div>
               
               {/* Search */}
