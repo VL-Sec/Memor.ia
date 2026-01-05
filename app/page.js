@@ -73,49 +73,30 @@ export default function App() {
   // Fetch folders
   const fetchFolders = async () => {
     try {
-      // Fetch all folders
-      const response = await fetch('/api/folders')
-      if (!response.ok) throw new Error('Failed to fetch folders')
-      const allFolders = await response.json()
+      // Fetch ONLY link folders (folderType='link')
+      const linkResponse = await fetch('/api/folders?folderType=link')
+      if (linkResponse.ok) {
+        const linkData = await linkResponse.json()
+        setFolders(linkData)
+      } else {
+        setFolders([])
+      }
       
-      // Get clipboard folder IDs from localStorage
-      const clipboardFolderIds = JSON.parse(localStorage.getItem('clipboardFolderIds') || '[]')
-      
-      // Separate folders by type
-      const linkFolders = allFolders.filter(folder => !clipboardFolderIds.includes(folder.id))
-      const clipboardFolders = allFolders.filter(folder => clipboardFolderIds.includes(folder.id))
-      
-      setFolders(linkFolders)
-      setClipboardFolders(clipboardFolders)
-      
-      // Create default clipboard folder if none exist
-      if (clipboardFolders.length === 0) {
-        const createResponse = await fetch('/api/folders', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: 'General Clipboard',
-            icon: '📋',
-            folderType: 'text'
-          })
-        })
-        
-        if (createResponse.ok) {
-          const result = await createResponse.json()
-          const newClipboardFolder = result.data
-          
-          // Add to clipboard folder IDs
-          const updatedClipboardIds = [...clipboardFolderIds, newClipboardFolder.id]
-          localStorage.setItem('clipboardFolderIds', JSON.stringify(updatedClipboardIds))
-          
-          setClipboardFolders([newClipboardFolder])
-        }
+      // Fetch ONLY clipboard folders (folderType='text')
+      const clipboardResponse = await fetch('/api/folders?folderType=text')
+      if (clipboardResponse.ok) {
+        const clipboardData = await clipboardResponse.json()
+        setClipboardFolders(clipboardData)
+      } else {
+        setClipboardFolders([])
       }
       
       // Default to "all" - no folder selected
       // Users can click on folders to filter
     } catch (error) {
       console.error('Error fetching folders:', error)
+      setFolders([])
+      setClipboardFolders([])
     }
   }
   
