@@ -163,7 +163,10 @@ export default function App() {
           content: addType === 'text' ? newContent : null,
           contentType: addType,
           tags: tags,
-          folderId: newFolderId || selectedFolder || folders.find(f => f.isDefault)?.id
+          folderId: newFolderId || 
+            (addType === 'text' 
+              ? selectedClipboardFolder || clipboardFolders.find(f => f.isDefault)?.id
+              : selectedFolder || folders.find(f => f.isDefault)?.id)
         })
       })
       
