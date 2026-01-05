@@ -1,104 +1,229 @@
-import { MongoClient } from 'mongodb'
-import { v4 as uuidv4 } from 'uuid'
 import { NextResponse } from 'next/server'
+import { supabase, generateId } from '../../../lib/supabase.js'
+import { headers } from 'next/headers'
 
-// MongoDB connection
-let client
-let db
-
-async function connectToMongo() {
-  if (!client) {
-    client = new MongoClient(process.env.MONGO_URL)
-    await client.connect()
-    db = client.db(process.env.DB_NAME)
-  }
-  return db
-}
-
-// Helper function to handle CORS
-function handleCORS(response) {
-  response.headers.set('Access-Control-Allow-Origin', process.env.CORS_ORIGINS || '*')
-  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-  response.headers.set('Access-Control-Allow-Credentials', 'true')
-  return response
-}
-
-// OPTIONS handler for CORS
-export async function OPTIONS() {
-  return handleCORS(new NextResponse(null, { status: 200 }))
-}
-
-// Route handler function
-async function handleRoute(request, { params }) {
-  const { path = [] } = params
-  const route = `/${path.join('/')}`
-  const method = request.method
-
+// Helper to extract meta tags from URL
+async function scrapeMetaTags(url) {
   try {
-    const db = await connectToMongo()
-
-    // Root endpoint - GET /api/root (since /api/ is not accessible with catch-all)
-    if (route === '/root' && method === 'GET') {
-      return handleCORS(NextResponse.json({ message: "Hello World" }))
-    }
-    // Root endpoint - GET /api/root (since /api/ is not accessible with catch-all)
-    if (route === '/' && method === 'GET') {
-      return handleCORS(NextResponse.json({ message: "Hello World" }))
-    }
-
-    // Status endpoints - POST /api/status
-    if (route === '/status' && method === 'POST') {
-      const body = await request.json()
-      
-      if (!body.client_name) {
-        return handleCORS(NextResponse.json(
-          { error: "client_name is required" }, 
-          { status: 400 }
-        ))
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; Memoria/1.0)'
       }
-
-      const statusObj = {
-        id: uuidv4(),
-        client_name: body.client_name,
-        timestamp: new Date()
-      }
-
-      await db.collection('status_checks').insertOne(statusObj)
-      return handleCORS(NextResponse.json(statusObj))
+    })
+    const html = await response.text()
+    
+    // Extract og:title
+    const titleMatch = html.match(/<meta[^>]*property="og:title"[^>]*content="([^"]*)"/i) ||
+                      html.match(/<meta[^>]*name="twitter:title"[^>]*content="([^"]*)"/i) ||
+                      html.match(/<title>([^<]*)<\/title>/i)
+    
+    // Extract og:image
+    const imageMatch = html.match(/<meta[^>]*property="og:image"[^>]*content="([^"]*)"/i) ||
+                      html.match(/<meta[^>]*name="twitter:image"[^>]*content="([^"]*)"/i)
+    
+    return {
+      title: titleMatch ? titleMatch[1].trim() : new URL(url).hostname,
+      imageUrl: imageMatch ? imageMatch[1].trim() : null
     }
+  } catch (error) {
+    console.error('Scraping error:', error)
+    return {
+      title: new URL(url).hostname,
+      imageUrl: null
+    }
+  }
+}
 
-    // Status endpoints - GET /api/status
-    if (route === '/status' && method === 'GET') {
-      const statusChecks = await db.collection('status_checks')
-        .find({})
-        .limit(1000)
-        .toArray()
+// Auto-categorize based on URL
+function autoCategorizeTags(url, content = null) {
+  const tags = []
+  
+  if (content && content.startsWith('#')) {
+    tags.push('Hashtags')
+  }
+  
+  if (url) {
+    const urlLower = url.toLowerCase()
+    
+    if (urlLower.includes('youtube.com') || urlLower.includes('vimeo.com') || urlLower.includes('tiktok.com')) {
+      tags.push('Video')
+    }
+    if (urlLower.includes('medium.com') || urlLower.includes('blog') || urlLower.includes('article')) {
+      tags.push('Reading')
+    }
+    if (urlLower.includes('github.com') || urlLower.includes('stackoverflow.com')) {
+      tags.push('Code')
+    }
+    if (urlLower.includes('linkedin.com') || urlLower.includes('twitter.com') || urlLower.includes('instagram.com')) {
+      tags.push('Social')
+    }
+  }
+  
+  return tags.length > 0 ? tags : ['General']
+}
 
-      // Remove MongoDB's _id field from response
-      const cleanedStatusChecks = statusChecks.map(({ _id, ...rest }) => rest)
+export async function GET(request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+    const contentType = searchParams.get('contentType')
+    const favorite = searchParams.get('favorite')
+    
+    // Get single link by ID
+    if (id) {
+      const { data, error } = await supabase
+        .from('links')
+        .select('*')
+        .eq('id', id)
+        .single()
       
-      return handleCORS(NextResponse.json(cleanedStatusChecks))
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 })
+      }
+      
+      return NextResponse.json(data)
     }
-
-    // Route not found
-    return handleCORS(NextResponse.json(
-      { error: `Route ${route} not found` }, 
-      { status: 404 }
-    ))
-
+    
+    // Build query
+    let query = supabase.from('links').select('*').order('createdAt', { ascending: false })
+    
+    // Filter by content type
+    if (contentType) {
+      query = query.eq('contentType', contentType)
+    }
+    
+    // Filter by favorite
+    if (favorite === 'true') {
+      query = query.eq('isFavorite', true)
+    }
+    
+    const { data, error } = await query
+    
+    if (error) {
+      console.error('Error fetching links:', error)
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+    
+    return NextResponse.json(data || [])
   } catch (error) {
     console.error('API Error:', error)
-    return handleCORS(NextResponse.json(
-      { error: "Internal server error" }, 
-      { status: 500 }
-    ))
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
-// Export all HTTP methods
-export const GET = handleRoute
-export const POST = handleRoute
-export const PUT = handleRoute
-export const DELETE = handleRoute
-export const PATCH = handleRoute
+export async function POST(request) {
+  try {
+    const body = await request.json()
+    const { url, title, content, contentType = 'link', tags = [] } = body
+    
+    // For links, scrape metadata
+    let finalTitle = title
+    let imageUrl = null
+    let finalTags = tags
+    
+    if (contentType === 'link' && url) {
+      const scraped = await scrapeMetaTags(url)
+      finalTitle = finalTitle || scraped.title
+      imageUrl = scraped.imageUrl
+      
+      // Auto-categorize if no tags provided
+      if (tags.length === 0) {
+        finalTags = autoCategorizeTags(url)
+      }
+    } else if (contentType === 'text' && tags.length === 0) {
+      finalTags = autoCategorizeTags(null, content)
+    }
+    
+    const newLink = {
+      id: generateId(),
+      userId: 'demo_user', // For MVP without auth
+      url: url || null,
+      title: finalTitle || 'Untitled',
+      imageUrl: imageUrl,
+      tags: finalTags,
+      isFavorite: false,
+      contentType: contentType,
+      content: content || null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+    
+    const { data, error } = await supabase
+      .from('links')
+      .insert([newLink])
+      .select()
+      .single()
+    
+    if (error) {
+      console.error('Error inserting link:', error)
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+    
+    return NextResponse.json({ success: true, data })
+  } catch (error) {
+    console.error('API Error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+export async function PATCH(request) {
+  try {
+    const body = await request.json()
+    const { id, isFavorite, title, tags } = body
+    
+    if (!id) {
+      return NextResponse.json({ error: 'ID is required' }, { status: 400 })
+    }
+    
+    const updateData = {
+      updatedAt: new Date().toISOString()
+    }
+    
+    if (isFavorite !== undefined) updateData.isFavorite = isFavorite
+    if (title !== undefined) updateData.title = title
+    if (tags !== undefined) updateData.tags = tags
+    
+    const { data, error } = await supabase
+      .from('links')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single()
+    
+    if (error) {
+      console.error('Error updating link:', error)
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+    
+    return NextResponse.json({ success: true, data })
+  } catch (error) {
+    console.error('API Error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+export async function DELETE(request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+    
+    if (!id) {
+      return NextResponse.json({ error: 'ID is required' }, { status: 400 })
+    }
+    
+    const { error } = await supabase
+      .from('links')
+      .delete()
+      .eq('id', id)
+    
+    if (error) {
+      console.error('Error deleting link:', error)
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+    
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('API Error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
