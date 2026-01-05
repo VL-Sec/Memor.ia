@@ -73,19 +73,23 @@ export default function App() {
   // Fetch folders
   const fetchFolders = async () => {
     try {
-      // Fetch link folders
-      const linkResponse = await fetch('/api/folders?folderType=link')
-      if (!linkResponse.ok) throw new Error('Failed to fetch link folders')
-      const linkData = await linkResponse.json()
-      setFolders(linkData)
+      // Fetch all folders
+      const response = await fetch('/api/folders')
+      if (!response.ok) throw new Error('Failed to fetch folders')
+      const allFolders = await response.json()
       
-      // Fetch clipboard folders
-      const clipboardResponse = await fetch('/api/folders?folderType=text')
-      if (!clipboardResponse.ok) throw new Error('Failed to fetch clipboard folders')
-      let clipboardData = await clipboardResponse.json()
+      // Get clipboard folder IDs from localStorage
+      const clipboardFolderIds = JSON.parse(localStorage.getItem('clipboardFolderIds') || '[]')
+      
+      // Separate folders by type
+      const linkFolders = allFolders.filter(folder => !clipboardFolderIds.includes(folder.id))
+      const clipboardFolders = allFolders.filter(folder => clipboardFolderIds.includes(folder.id))
+      
+      setFolders(linkFolders)
+      setClipboardFolders(clipboardFolders)
       
       // Create default clipboard folder if none exist
-      if (clipboardData.length === 0) {
+      if (clipboardFolders.length === 0) {
         const createResponse = await fetch('/api/folders', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -98,21 +102,26 @@ export default function App() {
         
         if (createResponse.ok) {
           const result = await createResponse.json()
-          clipboardData = [result.data]
+          const newClipboardFolder = result.data
+          
+          // Add to clipboard folder IDs
+          const updatedClipboardIds = [...clipboardFolderIds, newClipboardFolder.id]
+          localStorage.setItem('clipboardFolderIds', JSON.stringify(updatedClipboardIds))
+          
+          setClipboardFolders([newClipboardFolder])
+          setSelectedClipboardFolder(newClipboardFolder.id)
+        }
+      } else {
+        // Set default clipboard folder as selected if none selected
+        if (!selectedClipboardFolder) {
+          setSelectedClipboardFolder(clipboardFolders[0].id)
         }
       }
       
-      setClipboardFolders(clipboardData)
-      
-      // Set default folder as selected if none selected
-      if (!selectedFolder && linkData.length > 0) {
-        const defaultFolder = linkData.find(f => f.isDefault)
+      // Set default link folder as selected if none selected
+      if (!selectedFolder && linkFolders.length > 0) {
+        const defaultFolder = linkFolders.find(f => f.isDefault)
         if (defaultFolder) setSelectedFolder(defaultFolder.id)
-      }
-      
-      if (!selectedClipboardFolder && clipboardData.length > 0) {
-        const defaultClipboardFolder = clipboardData.find(f => f.isDefault) || clipboardData[0]
-        if (defaultClipboardFolder) setSelectedClipboardFolder(defaultClipboardFolder.id)
       }
     } catch (error) {
       console.error('Error fetching folders:', error)
