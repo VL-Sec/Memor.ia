@@ -61,19 +61,23 @@ function autoCategorizeTags(url, content = null) {
   }
   
   if (url) {
-    const urlLower = url.toLowerCase()
-    
-    if (urlLower.includes('youtube.com') || urlLower.includes('vimeo.com') || urlLower.includes('tiktok.com')) {
-      tags.push('Video')
-    }
-    if (urlLower.includes('medium.com') || urlLower.includes('blog') || urlLower.includes('article')) {
-      tags.push('Reading')
-    }
-    if (urlLower.includes('github.com') || urlLower.includes('stackoverflow.com')) {
-      tags.push('Code')
-    }
-    if (urlLower.includes('linkedin.com') || urlLower.includes('twitter.com') || urlLower.includes('instagram.com')) {
-      tags.push('Social')
+    try {
+      const urlLower = url.toLowerCase()
+      
+      if (urlLower.includes('youtube.com') || urlLower.includes('vimeo.com') || urlLower.includes('tiktok.com')) {
+        tags.push('Video')
+      }
+      if (urlLower.includes('medium.com') || urlLower.includes('blog') || urlLower.includes('article')) {
+        tags.push('Reading')
+      }
+      if (urlLower.includes('github.com') || urlLower.includes('stackoverflow.com')) {
+        tags.push('Code')
+      }
+      if (urlLower.includes('linkedin.com') || urlLower.includes('twitter.com') || urlLower.includes('instagram.com')) {
+        tags.push('Social')
+      }
+    } catch (error) {
+      console.error('Error in autoCategorizeTags:', error)
     }
   }
   
