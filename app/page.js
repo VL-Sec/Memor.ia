@@ -64,6 +64,12 @@ export default function App() {
   const [showSmartClipboardInfo, setShowSmartClipboardInfo] = useState(false)
   const [smartClipboardActivationCount, setSmartClipboardActivationCount] = useState(0)
   
+  // Premium states
+  const [premiumStatus, setPremiumStatus] = useState(null)
+  const [activationCodeInput, setActivationCodeInput] = useState('')
+  const [activatingCode, setActivatingCode] = useState(false)
+  const [isActivationDialogOpen, setIsActivationDialogOpen] = useState(false)
+  
   const t = translations[currentLanguage] || translations.en
   
   // Helper function to detect if text contains a valid URL
