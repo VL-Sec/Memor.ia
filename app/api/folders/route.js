@@ -35,7 +35,7 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const body = await request.json()
-    const { name, icon = '📁' } = body
+    const { name, icon = '📁', folderType = 'link' } = body
     
     if (!name) {
       return NextResponse.json({ error: 'Folder name is required' }, { status: 400 })
@@ -47,6 +47,7 @@ export async function POST(request) {
       name,
       icon,
       isDefault: false,
+      folderType,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }
