@@ -16,8 +16,11 @@ import { requestNotificationPermission, scheduleReminder, removeReminder, getRem
 export default function App() {
   const [links, setLinks] = useState([])
   const [folders, setFolders] = useState([])
+  const [clipboardFolders, setClipboardFolders] = useState([])
   const [activeTab, setActiveTab] = useState('dashboard')
   const [selectedFolder, setSelectedFolder] = useState(null)
+  const [selectedClipboardFolder, setSelectedClipboardFolder] = useState(null)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isReminderDialogOpen, setIsReminderDialogOpen] = useState(false)
