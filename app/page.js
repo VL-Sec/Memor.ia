@@ -1063,7 +1063,7 @@ export default function App() {
               {/* Quick Add Input */}
               <div className="bg-[#1C1C1E] rounded-3xl p-6 border border-[#2C2C2E]">
                 <Textarea
-                  placeholder="Paste text or emojis here... 📋✨"
+                  placeholder={t.clipboardPlaceholder}
                   value={newContent}
                   onChange={(e) => setNewContent(e.target.value)}
                   className="bg-black border-[#2C2C2E] rounded-2xl min-h-[120px] focus:border-[#007AFF] mb-4 text-base resize-none"
