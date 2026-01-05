@@ -388,6 +388,22 @@ export const translations = {
     saved: 'Enregistré!',
     deleted: 'Supprimé!',
     error: 'Erreur',
+    
+    // Reminders
+    reminder: 'Rappel',
+    setReminder: 'Définir un Rappel',
+    reminderDate: 'Date',
+    reminderTime: 'Heure',
+    reminderLocation: 'Lieu',
+    reminderLocationPlaceholder: 'Ajouter un lieu (optionnel)',
+    reminderEnabled: 'Rappel activé',
+    reminderDisabled: 'Rappel supprimé',
+    noDate: 'Pas de date',
+    noTime: 'Pas d\'heure',
+    noLocation: 'Pas de lieu',
+    clearReminder: 'Effacer le Rappel',
+    editItem: 'Modifier',
+    moveToFolder: 'Déplacer vers dossier',
   },
 };
 
