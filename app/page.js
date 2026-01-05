@@ -973,12 +973,18 @@ export default function App() {
               
               <div className="bg-[#1C1C1E] rounded-3xl p-6 border border-[#2C2C2E]">
                 <div className="space-y-3">
-                  <button className="w-full text-left text-[#007AFF] hover:underline">
+                  <a 
+                    href="/terms"
+                    className="block w-full text-left text-[#007AFF] hover:underline py-2"
+                  >
                     {t.termsOfService}
-                  </button>
-                  <button className="w-full text-left text-[#007AFF] hover:underline">
+                  </a>
+                  <a 
+                    href="/privacy"
+                    className="block w-full text-left text-[#007AFF] hover:underline py-2"
+                  >
                     {t.privacyPolicy}
-                  </button>
+                  </a>
                 </div>
               </div>
               
