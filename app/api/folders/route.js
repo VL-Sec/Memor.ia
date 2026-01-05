@@ -4,10 +4,20 @@ import { supabase, generateId } from '../../../lib/supabase.js'
 // GET all folders
 export async function GET(request) {
   try {
-    const { data, error } = await supabase
+    const { searchParams } = new URL(request.url)
+    const folderType = searchParams.get('folderType')
+    
+    let query = supabase
       .from('folders')
       .select('*')
       .order('createdAt', { ascending: true })
+    
+    // Filter by folder type if specified
+    if (folderType) {
+      query = query.eq('folderType', folderType)
+    }
+    
+    const { data, error } = await query
     
     if (error) {
       console.error('Error fetching folders:', error)
