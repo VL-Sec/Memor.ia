@@ -1165,6 +1165,16 @@ export default function App() {
                         
                         {/* Actions */}
                         <div className="flex items-center gap-2 flex-shrink-0">
+                          {/* Edit Button */}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => openEditDialog(item)}
+                            className="rounded-full hover:bg-[#007AFF]/10 text-[#007AFF] h-10 w-10 p-0"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </Button>
+                          
                           {/* Copy Button - Primary Action */}
                           <Button
                             onClick={() => handleCopy(item.content)}
