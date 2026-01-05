@@ -199,7 +199,7 @@ export async function POST(request) {
 export async function PATCH(request) {
   try {
     const body = await request.json()
-    const { id, isFavorite, title, tags } = body
+    const { id, isFavorite, title, tags, folderId } = body
     
     if (!id) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 })
@@ -212,6 +212,7 @@ export async function PATCH(request) {
     if (isFavorite !== undefined) updateData.isFavorite = isFavorite
     if (title !== undefined) updateData.title = title
     if (tags !== undefined) updateData.tags = tags
+    if (folderId !== undefined) updateData.folderId = folderId
     
     const { data, error } = await supabase
       .from('links')
