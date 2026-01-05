@@ -634,13 +634,21 @@ export default function App() {
   
   // Filter links based on active tab, folder and search
   const filteredLinks = links.filter(link => {
-    // Tab filter
-    if (activeTab === 'favorites' && !link.isFavorite) return false
+    // STRICT CONTENT TYPE SEPARATION
+    
+    // Dashboard: ONLY links (contentType='link')
+    if (activeTab === 'dashboard' && link.contentType !== 'link') return false
+    
+    // Clipboard: ONLY text (contentType='text')
     if (activeTab === 'clipboard' && link.contentType !== 'text') return false
-    if (activeTab === 'dashboard' && link.contentType === 'text') return false
+    
+    // Favorites: Both types, but must be favorited
+    if (activeTab === 'favorites' && !link.isFavorite) return false
+    
+    // Settings: No items shown
     if (activeTab === 'settings') return false
     
-    // Folder filter
+    // Folder filter (skip if "all" is selected)
     if (activeTab === 'dashboard' && selectedFolder && selectedFolder !== 'all') {
       if (link.folderId !== selectedFolder) return false
     }
