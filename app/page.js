@@ -815,7 +815,9 @@ export default function App() {
                   </SelectContent>
                 </Select>
                 
-                <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+                {/* Only show Add button on dashboard and favorites tabs */}
+                {activeTab !== 'clipboard' && activeTab !== 'settings' && (
+                  <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                   <DialogTrigger asChild>
                     <Button 
                       className="rounded-full bg-[#007AFF] hover:bg-[#0051D5] transition-all duration-300 shadow-lg shadow-[#007AFF]/20"
