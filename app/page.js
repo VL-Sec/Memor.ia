@@ -1146,7 +1146,7 @@ export default function App() {
                           </p>
                           <div className="flex items-center gap-3 mt-2">
                             <span className="text-xs text-[#8E8E93]">
-                              {item.content?.length || 0} chars
+                              {item.content?.length || 0} {t.chars}
                             </span>
                             {item.tags && item.tags.length > 0 && (
                               <div className="flex gap-1">
