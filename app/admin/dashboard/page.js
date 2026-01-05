@@ -6,17 +6,21 @@ import { supabase } from '@/lib/supabase'
 import { generateActivationCode } from '@/lib/premium'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { useToast } from '@/hooks/use-toast'
-import { Plus, Copy, LogOut, Ticket, CheckCircle, XCircle, Users, RefreshCw } from 'lucide-react'
+import { Plus, Copy, LogOut, Ticket, CheckCircle, Trash2, Users, RefreshCw, Edit2, Save } from 'lucide-react'
 
 export default function AdminDashboard() {
   const [codes, setCodes] = useState([])
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
   const [newInfluencerName, setNewInfluencerName] = useState('')
+  const [newNote, setNewNote] = useState('')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [editingCodeId, setEditingCodeId] = useState(null)
+  const [editNote, setEditNote] = useState('')
   const router = useRouter()
   const { toast } = useToast()
 
