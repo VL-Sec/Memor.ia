@@ -1350,19 +1350,31 @@ export default function App() {
                         </p>
                       )}
                       
-                      {item.tags && item.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          {item.tags.map((tag, idx) => (
-                            <Badge
-                              key={idx}
-                              variant="secondary"
-                              className="bg-[#007AFF]/10 text-[#007AFF] text-xs rounded-full"
-                            >
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
+                      {/* Show folder name badge */}
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        <Badge
+                          variant="secondary"
+                          className="bg-[#007AFF]/10 text-[#007AFF] text-xs rounded-full"
+                        >
+                          {(() => {
+                            const folder = folders.find(f => f.id === item.folderId)
+                            if (folder) {
+                              return folder.isDefault ? t.generalFolder : folder.name
+                            }
+                            return t.generalFolder
+                          })()}
+                        </Badge>
+                        {/* Show additional tags if any */}
+                        {item.tags && item.tags.length > 0 && item.tags.filter(tag => tag !== 'General' && tag !== 'Geral').map((tag, idx) => (
+                          <Badge
+                            key={idx}
+                            variant="secondary"
+                            className="bg-[#2C2C2E] text-[#8E8E93] text-xs rounded-full"
+                          >
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
                       
                       {hasReminder && (
                         <div className="mb-3 flex items-center gap-2 text-xs text-[#00D4FF]">
