@@ -14,7 +14,7 @@ import Toast from 'react-native-toast-message';
 import { translations, languages, setLanguage as saveLanguage } from '../lib/i18n';
 import { activatePremium, getPremiumStatus } from '../lib/premium';
 
-const API_URL = 'https://quickmemoria.preview.emergentagent.com';
+const API_URL = 'https://memor-clip.preview.emergentagent.com';
 
 export default function SettingsScreen({ 
   language, 

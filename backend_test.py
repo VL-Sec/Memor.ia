@@ -10,7 +10,7 @@ import time
 from typing import Dict, Any, Optional
 
 # Base URL from environment
-BASE_URL = "https://quickmemoria.preview.emergentagent.com"
+BASE_URL = "https://memor-clip.preview.emergentagent.com"
 
 class MemoriaAPITester:
     def __init__(self, base_url: str):
