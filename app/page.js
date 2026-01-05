@@ -1181,7 +1181,7 @@ export default function App() {
                             className="rounded-full bg-[#007AFF] hover:bg-[#0051D5] h-10 px-4"
                           >
                             <Copy className="w-4 h-4 mr-2" />
-                            Copy
+                            {t.copy}
                           </Button>
                           
                           {/* Delete Button */}
