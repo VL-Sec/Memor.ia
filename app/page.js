@@ -447,7 +447,7 @@ export default function App() {
                       <Button
                         variant={addType === 'link' ? 'default' : 'outline'}
                         onClick={() => setAddType('link')}
-                        className={`flex-1 rounded-2xl ${addType === 'link' ? 'bg-[#007AFF]' : 'border-[#2C2C2E]'}`}
+                        className={`flex-1 rounded-2xl ${addType === 'link' ? 'bg-[#007AFF] text-white hover:bg-[#0051D5]' : 'border-[#2C2C2E] bg-transparent text-white hover:bg-[#2C2C2E]'}`}
                       >
                         <LinkIcon className="w-4 h-4 mr-2" />
                         {t.link}
@@ -455,7 +455,7 @@ export default function App() {
                       <Button
                         variant={addType === 'text' ? 'default' : 'outline'}
                         onClick={() => setAddType('text')}
-                        className={`flex-1 rounded-2xl ${addType === 'text' ? 'bg-[#007AFF]' : 'border-[#2C2C2E]'}`}
+                        className={`flex-1 rounded-2xl ${addType === 'text' ? 'bg-[#007AFF] text-white hover:bg-[#0051D5]' : 'border-[#2C2C2E] bg-transparent text-white hover:bg-[#2C2C2E]'}`}
                       >
                         <FileText className="w-4 h-4 mr-2" />
                         {t.snippet}
