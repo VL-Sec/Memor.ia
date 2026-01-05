@@ -73,6 +73,7 @@ export default function AdminDashboard() {
           id,
           code,
           influencer_name: newInfluencerName || null,
+          notes: newNote || null,
           is_used: false
         }])
 
@@ -84,6 +85,7 @@ export default function AdminDashboard() {
       })
 
       setNewInfluencerName('')
+      setNewNote('')
       setIsCreateDialogOpen(false)
       fetchCodes()
     } catch (error) {
@@ -96,6 +98,68 @@ export default function AdminDashboard() {
     } finally {
       setCreating(false)
     }
+  }
+
+  // Delete code
+  const handleDeleteCode = async (codeId, codeName) => {
+    if (!window.confirm(`Apagar o código ${codeName}?`)) return
+    
+    try {
+      const { error } = await supabase
+        .from('activation_codes')
+        .delete()
+        .eq('id', codeId)
+
+      if (error) throw error
+
+      toast({
+        title: 'Sucesso',
+        description: 'Código apagado'
+      })
+      
+      fetchCodes()
+    } catch (error) {
+      console.error('Error deleting code:', error)
+      toast({
+        title: 'Erro',
+        description: 'Falha ao apagar código',
+        variant: 'destructive'
+      })
+    }
+  }
+
+  // Save note
+  const handleSaveNote = async (codeId) => {
+    try {
+      const { error } = await supabase
+        .from('activation_codes')
+        .update({ notes: editNote })
+        .eq('id', codeId)
+
+      if (error) throw error
+
+      toast({
+        title: 'Sucesso',
+        description: 'Nota guardada'
+      })
+      
+      setEditingCodeId(null)
+      setEditNote('')
+      fetchCodes()
+    } catch (error) {
+      console.error('Error saving note:', error)
+      toast({
+        title: 'Erro',
+        description: 'Falha ao guardar nota',
+        variant: 'destructive'
+      })
+    }
+  }
+
+  // Start editing note
+  const startEditNote = (code) => {
+    setEditingCodeId(code.id)
+    setEditNote(code.notes || '')
   }
 
   // Copy code to clipboard
