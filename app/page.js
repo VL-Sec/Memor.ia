@@ -101,6 +101,10 @@ export default function App() {
     // Load smart clipboard activation count
     const count = parseInt(localStorage.getItem('smartClipboardActivationCount') || '0')
     setSmartClipboardActivationCount(count)
+    
+    // Load premium status
+    const status = getPremiumStatus()
+    setPremiumStatus(status)
   }, [])
   
   // Smart Clipboard Timer Effect
