@@ -90,7 +90,170 @@ export default function App() {
     
     initializeReminders()
     scheduleWeeklyRecap()
+    
+    // Load smart clipboard activation count
+    const count = parseInt(localStorage.getItem('smartClipboardActivationCount') || '0')
+    setSmartClipboardActivationCount(count)
   }, [])
+  
+  // Smart Clipboard Timer Effect
+  useEffect(() => {
+    let timer = null
+    
+    if (smartClipboardActive && smartClipboardTimeLeft > 0) {
+      timer = setInterval(() => {
+        setSmartClipboardTimeLeft(prev => {
+          if (prev <= 1) {
+            // Deactivate when timer reaches 0
+            setSmartClipboardActive(false)
+            toast({
+              title: t.smartClipboard,
+              description: t.smartClipboardDeactivated,
+            })
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+    }
+    
+    return () => {
+      if (timer) clearInterval(timer)
+    }
+  }, [smartClipboardActive, smartClipboardTimeLeft, t])
+  
+  // Smart Clipboard - Listen for clipboard changes
+  useEffect(() => {
+    if (!smartClipboardActive) return
+    
+    const handlePaste = async (e) => {
+      try {
+        const clipboardData = e.clipboardData || window.clipboardData
+        const pastedText = clipboardData?.getData('text')
+        
+        if (pastedText && pastedText.trim() && pastedText !== lastSavedContent) {
+          await saveSmartClipboardContent(pastedText.trim())
+        }
+      } catch (error) {
+        console.error('Smart Clipboard paste error:', error)
+      }
+    }
+    
+    // Also try to read clipboard periodically (requires permission)
+    const checkClipboard = async () => {
+      if (!smartClipboardActive) return
+      
+      try {
+        if (navigator.clipboard && navigator.clipboard.readText) {
+          const text = await navigator.clipboard.readText()
+          if (text && text.trim() && text !== lastSavedContent) {
+            await saveSmartClipboardContent(text.trim())
+          }
+        }
+      } catch (error) {
+        // Permission denied or not supported - that's okay, we have paste listener
+        console.log('Clipboard read not available, using paste events')
+      }
+    }
+    
+    document.addEventListener('paste', handlePaste)
+    
+    // Check clipboard every 2 seconds while active
+    const clipboardInterval = setInterval(checkClipboard, 2000)
+    
+    return () => {
+      document.removeEventListener('paste', handlePaste)
+      clearInterval(clipboardInterval)
+    }
+  }, [smartClipboardActive, lastSavedContent])
+  
+  // Save content from Smart Clipboard
+  const saveSmartClipboardContent = async (content) => {
+    if (!content || content === lastSavedContent) return
+    
+    try {
+      // Find default clipboard folder
+      let targetFolderId = null
+      if (selectedClipboardFolder && selectedClipboardFolder !== 'all') {
+        targetFolderId = selectedClipboardFolder
+      } else {
+        const defaultFolder = clipboardFolders.find(f => f.isDefault)
+        targetFolderId = defaultFolder?.id || null
+      }
+      
+      const response = await fetch('/api/links', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: content.slice(0, 50) + (content.length > 50 ? '...' : ''),
+          content: content,
+          contentType: 'text',
+          tags: [],
+          folderId: targetFolderId
+        })
+      })
+      
+      if (response.ok) {
+        const result = await response.json()
+        setLinks([result.data, ...links])
+        setLastSavedContent(content)
+        
+        toast({
+          title: t.smartClipboard,
+          description: t.smartClipboardSaved,
+        })
+      }
+    } catch (error) {
+      console.error('Smart Clipboard save error:', error)
+    }
+  }
+  
+  // Activate Smart Clipboard
+  const activateSmartClipboard = async () => {
+    // Request clipboard permission
+    try {
+      if (navigator.clipboard && navigator.permissions) {
+        await navigator.permissions.query({ name: 'clipboard-read' })
+      }
+    } catch (error) {
+      // Permission API may not be available
+    }
+    
+    // Show info popup for first 3 activations
+    const newCount = smartClipboardActivationCount + 1
+    if (newCount <= 3) {
+      setShowSmartClipboardInfo(true)
+      setSmartClipboardActivationCount(newCount)
+      localStorage.setItem('smartClipboardActivationCount', newCount.toString())
+    }
+    
+    setSmartClipboardActive(true)
+    setSmartClipboardTimeLeft(120) // 2 minutes = 120 seconds
+    setLastSavedContent('')
+    
+    toast({
+      title: t.smartClipboard,
+      description: t.smartClipboardActivated,
+    })
+  }
+  
+  // Deactivate Smart Clipboard
+  const deactivateSmartClipboard = () => {
+    setSmartClipboardActive(false)
+    setSmartClipboardTimeLeft(0)
+    
+    toast({
+      title: t.smartClipboard,
+      description: t.smartClipboardDeactivated,
+    })
+  }
+  
+  // Format time remaining
+  const formatTimeRemaining = (seconds) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${mins}:${secs.toString().padStart(2, '0')}`
+  }
   
   // Fetch folders
   const fetchFolders = async () => {
