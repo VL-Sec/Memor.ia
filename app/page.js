@@ -559,9 +559,12 @@ export default function App() {
     if (activeTab === 'dashboard' && link.contentType === 'text') return false
     if (activeTab === 'settings') return false
     
-    // Folder filter (only on dashboard)
+    // Folder filter
     if (activeTab === 'dashboard' && selectedFolder) {
       if (link.folderId !== selectedFolder) return false
+    }
+    if (activeTab === 'clipboard' && selectedClipboardFolder) {
+      if (link.folderId !== selectedClipboardFolder) return false
     }
     
     // Search filter
