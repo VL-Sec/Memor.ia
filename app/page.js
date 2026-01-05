@@ -1148,18 +1148,18 @@ export default function App() {
                             <span className="text-xs text-[#8E8E93]">
                               {item.content?.length || 0} {t.chars}
                             </span>
-                            {item.tags && item.tags.length > 0 && (
-                              <div className="flex gap-1">
-                                {item.tags.slice(0, 2).map((tag, idx) => (
-                                  <Badge
-                                    key={idx}
-                                    className="bg-[#007AFF]/10 text-[#007AFF] text-xs rounded-full px-2 py-0"
-                                  >
-                                    {tag}
-                                  </Badge>
-                                ))}
-                              </div>
-                            )}
+                            {/* Show folder name */}
+                            <Badge
+                              className="bg-[#007AFF]/10 text-[#007AFF] text-xs rounded-full px-2 py-0"
+                            >
+                              {(() => {
+                                const folder = clipboardFolders.find(f => f.id === item.folderId)
+                                if (folder) {
+                                  return folder.isDefault ? t.generalFolder : folder.name
+                                }
+                                return t.generalFolder
+                              })()}
+                            </Badge>
                           </div>
                         </div>
                         
