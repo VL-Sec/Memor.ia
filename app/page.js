@@ -1277,6 +1277,88 @@ export default function App() {
                 <p className="text-xs text-[#8E8E93] mt-2">{t.cmdToSave}</p>
               </div>
               
+              {/* Smart Clipboard Section */}
+              <div className={`rounded-3xl p-4 border transition-all duration-300 ${
+                smartClipboardActive 
+                  ? 'bg-gradient-to-r from-[#007AFF]/20 to-[#00D4FF]/20 border-[#007AFF]' 
+                  : 'bg-[#1C1C1E] border-[#2C2C2E]'
+              }`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      smartClipboardActive ? 'bg-[#007AFF] animate-pulse' : 'bg-[#2C2C2E]'
+                    }`}>
+                      <Copy className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-sm">{t.smartClipboard}</h3>
+                      {smartClipboardActive ? (
+                        <p className="text-xs text-[#00D4FF]">
+                          {formatTimeRemaining(smartClipboardTimeLeft)} {t.timeRemaining}
+                        </p>
+                      ) : (
+                        <p className="text-xs text-[#8E8E93]">{t.smartClipboardInfo}</p>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {smartClipboardActive ? (
+                    <Button
+                      onClick={deactivateSmartClipboard}
+                      variant="outline"
+                      size="sm"
+                      className="rounded-full border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                    >
+                      {t.deactivate}
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={activateSmartClipboard}
+                      size="sm"
+                      className="rounded-full bg-[#007AFF] hover:bg-[#0051D5]"
+                    >
+                      {t.activate}
+                    </Button>
+                  )}
+                </div>
+                
+                {/* Active indicator bar */}
+                {smartClipboardActive && (
+                  <div className="mt-3 h-1 bg-[#2C2C2E] rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-[#007AFF] to-[#00D4FF] transition-all duration-1000 ease-linear"
+                      style={{ width: `${(smartClipboardTimeLeft / 120) * 100}%` }}
+                    />
+                  </div>
+                )}
+              </div>
+              
+              {/* Smart Clipboard Info Dialog */}
+              <Dialog open={showSmartClipboardInfo} onOpenChange={setShowSmartClipboardInfo}>
+                <DialogContent className="bg-[#1C1C1E] border-[#2C2C2E] text-white rounded-3xl max-w-sm">
+                  <DialogHeader>
+                    <DialogTitle className="text-center flex flex-col items-center gap-3">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#007AFF] to-[#00D4FF] flex items-center justify-center">
+                        <Copy className="w-8 h-8 text-white" />
+                      </div>
+                      {t.smartClipboardActive}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="text-center space-y-4 py-4">
+                    <p className="text-[#8E8E93]">{t.smartClipboardInfo}</p>
+                    <div className="text-sm text-[#00D4FF]">
+                      ⏱️ 2 min
+                    </div>
+                  </div>
+                  <Button
+                    onClick={() => setShowSmartClipboardInfo(false)}
+                    className="w-full rounded-2xl bg-[#007AFF] hover:bg-[#0051D5]"
+                  >
+                    {t.gotIt}
+                  </Button>
+                </DialogContent>
+              </Dialog>
+              
               {/* Search */}
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#8E8E93]" />
