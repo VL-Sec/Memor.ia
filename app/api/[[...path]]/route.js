@@ -5,7 +5,13 @@ import { headers } from 'next/headers'
 // Helper to extract meta tags from URL
 async function scrapeMetaTags(url) {
   try {
-    const response = await fetch(url, {
+    // Ensure URL has protocol
+    let fullUrl = url
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      fullUrl = 'https://' + url
+    }
+    
+    const response = await fetch(fullUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; Memoria/1.0)'
       }
@@ -22,14 +28,26 @@ async function scrapeMetaTags(url) {
                       html.match(/<meta[^>]*name="twitter:image"[^>]*content="([^"]*)"/i)
     
     return {
-      title: titleMatch ? titleMatch[1].trim() : new URL(url).hostname,
+      title: titleMatch ? titleMatch[1].trim() : new URL(fullUrl).hostname,
       imageUrl: imageMatch ? imageMatch[1].trim() : null
     }
   } catch (error) {
     console.error('Scraping error:', error)
-    return {
-      title: new URL(url).hostname,
-      imageUrl: null
+    // Fallback: try to extract hostname
+    try {
+      let fullUrl = url
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        fullUrl = 'https://' + url
+      }
+      return {
+        title: new URL(fullUrl).hostname,
+        imageUrl: null
+      }
+    } catch {
+      return {
+        title: url,
+        imageUrl: null
+      }
     }
   }
 }
