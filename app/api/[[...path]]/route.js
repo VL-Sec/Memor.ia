@@ -199,7 +199,7 @@ export async function POST(request) {
 export async function PATCH(request) {
   try {
     const body = await request.json()
-    const { id, isFavorite, title, tags, folderId } = body
+    let { id, isFavorite, title, tags, folderId, url } = body
     
     if (!id) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 })
@@ -213,6 +213,12 @@ export async function PATCH(request) {
     if (title !== undefined) updateData.title = title
     if (tags !== undefined) updateData.tags = tags
     if (folderId !== undefined) updateData.folderId = folderId
+    
+    // Update URL if provided and normalize it
+    if (url !== undefined && url) {
+      url = url.replace(/^(https?:\/\/)?(www\.)?/, '')
+      updateData.url = 'https://' + url
+    }
     
     const { data, error } = await supabase
       .from('links')
