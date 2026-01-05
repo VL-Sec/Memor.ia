@@ -748,12 +748,12 @@ export default function App() {
             className={`
               flex flex-col bg-black border-r border-[#2C2C2E]
               transition-all duration-300 ease-in-out
-              ${sidebarOpen ? 'w-48 md:w-64' : 'w-0'}
+              ${sidebarOpen ? 'w-40 md:w-56' : 'w-0'}
               overflow-hidden
             `}
           >
             {/* Sidebar Content */}
-            <div className="w-48 md:w-64 flex flex-col h-full">
+            <div className="w-40 md:w-56 flex flex-col h-full">
               <div className="p-4 border-b border-[#2C2C2E]">
                 <h2 className="text-lg font-semibold mb-4">{t.folders}</h2>
                 <Button
