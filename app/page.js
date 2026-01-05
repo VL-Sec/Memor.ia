@@ -109,7 +109,6 @@ export default function App() {
           localStorage.setItem('clipboardFolderIds', JSON.stringify(updatedClipboardIds))
           
           setClipboardFolders([newClipboardFolder])
-          setSelectedClipboardFolder(newClipboardFolder.id)
         }
       }
       
