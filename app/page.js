@@ -928,7 +928,8 @@ export default function App() {
               </div>
             </div>
             
-            {activeTab !== 'settings' && (
+            {/* Search and tags - only on dashboard and favorites */}
+            {activeTab !== 'settings' && activeTab !== 'clipboard' && (
               <>
                 <div className="mt-4 relative">
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#8E8E93]" />
