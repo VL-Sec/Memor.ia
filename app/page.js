@@ -159,6 +159,52 @@ export default function App() {
     setLanguage(lang)
   }
   
+  // Quick save clipboard item
+  const handleQuickSaveClipboard = async () => {
+    try {
+      if (!newContent.trim()) {
+        toast({
+          title: t.errorTitle,
+          description: t.enterText,
+          variant: 'destructive'
+        })
+        return
+      }
+      
+      const response = await fetch('/api/links', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: newContent.slice(0, 50) + (newContent.length > 50 ? '...' : ''),
+          content: newContent,
+          contentType: 'text',
+          tags: [],
+          folderId: selectedClipboardFolder || clipboardFolders.find(f => f.isDefault)?.id
+        })
+      })
+      
+      if (!response.ok) throw new Error('Failed to add item')
+      
+      const result = await response.json()
+      setLinks([result.data, ...links])
+      
+      // Clear input
+      setNewContent('')
+      
+      toast({
+        title: t.successTitle,
+        description: t.snippetSaved,
+      })
+    } catch (error) {
+      console.error('Error adding clipboard item:', error)
+      toast({
+        title: t.errorTitle,
+        description: t.failedToSave,
+        variant: 'destructive'
+      })
+    }
+  }
+  
   // Add new link or text
   const handleAdd = async () => {
     try {
