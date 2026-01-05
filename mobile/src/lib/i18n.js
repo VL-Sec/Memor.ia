@@ -309,9 +309,18 @@ export const translations = {
     // Settings
     settings: 'Paramètres',
     language: 'Langue',
-    backup: 'Sauvegarde',
+    backup: 'Sauvegarde Cloud',
     backupInfo: 'Vos données sont sauvegardées automatiquement',
     version: 'Version',
+    
+    // Cloud Backup Card
+    cloudBackupTitle: 'Sauvegarde Automatique',
+    cloudBackupSubtitle: 'Vos données sont en sécurité',
+    cloudBackupDescription: 'Tous vos liens, notes et paramètres sont automatiquement synchronisés avec la sauvegarde cloud de votre appareil.',
+    cloudBackupIOS: 'iCloud Backup',
+    cloudBackupAndroid: 'Google Backup',
+    cloudBackupEnabled: 'Activé',
+    cloudBackupTip: 'Assurez-vous que la sauvegarde cloud est activée dans les paramètres de votre appareil.',
     
     // Notifications - Weekly Summary
     notifications: 'Notifications',
