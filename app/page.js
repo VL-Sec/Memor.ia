@@ -1076,7 +1076,7 @@ export default function App() {
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3 flex-1">
                     <span className="text-xs text-[#8E8E93] whitespace-nowrap">
-                      {newContent.length} chars
+                      {newContent.length} {t.chars}
                     </span>
                     {/* Folder selector for clipboard */}
                     <Select 
