@@ -1104,7 +1104,7 @@ export default function App() {
                     {t.save || "Save"}
                   </Button>
                 </div>
-                <p className="text-xs text-[#8E8E93] mt-2">Cmd/Ctrl + Enter to save</p>
+                <p className="text-xs text-[#8E8E93] mt-2">{t.cmdToSave}</p>
               </div>
               
               {/* Search */}
