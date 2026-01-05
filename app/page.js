@@ -73,15 +73,27 @@ export default function App() {
   // Fetch folders
   const fetchFolders = async () => {
     try {
-      const response = await fetch('/api/folders')
-      if (!response.ok) throw new Error('Failed to fetch folders')
-      const data = await response.json()
-      setFolders(data)
+      // Fetch link folders
+      const linkResponse = await fetch('/api/folders?folderType=link')
+      if (!linkResponse.ok) throw new Error('Failed to fetch link folders')
+      const linkData = await linkResponse.json()
+      setFolders(linkData)
+      
+      // Fetch clipboard folders
+      const clipboardResponse = await fetch('/api/folders?folderType=text')
+      if (!clipboardResponse.ok) throw new Error('Failed to fetch clipboard folders')
+      const clipboardData = await clipboardResponse.json()
+      setClipboardFolders(clipboardData)
       
       // Set default folder as selected if none selected
-      if (!selectedFolder && data.length > 0) {
-        const defaultFolder = data.find(f => f.isDefault)
+      if (!selectedFolder && linkData.length > 0) {
+        const defaultFolder = linkData.find(f => f.isDefault)
         if (defaultFolder) setSelectedFolder(defaultFolder.id)
+      }
+      
+      if (!selectedClipboardFolder && clipboardData.length > 0) {
+        const defaultClipboardFolder = clipboardData.find(f => f.isDefault)
+        if (defaultClipboardFolder) setSelectedClipboardFolder(defaultClipboardFolder.id)
       }
     } catch (error) {
       console.error('Error fetching folders:', error)
