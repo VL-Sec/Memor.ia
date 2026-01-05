@@ -577,8 +577,8 @@ export default function App() {
                 onClick={() => setSelectedFolder(folder.id)}
               >
                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <span className="text-xl flex-shrink-0">{folder.icon}</span>
-                  <span className="truncate font-medium">{folder.name}</span>
+                  <span className="text-2xl flex-shrink-0">{folder.icon}</span>
+                  <span className="truncate font-semibold text-base">{folder.name}</span>
                 </div>
                 
                 {!folder.isDefault && (
