@@ -295,6 +295,43 @@ export default function SettingsScreen({
         )}
       </View>
 
+      {/* Cloud Backup Card - Prominent Notice */}
+      <View style={styles.cloudBackupCard}>
+        <View style={styles.cloudBackupHeader}>
+          <View style={styles.cloudBackupIconContainer}>
+            <Ionicons name="cloud-done" size={28} color="#FFFFFF" />
+          </View>
+          <View style={styles.cloudBackupTitleContainer}>
+            <Text style={styles.cloudBackupTitle}>{t.cloudBackupTitle}</Text>
+            <Text style={styles.cloudBackupSubtitle}>{t.cloudBackupSubtitle}</Text>
+          </View>
+          <View style={styles.cloudBackupBadge}>
+            <Ionicons name="checkmark-circle" size={16} color="#34C759" />
+            <Text style={styles.cloudBackupBadgeText}>{t.cloudBackupEnabled}</Text>
+          </View>
+        </View>
+        
+        <Text style={styles.cloudBackupDescription}>{t.cloudBackupDescription}</Text>
+        
+        <View style={styles.cloudBackupProviders}>
+          <View style={styles.cloudProvider}>
+            <Ionicons 
+              name={Platform.OS === 'ios' ? 'logo-apple' : 'logo-google'} 
+              size={20} 
+              color="#8E8E93" 
+            />
+            <Text style={styles.cloudProviderText}>
+              {Platform.OS === 'ios' ? t.cloudBackupIOS : t.cloudBackupAndroid}
+            </Text>
+          </View>
+        </View>
+        
+        <View style={styles.cloudBackupTipContainer}>
+          <Ionicons name="information-circle" size={16} color="#FFD60A" />
+          <Text style={styles.cloudBackupTip}>{t.cloudBackupTip}</Text>
+        </View>
+      </View>
+
       {/* Settings Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>{t.settings}</Text>
@@ -313,18 +350,6 @@ export default function SettingsScreen({
             <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
           </View>
         </TouchableOpacity>
-
-        {/* Backup Info */}
-        <View style={styles.settingItem}>
-          <View style={styles.settingLeft}>
-            <Ionicons name="cloud-outline" size={24} color="#34C759" />
-            <Text style={styles.settingLabel}>{t.backup}</Text>
-          </View>
-          <View style={styles.settingRight}>
-            <Ionicons name="checkmark-circle" size={20} color="#34C759" />
-          </View>
-        </View>
-        <Text style={styles.settingHint}>{t.backupInfo}</Text>
       </View>
 
       {/* App Info */}
