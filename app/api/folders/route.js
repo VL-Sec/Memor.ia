@@ -12,11 +12,8 @@ export async function GET(request) {
       .select('*')
       .order('createdAt', { ascending: true })
     
-    // Filter by folder type if specified
-    if (folderType) {
-      query = query.eq('folderType', folderType)
-    }
-    
+    // For now, we'll get all folders and filter in frontend
+    // TODO: Add folderType column to database
     const { data, error } = await query
     
     if (error) {
@@ -24,7 +21,17 @@ export async function GET(request) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
     
-    return NextResponse.json(data || [])
+    // Filter by folder type in code for now
+    let filteredData = data || []
+    if (folderType && data) {
+      filteredData = data.filter(folder => {
+        // If folderType column doesn't exist, assume all existing folders are 'link' type
+        const type = folder.folderType || 'link'
+        return type === folderType
+      })
+    }
+    
+    return NextResponse.json(filteredData)
   } catch (error) {
     console.error('API Error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
