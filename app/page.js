@@ -339,6 +339,10 @@ export default function App() {
         
         if (folderType === 'text') {
           setClipboardFolders([...clipboardFolders, result.data])
+          // Track clipboard folder in localStorage
+          const clipboardFolderIds = JSON.parse(localStorage.getItem('clipboardFolderIds') || '[]')
+          clipboardFolderIds.push(result.data.id)
+          localStorage.setItem('clipboardFolderIds', JSON.stringify(clipboardFolderIds))
         } else {
           setFolders([...folders, result.data])
         }
