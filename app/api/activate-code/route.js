@@ -9,7 +9,7 @@ const supabase = createClient(
 // POST - Activate a code
 export async function POST(request) {
   try {
-    const { code, deviceId } = await request.json()
+    const { code } = await request.json()
 
     if (!code) {
       return NextResponse.json({ error: 'Code is required' }, { status: 400 })
@@ -39,13 +39,12 @@ export async function POST(request) {
       }, { status: 400 })
     }
 
-    // Mark as used
+    // Mark as used (no device_id stored for privacy)
     const { error: updateError } = await supabase
       .from('activation_codes')
       .update({
         is_used: true,
-        used_at: new Date().toISOString(),
-        device_id: deviceId || null
+        used_at: new Date().toISOString()
       })
       .eq('id', codeData.id)
 
@@ -56,6 +55,14 @@ export async function POST(request) {
         error: 'update_failed',
         message: 'Erro ao ativar código' 
       }, { status: 500 })
+    }
+
+    // Update anonymous metrics
+    try {
+      await supabase.rpc('increment_metric', { metric_name: 'premium_via_code' })
+    } catch (e) {
+      // Metrics update is not critical
+      console.log('Metrics update skipped')
     }
 
     return NextResponse.json({ 
