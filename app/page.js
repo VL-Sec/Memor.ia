@@ -58,6 +58,21 @@ export default function App() {
   
   const t = translations[currentLanguage] || translations.en
   
+  // Helper function to detect if text contains a valid URL
+  const isValidURL = (text) => {
+    if (!text || typeof text !== 'string') return false
+    
+    // Remove whitespace
+    const trimmed = text.trim()
+    
+    // Check for URL patterns
+    const urlPattern = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/
+    const hasProtocol = /^https?:\/\//i.test(trimmed)
+    const hasDomain = /([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}/.test(trimmed)
+    
+    return urlPattern.test(trimmed) || hasProtocol || hasDomain
+  }
+  
   // Initialize language and reminders
   useEffect(() => {
     const lang = detectLanguage()
