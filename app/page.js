@@ -925,6 +925,7 @@ export default function App() {
                   </DialogContent>
                 </Dialog>
                 )}
+              </div>
             </div>
             
             {activeTab !== 'settings' && (
