@@ -195,6 +195,11 @@ export default function App() {
   // Add new link or text
   const handleAdd = async () => {
     try {
+      // Determine content type based on whether it's a valid URL
+      const hasURL = addType === 'link' && newUrl && isValidURL(newUrl)
+      const finalContentType = hasURL ? 'link' : 'text'
+      
+      // Validation
       if (addType === 'link' && !newUrl) {
         toast({
           title: t.errorTitle,
@@ -215,20 +220,28 @@ export default function App() {
       
       const tags = newTags.split(',').map(t => t.trim()).filter(t => t)
       
+      // If user entered text-only in link field, save as note
+      const requestBody = {
+        contentType: finalContentType,
+        tags: tags
+      }
+      
+      if (finalContentType === 'link') {
+        // Save as link
+        requestBody.url = newUrl
+        requestBody.title = newTitle || null
+        requestBody.folderId = newFolderId || selectedFolder || folders.find(f => f.isDefault)?.id
+      } else {
+        // Save as note (text only)
+        requestBody.content = addType === 'text' ? newContent : newUrl
+        requestBody.title = newTitle || (addType === 'text' ? newContent : newUrl).slice(0, 50) + '...'
+        requestBody.folderId = clipboardFolders.find(f => f.isDefault)?.id
+      }
+      
       const response = await fetch('/api/links', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          url: addType === 'link' ? newUrl : null,
-          title: newTitle || null,
-          content: addType === 'text' ? newContent : null,
-          contentType: addType,
-          tags: tags,
-          folderId: newFolderId || 
-            (addType === 'text' 
-              ? selectedClipboardFolder || clipboardFolders.find(f => f.isDefault)?.id
-              : selectedFolder || folders.find(f => f.isDefault)?.id)
-        })
+        body: JSON.stringify(requestBody)
       })
       
       if (!response.ok) throw new Error('Failed to add item')
@@ -246,7 +259,7 @@ export default function App() {
       
       toast({
         title: t.successTitle,
-        description: addType === 'link' ? t.linkSaved : t.snippetSaved,
+        description: finalContentType === 'link' ? t.linkSaved : t.snippetSaved,
       })
     } catch (error) {
       console.error('Error adding item:', error)
