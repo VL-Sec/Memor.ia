@@ -54,7 +54,7 @@ export async function POST(request) {
       name,
       icon,
       isDefault: false,
-      folderType,
+      // Don't include folderType until column is added to database
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }
@@ -70,7 +70,10 @@ export async function POST(request) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
     
-    return NextResponse.json({ success: true, data })
+    // Add folderType to response for frontend compatibility
+    const responseData = { ...data, folderType }
+    
+    return NextResponse.json({ success: true, data: responseData })
   } catch (error) {
     console.error('API Error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
