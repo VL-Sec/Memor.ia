@@ -261,6 +261,9 @@ export default function App() {
         return
       }
       
+      // Determine folderType based on active tab
+      const folderType = activeTab === 'clipboard' ? 'text' : 'link'
+      
       if (editingFolder) {
         // Update existing folder
         const response = await fetch('/api/folders', {
@@ -276,7 +279,12 @@ export default function App() {
         if (!response.ok) throw new Error('Failed to update folder')
         
         const result = await response.json()
-        setFolders(folders.map(f => f.id === editingFolder.id ? result.data : f))
+        
+        if (folderType === 'text') {
+          setClipboardFolders(clipboardFolders.map(f => f.id === editingFolder.id ? result.data : f))
+        } else {
+          setFolders(folders.map(f => f.id === editingFolder.id ? result.data : f))
+        }
         
         toast({
           title: t.successTitle,
@@ -289,14 +297,20 @@ export default function App() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             name: folderName,
-            icon: folderIcon
+            icon: folderIcon,
+            folderType: folderType
           })
         })
         
         if (!response.ok) throw new Error('Failed to create folder')
         
         const result = await response.json()
-        setFolders([...folders, result.data])
+        
+        if (folderType === 'text') {
+          setClipboardFolders([...clipboardFolders, result.data])
+        } else {
+          setFolders([...folders, result.data])
+        }
         
         toast({
           title: t.successTitle,
