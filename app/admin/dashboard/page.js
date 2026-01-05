@@ -280,6 +280,17 @@ export default function AdminDashboard() {
                       className="bg-black border-[#2C2C2E] rounded-xl"
                     />
                   </div>
+                  <div>
+                    <label className="block text-sm text-[#8E8E93] mb-2">
+                      Nota (opcional)
+                    </label>
+                    <Textarea
+                      value={newNote}
+                      onChange={(e) => setNewNote(e.target.value)}
+                      placeholder="Ex: Parceria YouTube 2025, contacto via email..."
+                      className="bg-black border-[#2C2C2E] rounded-xl min-h-[80px]"
+                    />
+                  </div>
                   <Button
                     onClick={handleCreateCode}
                     disabled={creating}
