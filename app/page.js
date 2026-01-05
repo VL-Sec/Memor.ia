@@ -18,8 +18,8 @@ export default function App() {
   const [folders, setFolders] = useState([])
   const [clipboardFolders, setClipboardFolders] = useState([])
   const [activeTab, setActiveTab] = useState('dashboard')
-  const [selectedFolder, setSelectedFolder] = useState(null)
-  const [selectedClipboardFolder, setSelectedClipboardFolder] = useState(null)
+  const [selectedFolder, setSelectedFolder] = useState('all') // 'all' or folder id
+  const [selectedClipboardFolder, setSelectedClipboardFolder] = useState('all') // 'all' or folder id
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
