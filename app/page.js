@@ -1101,7 +1101,7 @@ export default function App() {
                     className="rounded-2xl bg-[#007AFF] hover:bg-[#0051D5] disabled:opacity-50"
                   >
                     <Plus className="w-4 h-4 mr-2" />
-                    {t.save || "Save"}
+                    {t.save}
                   </Button>
                 </div>
                 <p className="text-xs text-[#8E8E93] mt-2">{t.cmdToSave}</p>
