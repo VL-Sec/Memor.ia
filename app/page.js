@@ -678,11 +678,25 @@ export default function App() {
                     </h3>
                     
                     {/* URL or Content preview */}
-                    {item.contentType === 'link' && item.url && (
-                      <p className="text-sm text-[#8E8E93] mb-3 line-clamp-1">
-                        {new URL(item.url).hostname}
-                      </p>
-                    )}
+                    {item.contentType === 'link' && item.url && (() => {
+                      try {
+                        let fullUrl = item.url
+                        if (!item.url.startsWith('http://') && !item.url.startsWith('https://')) {
+                          fullUrl = 'https://' + item.url
+                        }
+                        return (
+                          <p className="text-sm text-[#8E8E93] mb-3 line-clamp-1">
+                            {new URL(fullUrl).hostname}
+                          </p>
+                        )
+                      } catch {
+                        return (
+                          <p className="text-sm text-[#8E8E93] mb-3 line-clamp-1">
+                            {item.url}
+                          </p>
+                        )
+                      }
+                    })()}
                     
                     {item.contentType === 'text' && item.content && (
                       <p className="text-sm text-[#8E8E93] mb-3 line-clamp-3">
