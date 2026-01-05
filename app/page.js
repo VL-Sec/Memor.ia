@@ -1167,6 +1167,18 @@ export default function App() {
                 />
               </div>
               
+              {editingItem?.contentType === 'link' && (
+                <div>
+                  <label className="text-sm text-[#8E8E93] mb-2 block">Edit URL</label>
+                  <Input
+                    value={editUrl}
+                    onChange={(e) => setEditUrl(e.target.value)}
+                    className="bg-black border-[#2C2C2E] rounded-2xl focus:border-[#007AFF]"
+                    placeholder="https://example.com"
+                  />
+                </div>
+              )}
+              
               <div>
                 <label className="text-sm text-[#8E8E93] mb-2 block">{t.editTags}</label>
                 <Input
