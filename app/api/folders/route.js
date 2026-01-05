@@ -42,7 +42,7 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const body = await request.json()
-    const { name, icon = '📁', folderType = 'link' } = body
+    const { name, icon = '📁', folderType = 'link', isDefault = false } = body
     
     if (!name) {
       return NextResponse.json({ error: 'Folder name is required' }, { status: 400 })
@@ -53,7 +53,7 @@ export async function POST(request) {
       userId: 'demo_user',
       name,
       icon,
-      isDefault: false,
+      isDefault: isDefault,
       folderType: folderType, // Include folderType for proper separation
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
