@@ -90,21 +90,61 @@ export default function App() {
     try {
       // Fetch ONLY link folders (folderType='link')
       const linkResponse = await fetch('/api/folders?folderType=link')
+      let linkData = []
       if (linkResponse.ok) {
-        const linkData = await linkResponse.json()
-        setFolders(linkData)
-      } else {
-        setFolders([])
+        linkData = await linkResponse.json()
       }
       
       // Fetch ONLY clipboard folders (folderType='text')
       const clipboardResponse = await fetch('/api/folders?folderType=text')
+      let clipboardData = []
       if (clipboardResponse.ok) {
-        const clipboardData = await clipboardResponse.json()
-        setClipboardFolders(clipboardData)
-      } else {
-        setClipboardFolders([])
+        clipboardData = await clipboardResponse.json()
       }
+      
+      // Create default folders if they don't exist
+      // Check for default link folder
+      const hasDefaultLinkFolder = linkData.some(f => f.isDefault)
+      if (!hasDefaultLinkFolder) {
+        console.log('Creating default link folder...')
+        const createResponse = await fetch('/api/folders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: 'General',
+            icon: '📁',
+            folderType: 'link',
+            isDefault: true
+          })
+        })
+        if (createResponse.ok) {
+          const result = await createResponse.json()
+          linkData = [...linkData, { ...result.data, isDefault: true }]
+        }
+      }
+      
+      // Check for default clipboard folder
+      const hasDefaultClipboardFolder = clipboardData.some(f => f.isDefault)
+      if (!hasDefaultClipboardFolder) {
+        console.log('Creating default clipboard folder...')
+        const createResponse = await fetch('/api/folders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: 'General',
+            icon: '📋',
+            folderType: 'text',
+            isDefault: true
+          })
+        })
+        if (createResponse.ok) {
+          const result = await createResponse.json()
+          clipboardData = [...clipboardData, { ...result.data, isDefault: true }]
+        }
+      }
+      
+      setFolders(linkData)
+      setClipboardFolders(clipboardData)
       
       // Default to "all" - no folder selected
       // Users can click on folders to filter
