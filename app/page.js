@@ -209,15 +209,22 @@ export default function App() {
     try {
       const tags = editTags.split(',').map(t => t.trim()).filter(t => t)
       
+      const updateBody = {
+        id: editingItem.id,
+        title: editTitle,
+        tags: tags,
+        folderId: editFolderId
+      }
+      
+      // Only include URL for link type items
+      if (editingItem.contentType === 'link' && editUrl) {
+        updateBody.url = editUrl
+      }
+      
       const response = await fetch('/api/links', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: editingItem.id,
-          title: editTitle,
-          tags: tags,
-          folderId: editFolderId
-        })
+        body: JSON.stringify(updateBody)
       })
       
       if (!response.ok) throw new Error('Failed to update item')
