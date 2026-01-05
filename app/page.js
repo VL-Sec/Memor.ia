@@ -1111,7 +1111,7 @@ export default function App() {
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#8E8E93]" />
                 <Input
-                  placeholder="Search clipboard..."
+                  placeholder={t.searchClipboard}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-12 bg-[#1C1C1E] border-[#2C2C2E] rounded-2xl focus:border-[#007AFF]"
