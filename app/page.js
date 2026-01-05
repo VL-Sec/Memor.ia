@@ -219,6 +219,53 @@ export default function App() {
     }
   }
   
+  // Handle activation code submission
+  const handleActivateCode = async () => {
+    if (!activationCodeInput.trim()) return
+    
+    setActivatingCode(true)
+    try {
+      const response = await fetch('/api/activate-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: activationCodeInput.toUpperCase().trim(),
+          deviceId: getDeviceId()
+        })
+      })
+      
+      const result = await response.json()
+      
+      if (result.success) {
+        // Activate premium locally
+        activatePremium(result.code)
+        setPremiumStatus(getPremiumStatus())
+        setActivationCodeInput('')
+        setIsActivationDialogOpen(false)
+        
+        toast({
+          title: t.premium,
+          description: t.codeActivated,
+        })
+      } else {
+        toast({
+          title: t.errorTitle,
+          description: result.error === 'used' ? t.codeAlreadyUsed : t.invalidCode,
+          variant: 'destructive'
+        })
+      }
+    } catch (error) {
+      console.error('Activation error:', error)
+      toast({
+        title: t.errorTitle,
+        description: t.invalidCode,
+        variant: 'destructive'
+      })
+    } finally {
+      setActivatingCode(false)
+    }
+  }
+  
   // Activate Smart Clipboard
   const activateSmartClipboard = async () => {
     // Request clipboard permission
