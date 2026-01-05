@@ -856,7 +856,7 @@ export default function App() {
               rounded-r-lg
               flex items-center justify-center
               transition-all duration-300 ease-in-out
-              ${sidebarOpen ? 'left-48 md:left-64' : 'left-0'}
+              ${sidebarOpen ? 'left-48 md:left-56' : 'left-0'}
               z-50
               cursor-pointer
               group/toggle
