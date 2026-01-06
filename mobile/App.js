@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
-import { View, ActivityIndicator } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 
@@ -32,16 +32,22 @@ export default function App() {
   const [language, setLanguage] = useState('en');
   const [premiumStatus, setPremiumStatus] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const init = async () => {
-      const lang = await getStoredLanguage();
-      setLanguage(lang);
-      
-      const status = await getPremiumStatus();
-      setPremiumStatus(status);
-      
-      setLoading(false);
+      try {
+        const lang = await getStoredLanguage();
+        setLanguage(lang);
+        
+        const status = await getPremiumStatus();
+        setPremiumStatus(status);
+      } catch (e) {
+        console.error('Init error:', e);
+        setError(e.message);
+      } finally {
+        setLoading(false);
+      }
     };
     init();
   }, []);
@@ -50,8 +56,17 @@ export default function App() {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' }}>
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#007AFF" />
+        <Text style={styles.loadingText}>Memor.ia</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.errorText}>Error: {error}</Text>
       </View>
     );
   }
@@ -84,8 +99,6 @@ export default function App() {
           },
           headerStyle: {
             backgroundColor: '#000000',
-            borderBottomColor: '#2C2C2E',
-            borderBottomWidth: 1,
           },
           headerTintColor: '#FFFFFF',
           headerTitleStyle: {
@@ -96,7 +109,7 @@ export default function App() {
         <Tab.Screen 
           name="Links" 
           options={{ 
-            title: t.tabLinks,
+            title: t.tabLinks || 'Links',
             headerTitle: 'Memor.ia'
           }}
         >
@@ -106,8 +119,8 @@ export default function App() {
         <Tab.Screen 
           name="Clipboard" 
           options={{ 
-            title: t.tabClipboard,
-            headerTitle: t.tabClipboard
+            title: t.tabClipboard || 'Clipboard',
+            headerTitle: t.tabClipboard || 'Clipboard'
           }}
         >
           {(props) => <ClipboardScreen {...props} language={language} premiumStatus={premiumStatus} />}
@@ -116,8 +129,8 @@ export default function App() {
         <Tab.Screen 
           name="Favorites" 
           options={{ 
-            title: t.tabFavorites,
-            headerTitle: t.tabFavorites
+            title: t.tabFavorites || 'Favorites',
+            headerTitle: t.tabFavorites || 'Favorites'
           }}
         >
           {(props) => <FavoritesScreen {...props} language={language} />}
@@ -126,8 +139,8 @@ export default function App() {
         <Tab.Screen 
           name="Settings" 
           options={{ 
-            title: t.tabSettings,
-            headerTitle: t.tabSettings
+            title: t.tabSettings || 'Settings',
+            headerTitle: t.tabSettings || 'Settings'
           }}
         >
           {(props) => (
@@ -145,3 +158,22 @@ export default function App() {
     </NavigationContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    color: '#FFFFFF',
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginTop: 20,
+  },
+  errorText: {
+    color: '#FF3B30',
+    fontSize: 16,
+  },
+});
