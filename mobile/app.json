@@ -6,28 +6,16 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#000000"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.memoria.app",
-      "buildNumber": "1",
-      "infoPlist": {
-        "NSUbiquitousContainers": {
-          "iCloud.com.memoria.app": {
-            "NSUbiquitousContainerIsDocumentScopePublic": true,
-            "NSUbiquitousContainerSupportedFolderLevels": "Any",
-            "NSUbiquitousContainerName": "Memor.ia"
-          }
-        }
-      },
-      "usesIcloudStorage": true
+      "bundleIdentifier": "com.memoria.app"
     },
     "android": {
       "adaptiveIcon": {
@@ -35,26 +23,14 @@
         "backgroundColor": "#000000"
       },
       "package": "com.memoria.app",
-      "versionCode": 1,
-      "allowBackup": true,
-      "permissions": [
-        "INTERNET",
-        "RECEIVE_BOOT_COMPLETED",
-        "VIBRATE",
-        "SCHEDULE_EXACT_ALARM"
-      ]
+      "permissions": ["INTERNET"]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-secure-store",
-      "expo-localization",
-      [
-        "expo-notifications",
-        {
-          "icon": "./assets/notification-icon.png",
-          "color": "#007AFF",
-          "sounds": []
-        }
-      ]
+      "expo-localization"
     ],
     "extra": {
       "eas": {
