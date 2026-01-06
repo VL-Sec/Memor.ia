@@ -4,8 +4,11 @@
     "slug": "memoria",
     "version": "1.0.0",
     "orientation": "portrait",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
       "backgroundColor": "#000000"
     },
     "assetBundlePatterns": ["**/*"],
@@ -14,14 +17,25 @@
       "bundleIdentifier": "com.memoria.app"
     },
     "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#000000"
+      },
       "package": "com.memoria.app",
       "permissions": ["INTERNET"]
     },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
     "plugins": [
       "expo-secure-store",
-      "expo-localization"
+      "expo-localization",
+      "expo-font"
     ],
     "extra": {
+      "eas": {
+        "projectId": "5859e410-54f0-4917-bfc6-ae55b8968dd3"
+      },
       "supabaseUrl": "https://vczmygfrsmxzkyzzckfu.supabase.co",
       "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjem15Z2Zyc214emt5enpja2Z1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc2MTA5ODQsImV4cCI6MjA4MzE4Njk4NH0.qj0kSBcZpdLYxCLWY-fKchxLKJeBhUBoOAe13Sk4I2Q"
     }
