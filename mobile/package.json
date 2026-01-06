@@ -6,9 +6,7 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web",
-    "build:android": "eas build --platform android",
-    "build:ios": "eas build --platform ios"
+    "web": "expo start --web"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.4",
@@ -16,13 +14,11 @@
     "@react-native-community/datetimepicker": "8.3.0",
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/native": "^7.0.14",
-    "@react-navigation/native-stack": "^7.2.0",
     "@supabase/supabase-js": "^2.49.1",
-    "expo": "^54.0.0",
+    "expo": "~54.0.0",
     "expo-clipboard": "~7.0.1",
     "expo-constants": "~17.0.7",
     "expo-localization": "~16.0.1",
-    "expo-notifications": "~0.31.1",
     "expo-secure-store": "~14.0.1",
     "expo-status-bar": "~2.2.0",
     "react": "18.3.1",
