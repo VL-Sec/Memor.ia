@@ -127,7 +127,7 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
 
   const getCurrentLanguage = () => { 
     const lang = languages.find(l => l.code === language); 
-    return lang ? `${lang.flag} ${lang.name}` : 'English'; 
+    return lang ? `${lang.flag} ${lang.nativeName || lang.name}` : 'English'; 
   };
 
   return (
