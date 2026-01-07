@@ -87,6 +87,7 @@ export default function LinksScreen({ language }) {
     setEditingItem(item);
     setEditTitle(item.title || '');
     setEditFolderId(item.folderId || '');
+    setIsPinnedEdit(item.isPinned || false);
     if (item.reminder) {
       setReminderEnabled(true);
       setReminderLocation(item.reminder.location || '');
@@ -109,13 +110,24 @@ export default function LinksScreen({ language }) {
       if (reminderEnabled && reminderLocation) {
         reminderData = { location: reminderLocation };
       }
-      const updateData = { title: editTitle, folderId: editFolderId || null, reminder: reminderData };
+      const updateData = { title: editTitle, folderId: editFolderId || null, reminder: reminderData, isPinned: isPinnedEdit };
       await supabase.from('links').update(updateData).eq('id', editingItem.id);
       setLinks(links.map(l => l.id === editingItem.id ? { ...l, ...updateData } : l));
       Toast.show({ type: 'success', text1: t.saved });
       closeEditModal();
     } catch (error) {
       Toast.show({ type: 'error', text1: t.error });
+    }
+  };
+
+  const handleTogglePin = async (item) => {
+    try {
+      const newValue = !item.isPinned;
+      await supabase.from('links').update({ isPinned: newValue }).eq('id', item.id);
+      setLinks(links.map(l => l.id === item.id ? { ...l, isPinned: newValue } : l));
+      Toast.show({ type: 'success', text1: newValue ? (t.pinned || 'Fixado') : (t.unpinned || 'Desafixado') });
+    } catch (error) {
+      console.error('Error toggling pin:', error);
     }
   };
 
