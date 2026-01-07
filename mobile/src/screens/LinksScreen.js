@@ -22,6 +22,7 @@ export default function LinksScreen({ language }) {
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [reminderLocation, setReminderLocation] = useState('');
   const [showFolderPicker, setShowFolderPicker] = useState(false);
+  const [isPinnedEdit, setIsPinnedEdit] = useState(false);
 
   const t = translations[language] || translations.en;
 
