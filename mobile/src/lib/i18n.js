@@ -153,6 +153,9 @@ export const translations = {
     deleted: 'Deleted!',
     error: 'Something went wrong',
     success: 'Success',
+    pinned: 'Pinned to top',
+    unpinned: 'Unpinned',
+    pinToTop: 'Pin to top',
     
     // Reminders
     reminder: 'Reminder',
