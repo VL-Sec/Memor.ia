@@ -115,6 +115,17 @@ export default function ClipboardScreen({ language }) {
     }
   };
 
+  const handleTogglePin = async (item) => {
+    try {
+      const newValue = !item.isPinned;
+      await supabase.from('links').update({ isPinned: newValue }).eq('id', item.id);
+      setNotes(notes.map(n => n.id === item.id ? { ...n, isPinned: newValue } : n));
+      Toast.show({ type: 'success', text1: newValue ? (t.pinned || 'Fixado') : (t.unpinned || 'Desafixado') });
+    } catch (error) {
+      console.error('Error toggling pin:', error);
+    }
+  };
+
   const activateSmartClipboard = () => {
     setSmartClipboardActive(true);
     setTimeLeft(120);
