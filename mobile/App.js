@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 
 import LinksScreen from './src/screens/LinksScreen';
+import NotesScreen from './src/screens/NotesScreen';
 import ClipboardScreen from './src/screens/ClipboardScreen';
 import FavoritesScreen from './src/screens/FavoritesScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
@@ -80,6 +81,8 @@ export default function App() {
             let iconName;
             if (route.name === 'Links') {
               iconName = focused ? 'link' : 'link-outline';
+            } else if (route.name === 'Notes') {
+              iconName = focused ? 'document-text' : 'document-text-outline';
             } else if (route.name === 'Clipboard') {
               iconName = focused ? 'clipboard' : 'clipboard-outline';
             } else if (route.name === 'Favorites') {
@@ -114,6 +117,16 @@ export default function App() {
           }}
         >
           {(props) => <LinksScreen {...props} language={language} premiumStatus={premiumStatus} />}
+        </Tab.Screen>
+        
+        <Tab.Screen 
+          name="Notes" 
+          options={{ 
+            title: t.tabNotes || 'Notes',
+            headerTitle: t.tabNotes || 'Notes'
+          }}
+        >
+          {(props) => <NotesScreen {...props} language={language} />}
         </Tab.Screen>
         
         <Tab.Screen 
