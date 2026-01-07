@@ -59,14 +59,14 @@ export default function ClipboardScreen({ language }) {
         .select('*')
         .eq('userId', DEMO_USER)
         .eq('folderType', 'text')
-        .order('createdAt', { ascending: false });
+        .order('order', { ascending: true });
 
       const { data: notesData } = await supabase
         .from('links')
         .select('*')
         .eq('userId', DEMO_USER)
         .eq('contentType', 'text')
-        .order('createdAt', { ascending: false });
+        .order('order', { ascending: true });
 
       setFolders(foldersData || []);
       setNotes(notesData || []);
@@ -92,6 +92,7 @@ export default function ClipboardScreen({ language }) {
         contentType: 'text',
         tags: [],
         isFavorite: false,
+        order: 0,
         folderId: selectedFolder !== 'all' ? selectedFolder : defaultFolder?.id,
         createdAt: new Date().toISOString(),
       };
@@ -167,9 +168,46 @@ export default function ClipboardScreen({ language }) {
     return matchesFolder && matchesSearch;
   });
 
-  const onDragEnd = useCallback(({ data }) => {
+  const onDragEnd = useCallback(async ({ data }) => {
     setNotes(data);
+    try {
+      for (let i = 0; i < data.length; i++) {
+        await supabase.from('links').update({ order: i }).eq('id', data[i].id);
+      }
+    } catch (error) {
+      console.error('Error updating order:', error);
+    }
   }, []);
+
+  const onFolderDragEnd = useCallback(async ({ data }) => {
+    setFolders(data);
+    try {
+      for (let i = 0; i < data.length; i++) {
+        await supabase.from('folders').update({ order: i }).eq('id', data[i].id);
+      }
+    } catch (error) {
+      console.error('Error updating folder order:', error);
+    }
+  }, []);
+
+  const renderFolderChip = useCallback(({ item, drag, isActive }) => (
+    <ScaleDecorator>
+      <TouchableOpacity 
+        style={[
+          styles.folderChip, 
+          selectedFolder === item.id && styles.folderChipActive,
+          isActive && styles.folderChipDragging
+        ]} 
+        onPress={() => setSelectedFolder(item.id)}
+        onLongPress={item.id !== 'all' ? drag : undefined}
+        delayLongPress={200}
+      >
+        <Text style={[styles.folderChipText, selectedFolder === item.id && styles.folderChipTextActive]}>
+          {item.icon || ''} {item.isDefault ? t.generalFolder : item.name}
+        </Text>
+      </TouchableOpacity>
+    </ScaleDecorator>
+  ), [selectedFolder, t]);
 
   const renderNoteItem = useCallback(({ item, drag, isActive }) => {
     const folder = folders.find(f => f.id === item.folderId);
@@ -223,6 +261,8 @@ export default function ClipboardScreen({ language }) {
       </ScaleDecorator>
     );
   }, [folders, notes, t]);
+
+  const folderData = [{ id: 'all', name: t.allClipboards }, ...folders];
 
   return (
     <View style={styles.container}>
@@ -291,8 +331,21 @@ export default function ClipboardScreen({ language }) {
         />
       </View>
 
+      {/* Folder chips with drag */}
+      <View style={styles.folderListContainer}>
+        <DraggableFlatList
+          horizontal
+          data={folderData}
+          onDragEnd={onFolderDragEnd}
+          keyExtractor={(item) => item.id}
+          renderItem={renderFolderChip}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.folderListContent}
+        />
+      </View>
+
       {/* Drag hint */}
-      <Text style={styles.dragHint}>{t.dragToReorder || 'Pressione longamente para reorganizar'}</Text>
+      <Text style={styles.dragHint}>{t.dragToReorder}</Text>
 
       {/* Notes List */}
       {filteredNotes.length === 0 ? (
@@ -446,6 +499,13 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
   },
+  folderListContainer: { height: 44, marginBottom: 4 },
+  folderListContent: { paddingHorizontal: 16 },
+  folderChip: { backgroundColor: '#1C1C1E', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, marginRight: 8 },
+  folderChipActive: { backgroundColor: '#007AFF' },
+  folderChipDragging: { opacity: 0.8, transform: [{ scale: 1.05 }] },
+  folderChipText: { color: '#8E8E93', fontSize: 14 },
+  folderChipTextActive: { color: '#FFFFFF' },
   dragHint: {
     color: '#8E8E93',
     fontSize: 12,
