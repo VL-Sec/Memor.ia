@@ -241,6 +241,15 @@ export default function LinksScreen({ language }) {
               <View style={styles.reminderSection}>
                 <View style={styles.reminderHeader}>
                   <View style={styles.reminderHeaderLeft}>
+                    <Ionicons name="pin-outline" size={24} color="#FFD60A" />
+                    <Text style={styles.reminderTitle}>{t.pinToTop || 'Fixar no topo'}</Text>
+                  </View>
+                  <Switch value={isPinnedEdit} onValueChange={setIsPinnedEdit} trackColor={{ false: '#3A3A3C', true: '#FFD60A' }} thumbColor="#FFFFFF" />
+                </View>
+              </View>
+              <View style={styles.reminderSection}>
+                <View style={styles.reminderHeader}>
+                  <View style={styles.reminderHeaderLeft}>
                     <Ionicons name="location-outline" size={24} color="#FFD60A" />
                     <Text style={styles.reminderTitle}>{t.setReminder}</Text>
                   </View>
