@@ -137,6 +137,13 @@ export default function LinksScreen({ language }) {
     return matchesFolder && matchesSearch;
   });
 
+  // Sort: pinned items first, then by date
+  const sortedLinks = [...filteredLinks].sort((a, b) => {
+    if (a.isPinned && !b.isPinned) return -1;
+    if (!a.isPinned && b.isPinned) return 1;
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
+
   const renderLinkItem = ({ item }) => {
     const folder = folders.find(f => f.id === item.folderId);
     const hasReminder = item.reminder && item.reminder.location;
@@ -144,7 +151,10 @@ export default function LinksScreen({ language }) {
       <TouchableOpacity style={styles.linkCard} onPress={() => handleOpenLink(item.url)}>
         {item.imageUrl && <Image source={{ uri: item.imageUrl }} style={styles.linkImage} />}
         <View style={styles.linkContent}>
-          <Text style={styles.linkTitle} numberOfLines={2}>{item.title || item.url}</Text>
+          <View style={styles.linkTitleRow}>
+            <Text style={styles.linkTitle} numberOfLines={2}>{item.title || item.url}</Text>
+            {item.isPinned && <Ionicons name="pin" size={14} color="#FFD60A" style={{ marginLeft: 4 }} />}
+          </View>
           <Text style={styles.linkUrl} numberOfLines={1}>{item.url}</Text>
           <View style={styles.linkMeta}>
             <View style={styles.folderBadge}>
@@ -160,11 +170,14 @@ export default function LinksScreen({ language }) {
           </View>
         </View>
         <View style={styles.linkActions}>
-          <TouchableOpacity style={styles.editButton} onPress={() => openEditModal(item)}>
+          <TouchableOpacity style={styles.actionBtn} onPress={() => handleTogglePin(item)}>
+            <Ionicons name={item.isPinned ? "pin" : "pin-outline"} size={20} color={item.isPinned ? "#FFD60A" : "#8E8E93"} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.actionBtn} onPress={() => openEditModal(item)}>
             <Ionicons name="pencil" size={18} color="#8E8E93" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleToggleFavorite(item)}>
-            <Ionicons name={item.isFavorite ? 'heart' : 'heart-outline'} size={24} color={item.isFavorite ? '#FF3B30' : '#8E8E93'} />
+          <TouchableOpacity style={styles.actionBtn} onPress={() => handleToggleFavorite(item)}>
+            <Ionicons name={item.isFavorite ? 'heart' : 'heart-outline'} size={20} color={item.isFavorite ? '#FF3B30' : '#8E8E93'} />
           </TouchableOpacity>
         </View>
       </TouchableOpacity>
