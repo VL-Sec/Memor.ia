@@ -993,6 +993,9 @@ export const translations = {
     deleted: 'Eliminato!',
     error: 'Qualcosa è andato storto',
     success: 'Successo',
+    pinned: 'Fissato in alto',
+    unpinned: 'Rimosso dai fissati',
+    pinToTop: 'Fissa in alto',
     
     // Reminders
     reminder: 'Promemoria',
