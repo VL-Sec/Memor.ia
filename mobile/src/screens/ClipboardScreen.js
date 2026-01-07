@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
-  FlatList,
   TouchableOpacity,
   TextInput,
   StyleSheet,
   Alert,
   RefreshControl,
+  ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import DraggableFlatList, { ScaleDecorator } from 'react-native-draggable-flatlist';
 import * as Clipboard from 'expo-clipboard';
 import Toast from 'react-native-toast-message';
 import { supabase, generateId } from '../lib/supabase';
@@ -133,6 +134,20 @@ export default function ClipboardScreen({ language }) {
     ]);
   };
 
+  const handleToggleFavorite = async (item) => {
+    try {
+      const newValue = !item.isFavorite;
+      await supabase.from('links').update({ isFavorite: newValue }).eq('id', item.id);
+      setNotes(notes.map(n => n.id === item.id ? { ...n, isFavorite: newValue } : n));
+      Toast.show({ 
+        type: 'success', 
+        text1: newValue ? (t.addedToFavorites || 'Adicionado aos favoritos') : (t.removedFromFavorites || 'Removido dos favoritos')
+      });
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+    }
+  };
+
   const activateSmartClipboard = () => {
     setSmartClipboardActive(true);
     setTimeLeft(120);
@@ -152,39 +167,62 @@ export default function ClipboardScreen({ language }) {
     return matchesFolder && matchesSearch;
   });
 
-  const renderNoteItem = ({ item }) => {
+  const onDragEnd = useCallback(({ data }) => {
+    setNotes(data);
+  }, []);
+
+  const renderNoteItem = useCallback(({ item, drag, isActive }) => {
     const folder = folders.find(f => f.id === item.folderId);
     
     return (
-      <TouchableOpacity
-        style={styles.noteCard}
-        onLongPress={() => handleDeleteNote(item.id)}
-      >
-        <View style={styles.noteContent}>
-          <Text style={styles.noteText} numberOfLines={3}>
-            {item.content}
-          </Text>
-          <View style={styles.noteMeta}>
-            <Text style={styles.noteChars}>
-              {item.content?.length || 0} {t.chars}
+      <ScaleDecorator>
+        <TouchableOpacity
+          style={[styles.noteCard, isActive && styles.noteCardDragging]}
+          onLongPress={drag}
+          delayLongPress={200}
+        >
+          <View style={styles.noteContent}>
+            <Text style={styles.noteText} numberOfLines={3}>
+              {item.content}
             </Text>
-            <View style={styles.folderBadge}>
-              <Text style={styles.folderBadgeText}>
-                {folder?.isDefault ? t.generalFolder : folder?.name || t.generalFolder}
+            <View style={styles.noteMeta}>
+              <Text style={styles.noteChars}>
+                {item.content?.length || 0} {t.chars}
               </Text>
+              <View style={styles.folderBadge}>
+                <Text style={styles.folderBadgeText}>
+                  {folder?.isDefault ? t.generalFolder : folder?.name || t.generalFolder}
+                </Text>
+              </View>
+              {item.isFavorite && (
+                <Ionicons name="heart" size={14} color="#FF3B30" style={{ marginLeft: 4 }} />
+              )}
             </View>
           </View>
-        </View>
-        <TouchableOpacity
-          style={styles.copyButton}
-          onPress={() => handleCopyNote(item.content)}
-        >
-          <Ionicons name="copy" size={20} color="#FFFFFF" />
-          <Text style={styles.copyButtonText}>{t.copy}</Text>
+          <View style={styles.actionButtons}>
+            <TouchableOpacity
+              style={styles.favoriteButton}
+              onPress={() => handleToggleFavorite(item)}
+            >
+              <Ionicons name={item.isFavorite ? "heart" : "heart-outline"} size={20} color={item.isFavorite ? "#FF3B30" : "#8E8E93"} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.copyButton}
+              onPress={() => handleCopyNote(item.content)}
+            >
+              <Ionicons name="copy" size={18} color="#FFFFFF" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => handleDeleteNote(item.id)}
+            >
+              <Ionicons name="trash-outline" size={18} color="#FF3B30" />
+            </TouchableOpacity>
+          </View>
         </TouchableOpacity>
-      </TouchableOpacity>
+      </ScaleDecorator>
     );
-  };
+  }, [folders, notes, t]);
 
   return (
     <View style={styles.container}>
@@ -253,56 +291,48 @@ export default function ClipboardScreen({ language }) {
         />
       </View>
 
-      {/* Folder Filter */}
-      <FlatList
-        horizontal
-        data={[{ id: 'all', name: t.allClipboards }, ...folders]}
-        keyExtractor={(item) => item.id}
-        showsHorizontalScrollIndicator={false}
-        style={styles.folderList}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={[
-              styles.folderChip,
-              selectedFolder === item.id && styles.folderChipActive,
-            ]}
-            onPress={() => setSelectedFolder(item.id)}
-          >
-            <Text
-              style={[
-                styles.folderChipText,
-                selectedFolder === item.id && styles.folderChipTextActive,
-              ]}
-            >
-              {item.icon || ''} {item.isDefault ? t.generalFolder : item.name}
-            </Text>
-          </TouchableOpacity>
-        )}
-      />
+      {/* Drag hint */}
+      <Text style={styles.dragHint}>{t.dragToReorder || 'Pressione longamente para reorganizar'}</Text>
 
       {/* Notes List */}
-      <FlatList
-        data={filteredNotes}
-        keyExtractor={(item) => item.id}
-        renderItem={renderNoteItem}
-        contentContainerStyle={styles.listContent}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={() => {
-              setRefreshing(true);
-              fetchData();
-            }}
-            tintColor="#007AFF"
-          />
-        }
-        ListEmptyComponent={
+      {filteredNotes.length === 0 ? (
+        <ScrollView
+          style={{ flex: 1 }}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => {
+                setRefreshing(true);
+                fetchData();
+              }}
+              tintColor="#007AFF"
+            />
+          }
+        >
           <View style={styles.emptyState}>
             <Ionicons name="clipboard-outline" size={64} color="#8E8E93" />
             <Text style={styles.emptyText}>{t.noClipboardItems}</Text>
           </View>
-        }
-      />
+        </ScrollView>
+      ) : (
+        <DraggableFlatList
+          data={filteredNotes}
+          onDragEnd={onDragEnd}
+          keyExtractor={(item) => item.id}
+          renderItem={renderNoteItem}
+          contentContainerStyle={styles.listContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => {
+                setRefreshing(true);
+                fetchData();
+              }}
+              tintColor="#007AFF"
+            />
+          }
+        />
+      )}
     </View>
   );
 }
@@ -416,31 +446,16 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
   },
-  folderList: {
-    paddingHorizontal: 16,
-    marginBottom: 8,
-    maxHeight: 40,
-  },
-  folderChip: {
-    backgroundColor: '#1C1C1E',
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 16,
-    marginRight: 8,
-  },
-  folderChipActive: {
-    backgroundColor: '#007AFF',
-  },
-  folderChipText: {
+  dragHint: {
     color: '#8E8E93',
-    fontSize: 13,
-  },
-  folderChipTextActive: {
-    color: '#FFFFFF',
+    fontSize: 12,
+    textAlign: 'center',
+    marginBottom: 8,
   },
   listContent: {
     padding: 16,
     paddingTop: 8,
+    paddingBottom: 100,
   },
   noteCard: {
     backgroundColor: '#1C1C1E',
@@ -448,6 +463,14 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     padding: 12,
     flexDirection: 'row',
+  },
+  noteCardDragging: {
+    opacity: 0.9,
+    shadowColor: '#007AFF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   noteContent: {
     flex: 1,
@@ -477,20 +500,22 @@ const styles = StyleSheet.create({
     color: '#007AFF',
     fontSize: 11,
   },
-  copyButton: {
-    backgroundColor: '#007AFF',
-    flexDirection: 'row',
+  actionButtons: {
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    borderRadius: 12,
-    gap: 4,
-    alignSelf: 'center',
+    gap: 8,
     marginLeft: 8,
   },
-  copyButtonText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-    fontSize: 13,
+  favoriteButton: {
+    padding: 6,
+  },
+  copyButton: {
+    backgroundColor: '#007AFF',
+    padding: 8,
+    borderRadius: 8,
+  },
+  deleteButton: {
+    padding: 6,
   },
   emptyState: {
     alignItems: 'center',

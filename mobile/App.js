@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Toast from 'react-native-toast-message';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Toast, { BaseToast } from 'react-native-toast-message';
 
 import LinksScreen from './src/screens/LinksScreen';
 import NotesScreen from './src/screens/NotesScreen';
@@ -27,6 +28,97 @@ const theme = {
     border: '#2C2C2E',
     notification: '#007AFF',
   },
+};
+
+// Custom Toast Configuration with auto-dismiss after 3 seconds and close button
+const toastConfig = {
+  success: (props) => (
+    <BaseToast
+      {...props}
+      style={{
+        borderLeftColor: '#34C759',
+        backgroundColor: '#1C1C1E',
+        borderRadius: 12,
+        marginHorizontal: 16,
+      }}
+      contentContainerStyle={{ paddingHorizontal: 15 }}
+      text1Style={{
+        fontSize: 15,
+        fontWeight: '600',
+        color: '#FFFFFF',
+      }}
+      text2Style={{
+        fontSize: 13,
+        color: '#8E8E93',
+      }}
+      renderTrailingIcon={() => (
+        <TouchableOpacity
+          style={{ padding: 10, justifyContent: 'center' }}
+          onPress={() => Toast.hide()}
+        >
+          <Ionicons name="close" size={20} color="#8E8E93" />
+        </TouchableOpacity>
+      )}
+    />
+  ),
+  error: (props) => (
+    <BaseToast
+      {...props}
+      style={{
+        borderLeftColor: '#FF3B30',
+        backgroundColor: '#1C1C1E',
+        borderRadius: 12,
+        marginHorizontal: 16,
+      }}
+      contentContainerStyle={{ paddingHorizontal: 15 }}
+      text1Style={{
+        fontSize: 15,
+        fontWeight: '600',
+        color: '#FFFFFF',
+      }}
+      text2Style={{
+        fontSize: 13,
+        color: '#8E8E93',
+      }}
+      renderTrailingIcon={() => (
+        <TouchableOpacity
+          style={{ padding: 10, justifyContent: 'center' }}
+          onPress={() => Toast.hide()}
+        >
+          <Ionicons name="close" size={20} color="#8E8E93" />
+        </TouchableOpacity>
+      )}
+    />
+  ),
+  info: (props) => (
+    <BaseToast
+      {...props}
+      style={{
+        borderLeftColor: '#007AFF',
+        backgroundColor: '#1C1C1E',
+        borderRadius: 12,
+        marginHorizontal: 16,
+      }}
+      contentContainerStyle={{ paddingHorizontal: 15 }}
+      text1Style={{
+        fontSize: 15,
+        fontWeight: '600',
+        color: '#FFFFFF',
+      }}
+      text2Style={{
+        fontSize: 13,
+        color: '#8E8E93',
+      }}
+      renderTrailingIcon={() => (
+        <TouchableOpacity
+          style={{ padding: 10, justifyContent: 'center' }}
+          onPress={() => Toast.hide()}
+        >
+          <Ionicons name="close" size={20} color="#8E8E93" />
+        </TouchableOpacity>
+      )}
+    />
+  ),
 };
 
 export default function App() {
@@ -73,102 +165,104 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer theme={theme}>
-      <StatusBar style="light" />
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName;
-            if (route.name === 'Links') {
-              iconName = focused ? 'link' : 'link-outline';
-            } else if (route.name === 'Notes') {
-              iconName = focused ? 'document-text' : 'document-text-outline';
-            } else if (route.name === 'Clipboard') {
-              iconName = focused ? 'clipboard' : 'clipboard-outline';
-            } else if (route.name === 'Favorites') {
-              iconName = focused ? 'heart' : 'heart-outline';
-            } else if (route.name === 'Settings') {
-              iconName = focused ? 'settings' : 'settings-outline';
-            }
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
-          tabBarActiveTintColor: '#007AFF',
-          tabBarInactiveTintColor: '#8E8E93',
-          tabBarStyle: {
-            backgroundColor: '#1C1C1E',
-            borderTopColor: '#2C2C2E',
-            paddingTop: 5,
-            height: 85,
-          },
-          headerStyle: {
-            backgroundColor: '#000000',
-          },
-          headerTintColor: '#FFFFFF',
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
-        })}
-      >
-        <Tab.Screen 
-          name="Links" 
-          options={{ 
-            title: t.tabLinks || 'Links',
-            headerTitle: 'Memor.ia'
-          }}
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <NavigationContainer theme={theme}>
+        <StatusBar style="light" />
+        <Tab.Navigator
+          screenOptions={({ route }) => ({
+            tabBarIcon: ({ focused, color, size }) => {
+              let iconName;
+              if (route.name === 'Links') {
+                iconName = focused ? 'link' : 'link-outline';
+              } else if (route.name === 'Notes') {
+                iconName = focused ? 'document-text' : 'document-text-outline';
+              } else if (route.name === 'Clipboard') {
+                iconName = focused ? 'clipboard' : 'clipboard-outline';
+              } else if (route.name === 'Favorites') {
+                iconName = focused ? 'heart' : 'heart-outline';
+              } else if (route.name === 'Settings') {
+                iconName = focused ? 'settings' : 'settings-outline';
+              }
+              return <Ionicons name={iconName} size={size} color={color} />;
+            },
+            tabBarActiveTintColor: '#007AFF',
+            tabBarInactiveTintColor: '#8E8E93',
+            tabBarStyle: {
+              backgroundColor: '#1C1C1E',
+              borderTopColor: '#2C2C2E',
+              paddingTop: 5,
+              height: 85,
+            },
+            headerStyle: {
+              backgroundColor: '#000000',
+            },
+            headerTintColor: '#FFFFFF',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          })}
         >
-          {(props) => <LinksScreen {...props} language={language} premiumStatus={premiumStatus} />}
-        </Tab.Screen>
-        
-        <Tab.Screen 
-          name="Notes" 
-          options={{ 
-            title: t.tabNotes || 'Notes',
-            headerTitle: t.tabNotes || 'Notes'
-          }}
-        >
-          {(props) => <NotesScreen {...props} language={language} />}
-        </Tab.Screen>
-        
-        <Tab.Screen 
-          name="Clipboard" 
-          options={{ 
-            title: t.tabClipboard || 'Clipboard',
-            headerTitle: t.tabClipboard || 'Clipboard'
-          }}
-        >
-          {(props) => <ClipboardScreen {...props} language={language} premiumStatus={premiumStatus} />}
-        </Tab.Screen>
-        
-        <Tab.Screen 
-          name="Favorites" 
-          options={{ 
-            title: t.tabFavorites || 'Favorites',
-            headerTitle: t.tabFavorites || 'Favorites'
-          }}
-        >
-          {(props) => <FavoritesScreen {...props} language={language} />}
-        </Tab.Screen>
-        
-        <Tab.Screen 
-          name="Settings" 
-          options={{ 
-            title: t.tabSettings || 'Settings',
-            headerTitle: t.tabSettings || 'Settings'
-          }}
-        >
-          {(props) => (
-            <SettingsScreen 
-              {...props} 
-              language={language} 
-              setLanguage={setLanguage}
-              premiumStatus={premiumStatus}
-              setPremiumStatus={setPremiumStatus}
-            />
-          )}
-        </Tab.Screen>
-      </Tab.Navigator>
-      <Toast />
-    </NavigationContainer>
+          <Tab.Screen 
+            name="Links" 
+            options={{ 
+              title: t.tabLinks || 'Links',
+              headerTitle: 'Memor.ia'
+            }}
+          >
+            {(props) => <LinksScreen {...props} language={language} premiumStatus={premiumStatus} />}
+          </Tab.Screen>
+          
+          <Tab.Screen 
+            name="Notes" 
+            options={{ 
+              title: t.tabNotes || 'Notes',
+              headerTitle: t.tabNotes || 'Notes'
+            }}
+          >
+            {(props) => <NotesScreen {...props} language={language} />}
+          </Tab.Screen>
+          
+          <Tab.Screen 
+            name="Clipboard" 
+            options={{ 
+              title: t.tabClipboard || 'Clipboard',
+              headerTitle: t.tabClipboard || 'Clipboard'
+            }}
+          >
+            {(props) => <ClipboardScreen {...props} language={language} premiumStatus={premiumStatus} />}
+          </Tab.Screen>
+          
+          <Tab.Screen 
+            name="Favorites" 
+            options={{ 
+              title: t.tabFavorites || 'Favorites',
+              headerTitle: t.tabFavorites || 'Favorites'
+            }}
+          >
+            {(props) => <FavoritesScreen {...props} language={language} />}
+          </Tab.Screen>
+          
+          <Tab.Screen 
+            name="Settings" 
+            options={{ 
+              title: t.tabSettings || 'Settings',
+              headerTitle: t.tabSettings || 'Settings'
+            }}
+          >
+            {(props) => (
+              <SettingsScreen 
+                {...props} 
+                language={language} 
+                setLanguage={setLanguage}
+                premiumStatus={premiumStatus}
+                setPremiumStatus={setPremiumStatus}
+              />
+            )}
+          </Tab.Screen>
+        </Tab.Navigator>
+        <Toast config={toastConfig} visibilityTime={3000} autoHide={true} />
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
 }
 

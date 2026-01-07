@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, TextInput, StyleSheet, RefreshControl, Modal, ScrollView, Alert } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, RefreshControl, Modal, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import DraggableFlatList, { ScaleDecorator } from 'react-native-draggable-flatlist';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { translations } from '../lib/i18n';
@@ -81,7 +82,6 @@ export default function NotesScreen({ language }) {
     const now = new Date().toISOString();
     
     if (editingNote) {
-      // Update existing note
       const updatedNotes = notes.map(n => 
         n.id === editingNote.id 
           ? { ...n, title: noteTitle, content: noteContent, color: noteColor, updatedAt: now }
@@ -89,13 +89,14 @@ export default function NotesScreen({ language }) {
       );
       saveNotes(updatedNotes);
     } else {
-      // Create new note
       const newNote = {
         id: `note_${Date.now()}`,
         title: noteTitle,
         content: noteContent,
         color: noteColor,
         isPinned: false,
+        isFavorite: false,
+        order: 0,
         createdAt: now,
         updatedAt: now,
       };
@@ -132,6 +133,18 @@ export default function NotesScreen({ language }) {
     saveNotes(updatedNotes);
   };
 
+  const handleToggleFavorite = (noteId) => {
+    const note = notes.find(n => n.id === noteId);
+    const updatedNotes = notes.map(n =>
+      n.id === noteId ? { ...n, isFavorite: !n.isFavorite } : n
+    );
+    saveNotes(updatedNotes);
+    Toast.show({ 
+      type: 'success', 
+      text1: note?.isFavorite ? (t.removedFromFavorites || 'Removido dos favoritos') : (t.addedToFavorites || 'Adicionado aos favoritos')
+    });
+  };
+
   const handleCopyNote = async (content) => {
     try {
       const Clipboard = require('expo-clipboard');
@@ -161,51 +174,58 @@ export default function NotesScreen({ language }) {
     return date.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
   };
 
-  const renderNoteItem = ({ item }) => (
-    <TouchableOpacity 
-      style={[styles.noteCard, { borderLeftColor: getColorById(item.color), borderLeftWidth: 4 }]}
-      onPress={() => openEditNote(item)}
-      onLongPress={() => handleTogglePin(item.id)}
-    >
-      <View style={styles.noteHeader}>
-        {item.title ? (
-          <Text style={styles.noteTitle} numberOfLines={1}>{item.title}</Text>
-        ) : null}
-        {item.isPinned && (
-          <Ionicons name="pin" size={16} color="#FFD60A" />
-        )}
-      </View>
-      <Text style={styles.noteContent} numberOfLines={4}>{item.content}</Text>
-      <View style={styles.noteFooter}>
-        <Text style={styles.noteDate}>{formatDate(item.updatedAt)}</Text>
-        <View style={styles.noteActions}>
-          <TouchableOpacity onPress={() => handleCopyNote(item.content)} style={styles.actionButton}>
-            <Ionicons name="copy-outline" size={18} color="#8E8E93" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleTogglePin(item.id)} style={styles.actionButton}>
-            <Ionicons name={item.isPinned ? "pin" : "pin-outline"} size={18} color={item.isPinned ? "#FFD60A" : "#8E8E93"} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleDeleteNote(item.id)} style={styles.actionButton}>
-            <Ionicons name="trash-outline" size={18} color="#FF3B30" />
-          </TouchableOpacity>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
+  const onDragEnd = useCallback(({ data }) => {
+    saveNotes(data);
+  }, []);
 
-  const renderSection = (title, data) => {
-    if (data.length === 0) return null;
-    return (
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{title}</Text>
-        {data.map(item => (
-          <View key={item.id}>
-            {renderNoteItem({ item })}
+  const renderNoteItem = useCallback(({ item, drag, isActive }) => (
+    <ScaleDecorator>
+      <TouchableOpacity 
+        style={[
+          styles.noteCard, 
+          { borderLeftColor: getColorById(item.color), borderLeftWidth: 4 },
+          isActive && styles.noteCardDragging
+        ]}
+        onPress={() => openEditNote(item)}
+        onLongPress={drag}
+        delayLongPress={200}
+      >
+        <View style={styles.noteHeader}>
+          {item.title ? (
+            <Text style={styles.noteTitle} numberOfLines={1}>{item.title}</Text>
+          ) : null}
+          <View style={styles.noteIcons}>
+            {item.isPinned && (
+              <Ionicons name="pin" size={16} color="#FFD60A" />
+            )}
+            {item.isFavorite && (
+              <Ionicons name="heart" size={16} color="#FF3B30" style={{ marginLeft: 4 }} />
+            )}
           </View>
-        ))}
-      </View>
-    );
-  };
+        </View>
+        <Text style={styles.noteContent} numberOfLines={4}>{item.content}</Text>
+        <View style={styles.noteFooter}>
+          <Text style={styles.noteDate}>{formatDate(item.updatedAt)}</Text>
+          <View style={styles.noteActions}>
+            <TouchableOpacity onPress={() => handleCopyNote(item.content)} style={styles.actionButton}>
+              <Ionicons name="copy-outline" size={18} color="#8E8E93" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleToggleFavorite(item.id)} style={styles.actionButton}>
+              <Ionicons name={item.isFavorite ? "heart" : "heart-outline"} size={18} color={item.isFavorite ? "#FF3B30" : "#8E8E93"} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleTogglePin(item.id)} style={styles.actionButton}>
+              <Ionicons name={item.isPinned ? "pin" : "pin-outline"} size={18} color={item.isPinned ? "#FFD60A" : "#8E8E93"} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleDeleteNote(item.id)} style={styles.actionButton}>
+              <Ionicons name="trash-outline" size={18} color="#FF3B30" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </TouchableOpacity>
+    </ScaleDecorator>
+  ), [notes, t]);
+
+  const allNotes = [...pinnedNotes, ...otherNotes];
 
   return (
     <View style={styles.container}>
@@ -221,29 +241,42 @@ export default function NotesScreen({ language }) {
         />
       </View>
 
+      {/* Drag hint */}
+      <Text style={styles.dragHint}>{t.dragToReorder || 'Pressione longamente para reorganizar'}</Text>
+
       {/* Notes List */}
-      <ScrollView 
-        style={styles.scrollView}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={() => { setRefreshing(true); loadNotes(); }}
-            tintColor="#007AFF"
-          />
-        }
-      >
-        {filteredNotes.length === 0 ? (
+      {allNotes.length === 0 ? (
+        <ScrollView 
+          style={styles.scrollView}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => { setRefreshing(true); loadNotes(); }}
+              tintColor="#007AFF"
+            />
+          }
+        >
           <View style={styles.emptyState}>
             <Ionicons name="document-text-outline" size={64} color="#8E8E93" />
             <Text style={styles.emptyText}>{t.noNotes}</Text>
           </View>
-        ) : (
-          <>
-            {renderSection(t.pinnedNotes, pinnedNotes)}
-            {renderSection(t.otherNotes, otherNotes)}
-          </>
-        )}
-      </ScrollView>
+        </ScrollView>
+      ) : (
+        <DraggableFlatList
+          data={allNotes}
+          onDragEnd={onDragEnd}
+          keyExtractor={(item) => item.id}
+          renderItem={renderNoteItem}
+          contentContainerStyle={styles.listContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => { setRefreshing(true); loadNotes(); }}
+              tintColor="#007AFF"
+            />
+          }
+        />
+      )}
 
       {/* FAB - New Note */}
       <TouchableOpacity style={styles.fab} onPress={openNewNote}>
@@ -272,7 +305,6 @@ export default function NotesScreen({ language }) {
             </View>
 
             <ScrollView style={styles.modalBody}>
-              {/* Title Input */}
               <TextInput
                 style={styles.titleInput}
                 placeholder={t.noteTitlePlaceholder}
@@ -281,7 +313,6 @@ export default function NotesScreen({ language }) {
                 onChangeText={setNoteTitle}
               />
 
-              {/* Content Input */}
               <TextInput
                 style={styles.contentInput}
                 placeholder={t.notesPlaceholder}
@@ -292,7 +323,6 @@ export default function NotesScreen({ language }) {
                 textAlignVertical="top"
               />
 
-              {/* Color Picker */}
               <Text style={styles.colorLabel}>{t.noteColor}</Text>
               <View style={styles.colorPicker}>
                 {NOTE_COLORS.map(c => (
@@ -340,20 +370,19 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
   },
+  dragHint: {
+    color: '#8E8E93',
+    fontSize: 12,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
   scrollView: {
     flex: 1,
     paddingHorizontal: 16,
   },
-  section: {
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    color: '#8E8E93',
-    fontSize: 13,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    marginBottom: 8,
-    marginTop: 8,
+  listContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 100,
   },
   noteCard: {
     backgroundColor: '#1C1C1E',
@@ -361,11 +390,23 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 10,
   },
+  noteCardDragging: {
+    opacity: 0.9,
+    shadowColor: '#007AFF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
   noteHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 8,
+  },
+  noteIcons: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   noteTitle: {
     color: '#FFFFFF',

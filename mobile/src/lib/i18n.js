@@ -19,6 +19,7 @@ export const translations = {
     copy: 'Copy',
     open: 'Open',
     search: 'Search...',
+    all: 'All',
     
     // Folders
     allLinks: 'All Links',
@@ -52,6 +53,15 @@ export const translations = {
     unpinNote: 'Unpin',
     pinnedNotes: 'Pinned',
     otherNotes: 'Notes',
+    
+    // Favorites
+    noFavorites: 'No favorites yet',
+    addFavoritesHint: 'Tap the heart to add favorites',
+    addedToFavorites: 'Added to favorites',
+    removedFromFavorites: 'Removed from favorites',
+    
+    // Drag & Drop
+    dragToReorder: 'Long press to reorder',
     
     // Premium
     premium: 'Premium',
@@ -130,6 +140,7 @@ export const translations = {
     copy: 'Copiar',
     open: 'Abrir',
     search: 'Pesquisar...',
+    all: 'Todos',
     
     // Folders
     allLinks: 'Todos os Links',
@@ -163,6 +174,15 @@ export const translations = {
     unpinNote: 'Desafixar',
     pinnedNotes: 'Fixadas',
     otherNotes: 'Notas',
+    
+    // Favorites
+    noFavorites: 'Sem favoritos',
+    addFavoritesHint: 'Toca no coração para adicionar favoritos',
+    addedToFavorites: 'Adicionado aos favoritos',
+    removedFromFavorites: 'Removido dos favoritos',
+    
+    // Drag & Drop
+    dragToReorder: 'Pressiona longamente para reorganizar',
     
     // Premium
     premium: 'Premium',
@@ -241,6 +261,7 @@ export const translations = {
     copy: 'Copiar',
     open: 'Abrir',
     search: 'Buscar...',
+    all: 'Todos',
     
     // Folders
     allLinks: 'Todos los Enlaces',
@@ -274,6 +295,15 @@ export const translations = {
     unpinNote: 'Desfijar',
     pinnedNotes: 'Fijadas',
     otherNotes: 'Notas',
+    
+    // Favorites
+    noFavorites: 'Sin favoritos',
+    addFavoritesHint: 'Toca el corazón para añadir favoritos',
+    addedToFavorites: 'Añadido a favoritos',
+    removedFromFavorites: 'Eliminado de favoritos',
+    
+    // Drag & Drop
+    dragToReorder: 'Mantén pulsado para reorganizar',
     
     // Premium
     premium: 'Premium',
@@ -352,6 +382,7 @@ export const translations = {
     copy: 'Copier',
     open: 'Ouvrir',
     search: 'Rechercher...',
+    all: 'Tous',
     
     // Folders
     allLinks: 'Tous les Liens',
@@ -385,6 +416,15 @@ export const translations = {
     unpinNote: 'Désépingler',
     pinnedNotes: 'Épinglées',
     otherNotes: 'Notes',
+    
+    // Favorites
+    noFavorites: 'Pas de favoris',
+    addFavoritesHint: 'Appuyez sur le cœur pour ajouter des favoris',
+    addedToFavorites: 'Ajouté aux favoris',
+    removedFromFavorites: 'Retiré des favoris',
+    
+    // Drag & Drop
+    dragToReorder: 'Appuyez longuement pour réorganiser',
     
     // Premium
     premium: 'Premium',
