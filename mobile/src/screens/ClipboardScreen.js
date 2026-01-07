@@ -236,7 +236,7 @@ export default function ClipboardScreen({ language }) {
           </View>
         </ScrollView>
       ) : (
-        <FlatList data={filteredNotes} keyExtractor={(item) => item.id} renderItem={renderNoteItem} contentContainerStyle={styles.listContent} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchData(); }} tintColor="#007AFF" />} />
+        <FlatList data={sortedNotes} keyExtractor={(item) => item.id} renderItem={renderNoteItem} contentContainerStyle={styles.listContent} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchData(); }} tintColor="#007AFF" />} />
       )}
     </View>
   );
