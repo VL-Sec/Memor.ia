@@ -321,6 +321,9 @@ export const translations = {
     deleted: 'Eliminado!',
     error: 'Algo correu mal',
     success: 'Sucesso',
+    pinned: 'Fixado no topo',
+    unpinned: 'Desafixado',
+    pinToTop: 'Fixar no topo',
     
     // Reminders
     reminder: 'Lembrete',
