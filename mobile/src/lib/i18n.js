@@ -489,6 +489,9 @@ export const translations = {
     deleted: '¡Eliminado!',
     error: 'Algo salió mal',
     success: 'Éxito',
+    pinned: 'Fijado arriba',
+    unpinned: 'Desfijado',
+    pinToTop: 'Fijar arriba',
     
     // Reminders
     reminder: 'Recordatorio',
