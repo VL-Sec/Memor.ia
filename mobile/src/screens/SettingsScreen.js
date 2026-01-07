@@ -250,7 +250,7 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
             {languages.map((lang) => (
               <TouchableOpacity key={lang.code} style={[styles.languageOption, language === lang.code && styles.languageOptionActive]} onPress={() => handleLanguageChange(lang.code)}>
                 <Text style={styles.languageFlag}>{lang.flag}</Text>
-                <Text style={styles.languageName}>{lang.name}</Text>
+                <Text style={styles.languageName}>{lang.nativeName || lang.name}</Text>
                 {language === lang.code && <Ionicons name="checkmark" size={24} color="#007AFF" />}
               </TouchableOpacity>
             ))}
