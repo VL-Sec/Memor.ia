@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Image, Linking, Alert, RefreshControl, Modal, ScrollView, Switch } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Image, Linking, Alert, RefreshControl, Modal, ScrollView, Switch, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import DraggableFlatList, { ScaleDecorator } from 'react-native-draggable-flatlist';
 import Toast from 'react-native-toast-message';
 import { supabase, generateId } from '../lib/supabase';
 import { translations } from '../lib/i18n';
@@ -23,7 +22,6 @@ export default function LinksScreen({ language }) {
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [reminderLocation, setReminderLocation] = useState('');
   const [showFolderPicker, setShowFolderPicker] = useState(false);
-  const [showFolderManager, setShowFolderManager] = useState(false);
 
   const t = translations[language] || translations.en;
 
@@ -31,8 +29,8 @@ export default function LinksScreen({ language }) {
 
   const fetchData = async () => {
     try {
-      const { data: foldersData } = await supabase.from('folders').select('*').eq('userId', DEMO_USER).eq('folderType', 'link').order('order', { ascending: true });
-      const { data: linksData } = await supabase.from('links').select('*').eq('userId', DEMO_USER).eq('contentType', 'link').order('order', { ascending: true });
+      const { data: foldersData } = await supabase.from('folders').select('*').eq('userId', DEMO_USER).eq('folderType', 'link').order('createdAt', { ascending: false });
+      const { data: linksData } = await supabase.from('links').select('*').eq('userId', DEMO_USER).eq('contentType', 'link').order('createdAt', { ascending: false });
       setFolders(foldersData || []);
       setLinks(linksData || []);
     } catch (error) {
@@ -49,18 +47,7 @@ export default function LinksScreen({ language }) {
     if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
     try {
       const defaultFolder = folders.find(f => f.isDefault);
-      const newLink = { 
-        id: generateId(), 
-        userId: DEMO_USER, 
-        url, 
-        title: url, 
-        contentType: 'link', 
-        tags: [], 
-        isFavorite: false, 
-        folderId: selectedFolder !== 'all' ? selectedFolder : defaultFolder?.id, 
-        order: 0,
-        createdAt: new Date().toISOString() 
-      };
+      const newLink = { id: generateId(), userId: DEMO_USER, url, title: url, contentType: 'link', tags: [], isFavorite: false, folderId: selectedFolder !== 'all' ? selectedFolder : defaultFolder?.id, createdAt: new Date().toISOString() };
       const { error } = await supabase.from('links').insert([newLink]);
       if (error) throw error;
       setLinks([newLink, ...links]);
@@ -91,10 +78,7 @@ export default function LinksScreen({ language }) {
       const newValue = !item.isFavorite;
       await supabase.from('links').update({ isFavorite: newValue }).eq('id', item.id);
       setLinks(links.map(l => l.id === item.id ? { ...l, isFavorite: newValue } : l));
-      Toast.show({ 
-        type: 'success', 
-        text1: newValue ? (t.addedToFavorites || 'Adicionado aos favoritos') : (t.removedFromFavorites || 'Removido dos favoritos')
-      });
+      Toast.show({ type: 'success', text1: newValue ? (t.addedToFavorites || 'Adicionado aos favoritos') : (t.removedFromFavorites || 'Removido dos favoritos') });
     } catch (error) {}
   };
 
@@ -115,10 +99,6 @@ export default function LinksScreen({ language }) {
   const closeEditModal = () => {
     setShowEditModal(false);
     setEditingItem(null);
-    setEditTitle('');
-    setEditFolderId('');
-    setReminderEnabled(false);
-    setReminderLocation('');
   };
 
   const handleSaveEdit = async () => {
@@ -144,92 +124,39 @@ export default function LinksScreen({ language }) {
     return matchesFolder && matchesSearch;
   });
 
-  const onDragEnd = useCallback(async ({ data }) => {
-    setLinks(data);
-    // Update order in database
-    try {
-      for (let i = 0; i < data.length; i++) {
-        await supabase.from('links').update({ order: i }).eq('id', data[i].id);
-      }
-    } catch (error) {
-      console.error('Error updating order:', error);
-    }
-  }, []);
-
-  const onFolderDragEnd = useCallback(async ({ data }) => {
-    setFolders(data);
-    try {
-      for (let i = 0; i < data.length; i++) {
-        await supabase.from('folders').update({ order: i }).eq('id', data[i].id);
-      }
-    } catch (error) {
-      console.error('Error updating folder order:', error);
-    }
-  }, []);
-
-  const renderLinkItem = useCallback(({ item, drag, isActive }) => {
+  const renderLinkItem = ({ item }) => {
     const folder = folders.find(f => f.id === item.folderId);
     const hasReminder = item.reminder && item.reminder.location;
     return (
-      <ScaleDecorator>
-        <TouchableOpacity 
-          style={[styles.linkCard, isActive && styles.linkCardDragging]} 
-          onPress={() => handleOpenLink(item.url)} 
-          onLongPress={drag}
-          delayLongPress={200}
-        >
-          {item.imageUrl && <Image source={{ uri: item.imageUrl }} style={styles.linkImage} />}
-          <View style={styles.linkContent}>
-            <Text style={styles.linkTitle} numberOfLines={2}>{item.title || item.url}</Text>
-            <Text style={styles.linkUrl} numberOfLines={1}>{item.url}</Text>
-            <View style={styles.linkMeta}>
-              <View style={styles.folderBadge}>
-                <Text style={styles.folderBadgeText}>{folder?.isDefault ? t.generalFolder : folder?.name || t.generalFolder}</Text>
-              </View>
-              {hasReminder && (
-                <View style={styles.reminderBadge}>
-                  <Ionicons name="location" size={12} color="#FFD60A" />
-                  <Text style={styles.reminderBadgeText}>{t.reminder}</Text>
-                </View>
-              )}
-              {item.isFavorite && (
-                <Ionicons name="heart" size={14} color="#FF3B30" />
-              )}
+      <TouchableOpacity style={styles.linkCard} onPress={() => handleOpenLink(item.url)}>
+        {item.imageUrl && <Image source={{ uri: item.imageUrl }} style={styles.linkImage} />}
+        <View style={styles.linkContent}>
+          <Text style={styles.linkTitle} numberOfLines={2}>{item.title || item.url}</Text>
+          <Text style={styles.linkUrl} numberOfLines={1}>{item.url}</Text>
+          <View style={styles.linkMeta}>
+            <View style={styles.folderBadge}>
+              <Text style={styles.folderBadgeText}>{folder?.isDefault ? t.generalFolder : folder?.name || t.generalFolder}</Text>
             </View>
+            {hasReminder && (
+              <View style={styles.reminderBadge}>
+                <Ionicons name="location" size={12} color="#FFD60A" />
+                <Text style={styles.reminderBadgeText}>{t.reminder}</Text>
+              </View>
+            )}
+            {item.isFavorite && <Ionicons name="heart" size={14} color="#FF3B30" />}
           </View>
-          <View style={styles.linkActions}>
-            <TouchableOpacity style={styles.editButton} onPress={() => openEditModal(item)}>
-              <Ionicons name="pencil" size={18} color="#8E8E93" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleToggleFavorite(item)}>
-              <Ionicons name={item.isFavorite ? 'heart' : 'heart-outline'} size={24} color={item.isFavorite ? '#FF3B30' : '#8E8E93'} />
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      </ScaleDecorator>
-    );
-  }, [folders, links, t]);
-
-  const renderFolderChip = useCallback(({ item, drag, isActive }) => (
-    <ScaleDecorator>
-      <TouchableOpacity 
-        style={[
-          styles.folderChip, 
-          selectedFolder === item.id && styles.folderChipActive,
-          isActive && styles.folderChipDragging
-        ]} 
-        onPress={() => setSelectedFolder(item.id)}
-        onLongPress={item.id !== 'all' ? drag : undefined}
-        delayLongPress={200}
-      >
-        <Text style={[styles.folderChipText, selectedFolder === item.id && styles.folderChipTextActive]}>
-          {item.icon || ''} {item.isDefault ? t.generalFolder : item.name}
-        </Text>
+        </View>
+        <View style={styles.linkActions}>
+          <TouchableOpacity style={styles.editButton} onPress={() => openEditModal(item)}>
+            <Ionicons name="pencil" size={18} color="#8E8E93" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleToggleFavorite(item)}>
+            <Ionicons name={item.isFavorite ? 'heart' : 'heart-outline'} size={24} color={item.isFavorite ? '#FF3B30' : '#8E8E93'} />
+          </TouchableOpacity>
+        </View>
       </TouchableOpacity>
-    </ScaleDecorator>
-  ), [selectedFolder, t]);
-
-  const folderData = [{ id: 'all', name: t.allLinks }, ...folders];
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -245,57 +172,28 @@ export default function LinksScreen({ language }) {
         </TouchableOpacity>
       </View>
 
-      {/* Folder chips with drag */}
-      <View style={styles.folderListContainer}>
-        <DraggableFlatList
-          horizontal
-          data={folderData}
-          onDragEnd={onFolderDragEnd}
-          keyExtractor={(item) => item.id}
-          renderItem={renderFolderChip}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.folderListContent}
-        />
-      </View>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.folderList}>
+        <TouchableOpacity style={[styles.folderChip, selectedFolder === 'all' && styles.folderChipActive]} onPress={() => setSelectedFolder('all')}>
+          <Text style={[styles.folderChipText, selectedFolder === 'all' && styles.folderChipTextActive]}>{t.allLinks}</Text>
+        </TouchableOpacity>
+        {folders.map(folder => (
+          <TouchableOpacity key={folder.id} style={[styles.folderChip, selectedFolder === folder.id && styles.folderChipActive]} onPress={() => setSelectedFolder(folder.id)}>
+            <Text style={[styles.folderChipText, selectedFolder === folder.id && styles.folderChipTextActive]}>{folder.isDefault ? t.generalFolder : folder.name}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
 
-      {/* Drag hint */}
-      <Text style={styles.dragHint}>{t.dragToReorder}</Text>
-
-      {/* Links list with drag */}
       {filteredLinks.length === 0 ? (
-        <ScrollView
-          style={{ flex: 1 }}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={() => { setRefreshing(true); fetchData(); }}
-              tintColor="#007AFF"
-            />
-          }
-        >
+        <ScrollView style={{ flex: 1 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchData(); }} tintColor="#007AFF" />}>
           <View style={styles.emptyState}>
             <Ionicons name="link-outline" size={64} color="#8E8E93" />
             <Text style={styles.emptyText}>{t.noClipboardItems}</Text>
           </View>
         </ScrollView>
       ) : (
-        <DraggableFlatList
-          data={filteredLinks}
-          onDragEnd={onDragEnd}
-          keyExtractor={(item) => item.id}
-          renderItem={renderLinkItem}
-          contentContainerStyle={styles.listContent}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={() => { setRefreshing(true); fetchData(); }}
-              tintColor="#007AFF"
-            />
-          }
-        />
+        <FlatList data={filteredLinks} keyExtractor={(item) => item.id} renderItem={renderLinkItem} contentContainerStyle={styles.listContent} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchData(); }} tintColor="#007AFF" />} />
       )}
       
-      {/* Edit Modal */}
       <Modal visible={showEditModal} animationType="slide" transparent={true} onRequestClose={closeEditModal}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -325,12 +223,6 @@ export default function LinksScreen({ language }) {
                 {reminderEnabled && (
                   <View style={styles.reminderOptions}>
                     <TextInput style={styles.locationInput} value={reminderLocation} onChangeText={setReminderLocation} placeholder={t.reminderLocationPlaceholder} placeholderTextColor="#8E8E93" />
-                    {reminderLocation && (
-                      <TouchableOpacity style={styles.clearReminderButton} onPress={() => setReminderLocation('')}>
-                        <Ionicons name="trash-outline" size={18} color="#FF3B30" />
-                        <Text style={styles.clearReminderText}>{t.clearReminder}</Text>
-                      </TouchableOpacity>
-                    )}
                   </View>
                 )}
               </View>
@@ -342,7 +234,6 @@ export default function LinksScreen({ language }) {
         </View>
       </Modal>
 
-      {/* Folder Picker Modal */}
       <Modal visible={showFolderPicker} animationType="slide" transparent={true} onRequestClose={() => setShowFolderPicker(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.folderPickerContent}>
@@ -354,11 +245,7 @@ export default function LinksScreen({ language }) {
             </View>
             <ScrollView>
               {folders.map((folder) => (
-                <TouchableOpacity 
-                  key={folder.id} 
-                  style={[styles.folderOption, editFolderId === folder.id && styles.folderOptionActive]} 
-                  onPress={() => { setEditFolderId(folder.id); setShowFolderPicker(false); }}
-                >
+                <TouchableOpacity key={folder.id} style={[styles.folderOption, editFolderId === folder.id && styles.folderOptionActive]} onPress={() => { setEditFolderId(folder.id); setShowFolderPicker(false); }}>
                   <Text style={styles.folderOptionIcon}>{folder.icon || '📁'}</Text>
                   <Text style={styles.folderOptionName}>{folder.isDefault ? t.generalFolder : folder.name}</Text>
                   {editFolderId === folder.id && <Ionicons name="checkmark" size={24} color="#007AFF" />}
@@ -379,17 +266,13 @@ const styles = StyleSheet.create({
   addContainer: { flexDirection: 'row', marginHorizontal: 16, marginBottom: 8, gap: 8 },
   addInput: { flex: 1, backgroundColor: '#1C1C1E', paddingHorizontal: 16, borderRadius: 12, height: 44, color: '#FFFFFF', fontSize: 16 },
   addButton: { backgroundColor: '#007AFF', width: 44, height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
-  folderListContainer: { height: 44, marginBottom: 4 },
-  folderListContent: { paddingHorizontal: 16 },
+  folderList: { paddingHorizontal: 16, marginBottom: 8, maxHeight: 44 },
   folderChip: { backgroundColor: '#1C1C1E', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, marginRight: 8 },
   folderChipActive: { backgroundColor: '#007AFF' },
-  folderChipDragging: { opacity: 0.8, transform: [{ scale: 1.05 }] },
   folderChipText: { color: '#8E8E93', fontSize: 14 },
   folderChipTextActive: { color: '#FFFFFF' },
-  dragHint: { color: '#8E8E93', fontSize: 12, textAlign: 'center', marginBottom: 8 },
   listContent: { padding: 16, paddingTop: 8, paddingBottom: 100 },
   linkCard: { backgroundColor: '#1C1C1E', borderRadius: 16, marginBottom: 12, flexDirection: 'row', overflow: 'hidden' },
-  linkCardDragging: { opacity: 0.9, shadowColor: '#007AFF', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 8 },
   linkImage: { width: 80, height: 80 },
   linkContent: { flex: 1, padding: 12 },
   linkTitle: { color: '#FFFFFF', fontSize: 16, fontWeight: '600', marginBottom: 4 },
@@ -417,9 +300,7 @@ const styles = StyleSheet.create({
   reminderHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   reminderTitle: { color: '#FFFFFF', fontSize: 18, fontWeight: '600' },
   reminderOptions: { marginTop: 16, borderTopWidth: 1, borderTopColor: '#2C2C2E', paddingTop: 16 },
-  locationInput: { backgroundColor: '#1C1C1E', borderRadius: 10, padding: 12, color: '#FFFFFF', fontSize: 16, marginBottom: 12 },
-  clearReminderButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 12 },
-  clearReminderText: { color: '#FF3B30', fontSize: 16 },
+  locationInput: { backgroundColor: '#1C1C1E', borderRadius: 10, padding: 12, color: '#FFFFFF', fontSize: 16 },
   saveButton: { backgroundColor: '#007AFF', margin: 20, padding: 16, borderRadius: 12, alignItems: 'center' },
   saveButtonText: { color: '#FFFFFF', fontSize: 18, fontWeight: '600' },
   folderPickerContent: { backgroundColor: '#1C1C1E', borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '60%', paddingBottom: 40 },

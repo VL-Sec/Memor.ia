@@ -1,16 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  StyleSheet,
-  Alert,
-  RefreshControl,
-  ScrollView,
-} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert, RefreshControl, ScrollView, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import DraggableFlatList, { ScaleDecorator } from 'react-native-draggable-flatlist';
 import * as Clipboard from 'expo-clipboard';
 import Toast from 'react-native-toast-message';
 import { supabase, generateId } from '../lib/supabase';
@@ -31,9 +21,7 @@ export default function ClipboardScreen({ language }) {
 
   const t = translations[language] || translations.en;
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  useEffect(() => { fetchData(); }, []);
 
   useEffect(() => {
     let timer;
@@ -54,20 +42,8 @@ export default function ClipboardScreen({ language }) {
 
   const fetchData = async () => {
     try {
-      const { data: foldersData } = await supabase
-        .from('folders')
-        .select('*')
-        .eq('userId', DEMO_USER)
-        .eq('folderType', 'text')
-        .order('order', { ascending: true });
-
-      const { data: notesData } = await supabase
-        .from('links')
-        .select('*')
-        .eq('userId', DEMO_USER)
-        .eq('contentType', 'text')
-        .order('order', { ascending: true });
-
+      const { data: foldersData } = await supabase.from('folders').select('*').eq('userId', DEMO_USER).eq('folderType', 'text').order('createdAt', { ascending: false });
+      const { data: notesData } = await supabase.from('links').select('*').eq('userId', DEMO_USER).eq('contentType', 'text').order('createdAt', { ascending: false });
       setFolders(foldersData || []);
       setNotes(notesData || []);
     } catch (error) {
@@ -80,10 +56,8 @@ export default function ClipboardScreen({ language }) {
 
   const handleAddNote = async () => {
     if (!newContent.trim()) return;
-
     try {
       const defaultFolder = folders.find(f => f.isDefault);
-      
       const newNote = {
         id: generateId(),
         userId: DEMO_USER,
@@ -92,18 +66,13 @@ export default function ClipboardScreen({ language }) {
         contentType: 'text',
         tags: [],
         isFavorite: false,
-        order: 0,
         folderId: selectedFolder !== 'all' ? selectedFolder : defaultFolder?.id,
         createdAt: new Date().toISOString(),
       };
-
       const { error } = await supabase.from('links').insert([newNote]);
-
       if (error) throw error;
-
       setNotes([newNote, ...notes]);
       setNewContent('');
-      
       Toast.show({ type: 'success', text1: t.saved });
     } catch (error) {
       console.error('Error adding note:', error);
@@ -140,10 +109,7 @@ export default function ClipboardScreen({ language }) {
       const newValue = !item.isFavorite;
       await supabase.from('links').update({ isFavorite: newValue }).eq('id', item.id);
       setNotes(notes.map(n => n.id === item.id ? { ...n, isFavorite: newValue } : n));
-      Toast.show({ 
-        type: 'success', 
-        text1: newValue ? (t.addedToFavorites || 'Adicionado aos favoritos') : (t.removedFromFavorites || 'Removido dos favoritos')
-      });
+      Toast.show({ type: 'success', text1: newValue ? (t.addedToFavorites || 'Adicionado aos favoritos') : (t.removedFromFavorites || 'Removido dos favoritos') });
     } catch (error) {
       console.error('Error toggling favorite:', error);
     }
@@ -163,428 +129,132 @@ export default function ClipboardScreen({ language }) {
 
   const filteredNotes = notes.filter(note => {
     const matchesFolder = selectedFolder === 'all' || note.folderId === selectedFolder;
-    const matchesSearch = !searchQuery || 
-      note.content?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = !searchQuery || note.content?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesFolder && matchesSearch;
   });
 
-  const onDragEnd = useCallback(async ({ data }) => {
-    setNotes(data);
-    try {
-      for (let i = 0; i < data.length; i++) {
-        await supabase.from('links').update({ order: i }).eq('id', data[i].id);
-      }
-    } catch (error) {
-      console.error('Error updating order:', error);
-    }
-  }, []);
-
-  const onFolderDragEnd = useCallback(async ({ data }) => {
-    setFolders(data);
-    try {
-      for (let i = 0; i < data.length; i++) {
-        await supabase.from('folders').update({ order: i }).eq('id', data[i].id);
-      }
-    } catch (error) {
-      console.error('Error updating folder order:', error);
-    }
-  }, []);
-
-  const renderFolderChip = useCallback(({ item, drag, isActive }) => (
-    <ScaleDecorator>
-      <TouchableOpacity 
-        style={[
-          styles.folderChip, 
-          selectedFolder === item.id && styles.folderChipActive,
-          isActive && styles.folderChipDragging
-        ]} 
-        onPress={() => setSelectedFolder(item.id)}
-        onLongPress={item.id !== 'all' ? drag : undefined}
-        delayLongPress={200}
-      >
-        <Text style={[styles.folderChipText, selectedFolder === item.id && styles.folderChipTextActive]}>
-          {item.icon || ''} {item.isDefault ? t.generalFolder : item.name}
-        </Text>
-      </TouchableOpacity>
-    </ScaleDecorator>
-  ), [selectedFolder, t]);
-
-  const renderNoteItem = useCallback(({ item, drag, isActive }) => {
+  const renderNoteItem = ({ item }) => {
     const folder = folders.find(f => f.id === item.folderId);
-    
     return (
-      <ScaleDecorator>
-        <TouchableOpacity
-          style={[styles.noteCard, isActive && styles.noteCardDragging]}
-          onLongPress={drag}
-          delayLongPress={200}
-        >
-          <View style={styles.noteContent}>
-            <Text style={styles.noteText} numberOfLines={3}>
-              {item.content}
-            </Text>
-            <View style={styles.noteMeta}>
-              <Text style={styles.noteChars}>
-                {item.content?.length || 0} {t.chars}
-              </Text>
-              <View style={styles.folderBadge}>
-                <Text style={styles.folderBadgeText}>
-                  {folder?.isDefault ? t.generalFolder : folder?.name || t.generalFolder}
-                </Text>
-              </View>
-              {item.isFavorite && (
-                <Ionicons name="heart" size={14} color="#FF3B30" style={{ marginLeft: 4 }} />
-              )}
+      <View style={styles.noteCard}>
+        <View style={styles.noteContent}>
+          <Text style={styles.noteText} numberOfLines={3}>{item.content}</Text>
+          <View style={styles.noteMeta}>
+            <Text style={styles.noteChars}>{item.content?.length || 0} {t.chars}</Text>
+            <View style={styles.folderBadge}>
+              <Text style={styles.folderBadgeText}>{folder?.isDefault ? t.generalFolder : folder?.name || t.generalFolder}</Text>
             </View>
+            {item.isFavorite && <Ionicons name="heart" size={14} color="#FF3B30" style={{ marginLeft: 4 }} />}
           </View>
-          <View style={styles.actionButtons}>
-            <TouchableOpacity
-              style={styles.favoriteButton}
-              onPress={() => handleToggleFavorite(item)}
-            >
-              <Ionicons name={item.isFavorite ? "heart" : "heart-outline"} size={20} color={item.isFavorite ? "#FF3B30" : "#8E8E93"} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.copyButton}
-              onPress={() => handleCopyNote(item.content)}
-            >
-              <Ionicons name="copy" size={18} color="#FFFFFF" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.deleteButton}
-              onPress={() => handleDeleteNote(item.id)}
-            >
-              <Ionicons name="trash-outline" size={18} color="#FF3B30" />
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      </ScaleDecorator>
+        </View>
+        <View style={styles.actionButtons}>
+          <TouchableOpacity style={styles.favoriteButton} onPress={() => handleToggleFavorite(item)}>
+            <Ionicons name={item.isFavorite ? "heart" : "heart-outline"} size={20} color={item.isFavorite ? "#FF3B30" : "#8E8E93"} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.copyButton} onPress={() => handleCopyNote(item.content)}>
+            <Ionicons name="copy" size={18} color="#FFFFFF" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteNote(item.id)}>
+            <Ionicons name="trash-outline" size={18} color="#FF3B30" />
+          </TouchableOpacity>
+        </View>
+      </View>
     );
-  }, [folders, notes, t]);
-
-  const folderData = [{ id: 'all', name: t.allClipboards }, ...folders];
+  };
 
   return (
     <View style={styles.container}>
-      {/* Add Note */}
       <View style={styles.addContainer}>
-        <TextInput
-          style={styles.addInput}
-          placeholder={t.clipboardPlaceholder}
-          placeholderTextColor="#8E8E93"
-          value={newContent}
-          onChangeText={setNewContent}
-          multiline
-        />
+        <TextInput style={styles.addInput} placeholder={t.clipboardPlaceholder} placeholderTextColor="#8E8E93" value={newContent} onChangeText={setNewContent} multiline />
         <View style={styles.addActions}>
           <Text style={styles.charCount}>{newContent.length} {t.chars}</Text>
-          <TouchableOpacity
-            style={[styles.saveButton, !newContent.trim() && styles.saveButtonDisabled]}
-            onPress={handleAddNote}
-            disabled={!newContent.trim()}
-          >
+          <TouchableOpacity style={[styles.saveButton, !newContent.trim() && styles.saveButtonDisabled]} onPress={handleAddNote} disabled={!newContent.trim()}>
             <Ionicons name="add" size={20} color="#FFFFFF" />
             <Text style={styles.saveButtonText}>{t.save}</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* Smart Clipboard */}
-      <TouchableOpacity
-        style={[
-          styles.smartClipboard,
-          smartClipboardActive && styles.smartClipboardActive,
-        ]}
-        onPress={smartClipboardActive ? () => setSmartClipboardActive(false) : activateSmartClipboard}
-      >
+      <TouchableOpacity style={[styles.smartClipboard, smartClipboardActive && styles.smartClipboardActive]} onPress={smartClipboardActive ? () => setSmartClipboardActive(false) : activateSmartClipboard}>
         <View style={styles.smartClipboardIcon}>
-          <Ionicons
-            name="clipboard"
-            size={24}
-            color={smartClipboardActive ? '#FFFFFF' : '#007AFF'}
-          />
+          <Ionicons name="clipboard" size={24} color={smartClipboardActive ? '#FFFFFF' : '#007AFF'} />
         </View>
         <View style={styles.smartClipboardContent}>
           <Text style={styles.smartClipboardTitle}>{t.smartClipboard}</Text>
-          <Text style={styles.smartClipboardInfo}>
-            {smartClipboardActive
-              ? `${formatTime(timeLeft)} ${t.timeRemaining}`
-              : t.smartClipboardInfo}
-          </Text>
+          <Text style={styles.smartClipboardInfo}>{smartClipboardActive ? `${formatTime(timeLeft)} ${t.timeRemaining}` : t.smartClipboardInfo}</Text>
         </View>
         <View style={[styles.smartClipboardButton, smartClipboardActive && styles.smartClipboardButtonStop]}>
-          <Text style={styles.smartClipboardButtonText}>
-            {smartClipboardActive ? t.deactivate : t.activate}
-          </Text>
+          <Text style={styles.smartClipboardButtonText}>{smartClipboardActive ? t.deactivate : t.activate}</Text>
         </View>
       </TouchableOpacity>
 
-      {/* Search */}
       <View style={styles.searchContainer}>
         <Ionicons name="search" size={20} color="#8E8E93" />
-        <TextInput
-          style={styles.searchInput}
-          placeholder={t.search}
-          placeholderTextColor="#8E8E93"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
+        <TextInput style={styles.searchInput} placeholder={t.search} placeholderTextColor="#8E8E93" value={searchQuery} onChangeText={setSearchQuery} />
       </View>
 
-      {/* Folder chips with drag */}
-      <View style={styles.folderListContainer}>
-        <DraggableFlatList
-          horizontal
-          data={folderData}
-          onDragEnd={onFolderDragEnd}
-          keyExtractor={(item) => item.id}
-          renderItem={renderFolderChip}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.folderListContent}
-        />
-      </View>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.folderList}>
+        <TouchableOpacity style={[styles.folderChip, selectedFolder === 'all' && styles.folderChipActive]} onPress={() => setSelectedFolder('all')}>
+          <Text style={[styles.folderChipText, selectedFolder === 'all' && styles.folderChipTextActive]}>{t.allClipboards}</Text>
+        </TouchableOpacity>
+        {folders.map(folder => (
+          <TouchableOpacity key={folder.id} style={[styles.folderChip, selectedFolder === folder.id && styles.folderChipActive]} onPress={() => setSelectedFolder(folder.id)}>
+            <Text style={[styles.folderChipText, selectedFolder === folder.id && styles.folderChipTextActive]}>{folder.isDefault ? t.generalFolder : folder.name}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
 
-      {/* Drag hint */}
-      <Text style={styles.dragHint}>{t.dragToReorder}</Text>
-
-      {/* Notes List */}
       {filteredNotes.length === 0 ? (
-        <ScrollView
-          style={{ flex: 1 }}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={() => {
-                setRefreshing(true);
-                fetchData();
-              }}
-              tintColor="#007AFF"
-            />
-          }
-        >
+        <ScrollView style={{ flex: 1 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchData(); }} tintColor="#007AFF" />}>
           <View style={styles.emptyState}>
             <Ionicons name="clipboard-outline" size={64} color="#8E8E93" />
             <Text style={styles.emptyText}>{t.noClipboardItems}</Text>
           </View>
         </ScrollView>
       ) : (
-        <DraggableFlatList
-          data={filteredNotes}
-          onDragEnd={onDragEnd}
-          keyExtractor={(item) => item.id}
-          renderItem={renderNoteItem}
-          contentContainerStyle={styles.listContent}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={() => {
-                setRefreshing(true);
-                fetchData();
-              }}
-              tintColor="#007AFF"
-            />
-          }
-        />
+        <FlatList data={filteredNotes} keyExtractor={(item) => item.id} renderItem={renderNoteItem} contentContainerStyle={styles.listContent} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchData(); }} tintColor="#007AFF" />} />
       )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000000',
-  },
-  addContainer: {
-    backgroundColor: '#1C1C1E',
-    margin: 16,
-    borderRadius: 16,
-    padding: 12,
-  },
-  addInput: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    minHeight: 80,
-    textAlignVertical: 'top',
-  },
-  addActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  charCount: {
-    color: '#8E8E93',
-    fontSize: 12,
-  },
-  saveButton: {
-    backgroundColor: '#007AFF',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    gap: 4,
-  },
-  saveButtonDisabled: {
-    opacity: 0.5,
-  },
-  saveButtonText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-  },
-  smartClipboard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1C1C1E',
-    marginHorizontal: 16,
-    marginBottom: 12,
-    borderRadius: 16,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: '#2C2C2E',
-  },
-  smartClipboardActive: {
-    backgroundColor: 'rgba(0, 122, 255, 0.2)',
-    borderColor: '#007AFF',
-  },
-  smartClipboardIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(0, 122, 255, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  smartClipboardContent: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  smartClipboardTitle: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-    fontSize: 14,
-  },
-  smartClipboardInfo: {
-    color: '#8E8E93',
-    fontSize: 12,
-  },
-  smartClipboardButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 14,
-  },
-  smartClipboardButtonStop: {
-    backgroundColor: '#FF3B30',
-  },
-  smartClipboardButtonText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1C1C1E',
-    marginHorizontal: 16,
-    marginBottom: 8,
-    paddingHorizontal: 12,
-    borderRadius: 12,
-    height: 40,
-  },
-  searchInput: {
-    flex: 1,
-    marginLeft: 8,
-    color: '#FFFFFF',
-    fontSize: 16,
-  },
-  folderListContainer: { height: 44, marginBottom: 4 },
-  folderListContent: { paddingHorizontal: 16 },
+  container: { flex: 1, backgroundColor: '#000000' },
+  addContainer: { backgroundColor: '#1C1C1E', margin: 16, borderRadius: 16, padding: 12 },
+  addInput: { color: '#FFFFFF', fontSize: 16, minHeight: 80, textAlignVertical: 'top' },
+  addActions: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 },
+  charCount: { color: '#8E8E93', fontSize: 12 },
+  saveButton: { backgroundColor: '#007AFF', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, gap: 4 },
+  saveButtonDisabled: { opacity: 0.5 },
+  saveButtonText: { color: '#FFFFFF', fontWeight: '600' },
+  smartClipboard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1C1C1E', marginHorizontal: 16, marginBottom: 12, borderRadius: 16, padding: 12, borderWidth: 1, borderColor: '#2C2C2E' },
+  smartClipboardActive: { backgroundColor: 'rgba(0, 122, 255, 0.2)', borderColor: '#007AFF' },
+  smartClipboardIcon: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(0, 122, 255, 0.2)', justifyContent: 'center', alignItems: 'center' },
+  smartClipboardContent: { flex: 1, marginLeft: 12 },
+  smartClipboardTitle: { color: '#FFFFFF', fontWeight: '600', fontSize: 14 },
+  smartClipboardInfo: { color: '#8E8E93', fontSize: 12 },
+  smartClipboardButton: { backgroundColor: '#007AFF', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 14 },
+  smartClipboardButtonStop: { backgroundColor: '#FF3B30' },
+  smartClipboardButtonText: { color: '#FFFFFF', fontSize: 12, fontWeight: '600' },
+  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1C1C1E', marginHorizontal: 16, marginBottom: 8, paddingHorizontal: 12, borderRadius: 12, height: 40 },
+  searchInput: { flex: 1, marginLeft: 8, color: '#FFFFFF', fontSize: 16 },
+  folderList: { paddingHorizontal: 16, marginBottom: 8, maxHeight: 44 },
   folderChip: { backgroundColor: '#1C1C1E', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, marginRight: 8 },
   folderChipActive: { backgroundColor: '#007AFF' },
-  folderChipDragging: { opacity: 0.8, transform: [{ scale: 1.05 }] },
   folderChipText: { color: '#8E8E93', fontSize: 14 },
   folderChipTextActive: { color: '#FFFFFF' },
-  dragHint: {
-    color: '#8E8E93',
-    fontSize: 12,
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  listContent: {
-    padding: 16,
-    paddingTop: 8,
-    paddingBottom: 100,
-  },
-  noteCard: {
-    backgroundColor: '#1C1C1E',
-    borderRadius: 16,
-    marginBottom: 12,
-    padding: 12,
-    flexDirection: 'row',
-  },
-  noteCardDragging: {
-    opacity: 0.9,
-    shadowColor: '#007AFF',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  noteContent: {
-    flex: 1,
-  },
-  noteText: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    lineHeight: 22,
-    marginBottom: 8,
-  },
-  noteMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  noteChars: {
-    color: '#8E8E93',
-    fontSize: 12,
-  },
-  folderBadge: {
-    backgroundColor: 'rgba(0, 122, 255, 0.2)',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
-  },
-  folderBadgeText: {
-    color: '#007AFF',
-    fontSize: 11,
-  },
-  actionButtons: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 8,
-    marginLeft: 8,
-  },
-  favoriteButton: {
-    padding: 6,
-  },
-  copyButton: {
-    backgroundColor: '#007AFF',
-    padding: 8,
-    borderRadius: 8,
-  },
-  deleteButton: {
-    padding: 6,
-  },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 60,
-  },
-  emptyText: {
-    color: '#8E8E93',
-    fontSize: 16,
-    marginTop: 16,
-  },
+  listContent: { padding: 16, paddingTop: 8, paddingBottom: 100 },
+  noteCard: { backgroundColor: '#1C1C1E', borderRadius: 16, marginBottom: 12, padding: 12, flexDirection: 'row' },
+  noteContent: { flex: 1 },
+  noteText: { color: '#FFFFFF', fontSize: 15, lineHeight: 22, marginBottom: 8 },
+  noteMeta: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  noteChars: { color: '#8E8E93', fontSize: 12 },
+  folderBadge: { backgroundColor: 'rgba(0, 122, 255, 0.2)', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 },
+  folderBadgeText: { color: '#007AFF', fontSize: 11 },
+  actionButtons: { justifyContent: 'center', alignItems: 'center', gap: 8, marginLeft: 8 },
+  favoriteButton: { padding: 6 },
+  copyButton: { backgroundColor: '#007AFF', padding: 8, borderRadius: 8 },
+  deleteButton: { padding: 6 },
+  emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
+  emptyText: { color: '#8E8E93', fontSize: 16, marginTop: 16 },
 });
