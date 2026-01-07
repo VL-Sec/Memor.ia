@@ -455,8 +455,14 @@ export const languages = [
 ];
 
 export const detectLanguage = () => {
-  const locale = Localization.locale.split('-')[0];
-  return ['en', 'pt', 'es', 'fr'].includes(locale) ? locale : 'en';
+  try {
+    const locale = Localization.locale || Localization.getLocales()?.[0]?.languageCode || 'en';
+    const langCode = typeof locale === 'string' ? locale.split('-')[0] : 'en';
+    return ['en', 'pt', 'es', 'fr'].includes(langCode) ? langCode : 'en';
+  } catch (error) {
+    console.warn('Error detecting language:', error);
+    return 'en';
+  }
 };
 
 export const getStoredLanguage = async () => {
