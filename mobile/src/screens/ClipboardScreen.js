@@ -144,12 +144,22 @@ export default function ClipboardScreen({ language }) {
     return matchesFolder && matchesSearch;
   });
 
+  // Sort: pinned items first, then by date
+  const sortedNotes = [...filteredNotes].sort((a, b) => {
+    if (a.isPinned && !b.isPinned) return -1;
+    if (!a.isPinned && b.isPinned) return 1;
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
+
   const renderNoteItem = ({ item }) => {
     const folder = folders.find(f => f.id === item.folderId);
     return (
       <View style={styles.noteCard}>
         <View style={styles.noteContent}>
-          <Text style={styles.noteText} numberOfLines={3}>{item.content}</Text>
+          <View style={styles.noteHeader}>
+            <Text style={styles.noteText} numberOfLines={3}>{item.content}</Text>
+            {item.isPinned && <Ionicons name="pin" size={14} color="#FFD60A" style={{ marginLeft: 4 }} />}
+          </View>
           <View style={styles.noteMeta}>
             <Text style={styles.noteChars}>{item.content?.length || 0} {t.chars}</Text>
             <View style={styles.folderBadge}>
@@ -159,13 +169,16 @@ export default function ClipboardScreen({ language }) {
           </View>
         </View>
         <View style={styles.actionButtons}>
-          <TouchableOpacity style={styles.favoriteButton} onPress={() => handleToggleFavorite(item)}>
+          <TouchableOpacity style={styles.actionBtn} onPress={() => handleTogglePin(item)}>
+            <Ionicons name={item.isPinned ? "pin" : "pin-outline"} size={20} color={item.isPinned ? "#FFD60A" : "#8E8E93"} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.actionBtn} onPress={() => handleToggleFavorite(item)}>
             <Ionicons name={item.isFavorite ? "heart" : "heart-outline"} size={20} color={item.isFavorite ? "#FF3B30" : "#8E8E93"} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.copyButton} onPress={() => handleCopyNote(item.content)}>
             <Ionicons name="copy" size={18} color="#FFFFFF" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteNote(item.id)}>
+          <TouchableOpacity style={styles.actionBtn} onPress={() => handleDeleteNote(item.id)}>
             <Ionicons name="trash-outline" size={18} color="#FF3B30" />
           </TouchableOpacity>
         </View>
