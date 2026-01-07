@@ -1,7 +1,22 @@
 import * as Localization from 'expo-localization';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+/**
+ * Memor.ia Translations
+ * 
+ * Languages supported: 6
+ * - English (US)
+ * - Português (Portugal)
+ * - Español (España)
+ * - Français (France)
+ * - Deutsch (Deutschland)
+ * - Italiano (Italia)
+ */
+
 export const translations = {
+  // ============================================
+  // ENGLISH (US)
+  // ============================================
   en: {
     // Tabs
     tabLinks: 'Links',
@@ -20,6 +35,9 @@ export const translations = {
     open: 'Open',
     search: 'Search...',
     all: 'All',
+    done: 'Done',
+    confirm: 'Confirm',
+    loading: 'Loading...',
     
     // Folders
     allLinks: 'All Links',
@@ -29,22 +47,31 @@ export const translations = {
     newFolder: 'New Folder',
     generalFolder: 'General',
     folderName: 'Folder Name',
-    selectFolder: 'Select folder',
+    selectFolder: 'Choose a folder',
+    manageFolders: 'Manage Folders',
+    
+    // Links
+    addLink: 'Add Link',
+    pasteLink: 'Paste a link...',
+    noLinks: 'No links saved yet',
+    openInBrowser: 'Open in browser',
+    copyLink: 'Copy link',
     
     // Clipboard
-    clipboardPlaceholder: 'Paste text here...',
-    noClipboardItems: 'No items yet',
-    chars: 'chars',
+    clipboardPlaceholder: 'Paste your text here...',
+    noClipboardItems: 'Nothing here yet',
+    chars: 'characters',
     smartClipboard: 'Smart Clipboard',
-    smartClipboardInfo: 'While active, saves everything you copy.',
-    activate: 'Activate',
+    smartClipboardInfo: 'Automatically saves everything you copy while active.',
+    smartClipboardActivated: 'Smart Clipboard is now active',
+    activate: 'Start',
     deactivate: 'Stop',
-    timeRemaining: 'remaining',
+    timeRemaining: 'left',
     
     // Notes
-    notesPlaceholder: 'Write your note...',
+    notesPlaceholder: 'Start writing...',
     noteTitle: 'Title',
-    noteTitlePlaceholder: 'Note title (optional)',
+    noteTitlePlaceholder: 'Give your note a title (optional)',
     noNotes: 'No notes yet',
     newNote: 'New Note',
     editNote: 'Edit Note',
@@ -56,57 +83,76 @@ export const translations = {
     
     // Favorites
     noFavorites: 'No favorites yet',
-    addFavoritesHint: 'Tap the heart to add favorites',
+    addFavoritesHint: 'Tap the heart icon to save items here',
     addedToFavorites: 'Added to favorites',
     removedFromFavorites: 'Removed from favorites',
     
     // Drag & Drop
-    dragToReorder: 'Long press to reorder',
+    dragToReorder: 'Hold and drag to reorder',
     
     // Premium
     premium: 'Premium',
     premiumActive: 'Premium Active',
-    trialActive: 'Trial Active',
-    trialDaysLeft: 'days left',
-    trialExpired: 'Trial Expired',
+    trialActive: 'Free Trial',
+    trialDaysLeft: 'days remaining',
+    trialExpired: 'Trial Ended',
     activationCode: 'Activation Code',
-    enterActivationCode: 'Enter activation code',
-    codeActivated: 'Code activated!',
+    enterActivationCode: 'Enter your code',
+    codeActivated: 'Code activated successfully!',
     invalidCode: 'Invalid code',
-    codeAlreadyUsed: 'Code already used',
+    codeAlreadyUsed: 'This code has already been used',
+    getPremium: 'Get Premium',
+    restorePurchase: 'Restore Purchase',
     
     // Settings
     settings: 'Settings',
     language: 'Language',
     backup: 'Cloud Backup',
-    backupInfo: 'Your data is automatically backed up',
+    backupInfo: 'Your data is backed up automatically',
     version: 'Version',
+    about: 'About',
+    help: 'Help & Support',
+    feedback: 'Send Feedback',
+    rateApp: 'Rate the App',
+    shareApp: 'Share with Friends',
+    termsOfService: 'Terms of Service',
+    privacyPolicy: 'Privacy Policy',
     
     // Cloud Backup Card
     cloudBackupTitle: 'Automatic Backup',
-    cloudBackupSubtitle: 'Your data is safe',
-    cloudBackupDescription: 'All your links, notes and settings are automatically synced.',
+    cloudBackupSubtitle: 'Your data is protected',
+    cloudBackupDescription: 'All your links, notes, and settings sync automatically across your devices.',
     cloudBackupIOS: 'iCloud Backup',
     cloudBackupAndroid: 'Google Backup',
     cloudBackupEnabled: 'Enabled',
-    cloudBackupTip: 'Make sure cloud backup is enabled in your device settings.',
+    cloudBackupTip: 'Make sure cloud backup is turned on in your device settings.',
     
     // Notifications
     notifications: 'Notifications',
-    weeklySummary: 'Weekly Summary',
-    weeklySummaryInfo: 'Receive a reminder to review your saved content',
+    weeklySummary: 'Weekly Digest',
+    weeklySummaryInfo: 'Get a weekly reminder to review your saved content',
     dayOfWeek: 'Day',
     time: 'Time',
     selectDay: 'Select day',
     selectTime: 'Select time',
-    weeklySummaryEnabled: 'Weekly summary enabled',
-    weeklySummaryDisabled: 'Weekly summary disabled',
+    weeklySummaryEnabled: 'Weekly digest enabled',
+    weeklySummaryDisabled: 'Weekly digest disabled',
+    
+    // Days of week
+    sunday: 'Sunday',
+    monday: 'Monday',
+    tuesday: 'Tuesday',
+    wednesday: 'Wednesday',
+    thursday: 'Thursday',
+    friday: 'Friday',
+    saturday: 'Saturday',
     
     // Messages
     copied: 'Copied!',
     saved: 'Saved!',
     deleted: 'Deleted!',
-    error: 'Error',
+    error: 'Something went wrong',
+    success: 'Success',
     
     // Reminders
     reminder: 'Reminder',
@@ -114,20 +160,33 @@ export const translations = {
     reminderDate: 'Date',
     reminderTime: 'Time',
     reminderLocation: 'Location',
-    reminderLocationPlaceholder: 'Add location (optional)',
-    reminderEnabled: 'Reminder enabled',
-    noDate: 'No date',
-    noTime: 'No time',
-    clearReminder: 'Clear Reminder',
+    reminderLocationPlaceholder: 'Add a location (optional)',
+    reminderEnabled: 'Reminder set',
+    noDate: 'No date selected',
+    noTime: 'No time selected',
+    clearReminder: 'Remove Reminder',
     editItem: 'Edit',
     moveToFolder: 'Move to folder',
+    
+    // Empty States
+    emptyLinksTitle: 'Save your first link',
+    emptyLinksSubtitle: 'Paste any URL to get started',
+    emptyNotesTitle: 'Create your first note',
+    emptyNotesSubtitle: 'Tap the + button to start writing',
+    emptyClipboardTitle: 'Your clipboard is empty',
+    emptyClipboardSubtitle: 'Paste text or activate Smart Clipboard',
+    emptyFavoritesTitle: 'No favorites yet',
+    emptyFavoritesSubtitle: 'Tap the heart on any item to add it here',
   },
-  
+
+  // ============================================
+  // PORTUGUÊS (Portugal)
+  // ============================================
   pt: {
     // Tabs
     tabLinks: 'Links',
     tabNotes: 'Notas',
-    tabClipboard: 'Clipboard',
+    tabClipboard: 'Área de Transferência',
     tabFavorites: 'Favoritos',
     tabSettings: 'Definições',
     
@@ -135,12 +194,15 @@ export const translations = {
     appName: 'Memor.ia',
     save: 'Guardar',
     cancel: 'Cancelar',
-    delete: 'Apagar',
+    delete: 'Eliminar',
     edit: 'Editar',
     copy: 'Copiar',
     open: 'Abrir',
     search: 'Pesquisar...',
     all: 'Todos',
+    done: 'Concluído',
+    confirm: 'Confirmar',
+    loading: 'A carregar...',
     
     // Folders
     allLinks: 'Todos os Links',
@@ -150,23 +212,32 @@ export const translations = {
     newFolder: 'Nova Pasta',
     generalFolder: 'Geral',
     folderName: 'Nome da Pasta',
-    selectFolder: 'Selecionar pasta',
+    selectFolder: 'Escolher pasta',
+    manageFolders: 'Gerir Pastas',
+    
+    // Links
+    addLink: 'Adicionar Link',
+    pasteLink: 'Cola um link...',
+    noLinks: 'Ainda não guardaste nenhum link',
+    openInBrowser: 'Abrir no navegador',
+    copyLink: 'Copiar link',
     
     // Clipboard
     clipboardPlaceholder: 'Cola o texto aqui...',
-    noClipboardItems: 'Ainda sem itens',
+    noClipboardItems: 'Ainda não há nada aqui',
     chars: 'caracteres',
-    smartClipboard: 'Smart Clipboard',
-    smartClipboardInfo: 'Enquanto ativo, guarda tudo o que copiares.',
-    activate: 'Ativar',
+    smartClipboard: 'Área de Transferência Inteligente',
+    smartClipboardInfo: 'Guarda automaticamente tudo o que copiares enquanto estiver ativo.',
+    smartClipboardActivated: 'Área de transferência inteligente ativada',
+    activate: 'Iniciar',
     deactivate: 'Parar',
-    timeRemaining: 'restantes',
+    timeRemaining: 'restante',
     
     // Notes
-    notesPlaceholder: 'Escreve a tua nota...',
+    notesPlaceholder: 'Começa a escrever...',
     noteTitle: 'Título',
-    noteTitlePlaceholder: 'Título da nota (opcional)',
-    noNotes: 'Ainda sem notas',
+    noteTitlePlaceholder: 'Dá um título à tua nota (opcional)',
+    noNotes: 'Ainda não tens notas',
     newNote: 'Nova Nota',
     editNote: 'Editar Nota',
     noteColor: 'Cor',
@@ -176,46 +247,55 @@ export const translations = {
     otherNotes: 'Notas',
     
     // Favorites
-    noFavorites: 'Sem favoritos',
-    addFavoritesHint: 'Toca no coração para adicionar favoritos',
+    noFavorites: 'Ainda não tens favoritos',
+    addFavoritesHint: 'Toca no coração para guardar itens aqui',
     addedToFavorites: 'Adicionado aos favoritos',
     removedFromFavorites: 'Removido dos favoritos',
     
     // Drag & Drop
-    dragToReorder: 'Pressiona longamente para reorganizar',
+    dragToReorder: 'Mantém premido e arrasta para reorganizar',
     
     // Premium
     premium: 'Premium',
     premiumActive: 'Premium Ativo',
     trialActive: 'Período de Teste',
     trialDaysLeft: 'dias restantes',
-    trialExpired: 'Período de Teste Expirado',
+    trialExpired: 'Período de Teste Terminado',
     activationCode: 'Código de Ativação',
-    enterActivationCode: 'Inserir código de ativação',
-    codeActivated: 'Código ativado!',
+    enterActivationCode: 'Introduz o teu código',
+    codeActivated: 'Código ativado com sucesso!',
     invalidCode: 'Código inválido',
-    codeAlreadyUsed: 'Código já utilizado',
+    codeAlreadyUsed: 'Este código já foi utilizado',
+    getPremium: 'Obter Premium',
+    restorePurchase: 'Restaurar Compra',
     
     // Settings
     settings: 'Definições',
     language: 'Idioma',
-    backup: 'Backup na Cloud',
+    backup: 'Cópia de Segurança',
     backupInfo: 'Os teus dados são guardados automaticamente',
     version: 'Versão',
+    about: 'Sobre',
+    help: 'Ajuda e Suporte',
+    feedback: 'Enviar Feedback',
+    rateApp: 'Avaliar a App',
+    shareApp: 'Partilhar com Amigos',
+    termsOfService: 'Termos de Serviço',
+    privacyPolicy: 'Política de Privacidade',
     
     // Cloud Backup Card
-    cloudBackupTitle: 'Backup Automático',
-    cloudBackupSubtitle: 'Os teus dados estão seguros',
-    cloudBackupDescription: 'Todos os teus links, notas e definições são sincronizados automaticamente.',
-    cloudBackupIOS: 'iCloud Backup',
+    cloudBackupTitle: 'Cópia de Segurança Automática',
+    cloudBackupSubtitle: 'Os teus dados estão protegidos',
+    cloudBackupDescription: 'Todos os teus links, notas e definições são sincronizados automaticamente entre dispositivos.',
+    cloudBackupIOS: 'iCloud',
     cloudBackupAndroid: 'Google Backup',
     cloudBackupEnabled: 'Ativado',
-    cloudBackupTip: 'Certifica-te que o backup na cloud está ativado nas definições do dispositivo.',
+    cloudBackupTip: 'Certifica-te de que a cópia de segurança está ativada nas definições do dispositivo.',
     
     // Notifications
     notifications: 'Notificações',
     weeklySummary: 'Resumo Semanal',
-    weeklySummaryInfo: 'Recebe um lembrete para rever o conteúdo guardado',
+    weeklySummaryInfo: 'Recebe um lembrete semanal para rever o que guardaste',
     dayOfWeek: 'Dia',
     time: 'Hora',
     selectDay: 'Selecionar dia',
@@ -223,32 +303,55 @@ export const translations = {
     weeklySummaryEnabled: 'Resumo semanal ativado',
     weeklySummaryDisabled: 'Resumo semanal desativado',
     
+    // Days of week
+    sunday: 'Domingo',
+    monday: 'Segunda-feira',
+    tuesday: 'Terça-feira',
+    wednesday: 'Quarta-feira',
+    thursday: 'Quinta-feira',
+    friday: 'Sexta-feira',
+    saturday: 'Sábado',
+    
     // Messages
     copied: 'Copiado!',
     saved: 'Guardado!',
-    deleted: 'Apagado!',
-    error: 'Erro',
+    deleted: 'Eliminado!',
+    error: 'Algo correu mal',
+    success: 'Sucesso',
     
     // Reminders
     reminder: 'Lembrete',
     setReminder: 'Definir Lembrete',
     reminderDate: 'Data',
     reminderTime: 'Hora',
-    reminderLocation: 'Local',
-    reminderLocationPlaceholder: 'Adicionar local (opcional)',
-    reminderEnabled: 'Lembrete ativado',
-    noDate: 'Sem data',
-    noTime: 'Sem hora',
-    clearReminder: 'Limpar Lembrete',
+    reminderLocation: 'Localização',
+    reminderLocationPlaceholder: 'Adicionar localização (opcional)',
+    reminderEnabled: 'Lembrete definido',
+    noDate: 'Sem data selecionada',
+    noTime: 'Sem hora selecionada',
+    clearReminder: 'Remover Lembrete',
     editItem: 'Editar',
     moveToFolder: 'Mover para pasta',
+    
+    // Empty States
+    emptyLinksTitle: 'Guarda o teu primeiro link',
+    emptyLinksSubtitle: 'Cola qualquer URL para começar',
+    emptyNotesTitle: 'Cria a tua primeira nota',
+    emptyNotesSubtitle: 'Toca no + para começar a escrever',
+    emptyClipboardTitle: 'A área de transferência está vazia',
+    emptyClipboardSubtitle: 'Cola texto ou ativa a área de transferência inteligente',
+    emptyFavoritesTitle: 'Ainda não tens favoritos',
+    emptyFavoritesSubtitle: 'Toca no coração em qualquer item para o adicionar aqui',
   },
-  
+
+  // ============================================
+  // ESPAÑOL (España)
+  // ============================================
   es: {
     // Tabs
     tabLinks: 'Enlaces',
     tabNotes: 'Notas',
-    tabClipboard: 'Clipboard',
+    tabClipboard: 'Portapapeles',
     tabFavorites: 'Favoritos',
     tabSettings: 'Ajustes',
     
@@ -261,33 +364,45 @@ export const translations = {
     copy: 'Copiar',
     open: 'Abrir',
     search: 'Buscar...',
-    all: 'Todos',
+    all: 'Todo',
+    done: 'Hecho',
+    confirm: 'Confirmar',
+    loading: 'Cargando...',
     
     // Folders
     allLinks: 'Todos los Enlaces',
     allNotes: 'Todas las Notas',
-    allClipboards: 'Todos los Clips',
+    allClipboards: 'Todo el Portapapeles',
     folders: 'Carpetas',
     newFolder: 'Nueva Carpeta',
     generalFolder: 'General',
-    folderName: 'Nombre',
-    selectFolder: 'Seleccionar carpeta',
+    folderName: 'Nombre de la Carpeta',
+    selectFolder: 'Elegir carpeta',
+    manageFolders: 'Gestionar Carpetas',
+    
+    // Links
+    addLink: 'Añadir Enlace',
+    pasteLink: 'Pega un enlace...',
+    noLinks: 'Aún no has guardado ningún enlace',
+    openInBrowser: 'Abrir en el navegador',
+    copyLink: 'Copiar enlace',
     
     // Clipboard
-    clipboardPlaceholder: 'Pega el texto aquí...',
-    noClipboardItems: 'Sin elementos',
+    clipboardPlaceholder: 'Pega tu texto aquí...',
+    noClipboardItems: 'Todavía no hay nada aquí',
     chars: 'caracteres',
-    smartClipboard: 'Smart Clipboard',
-    smartClipboardInfo: 'Mientras está activo, guarda todo lo que copies.',
-    activate: 'Activar',
-    deactivate: 'Parar',
-    timeRemaining: 'restantes',
+    smartClipboard: 'Portapapeles Inteligente',
+    smartClipboardInfo: 'Guarda automáticamente todo lo que copies mientras esté activo.',
+    smartClipboardActivated: 'Portapapeles inteligente activado',
+    activate: 'Iniciar',
+    deactivate: 'Detener',
+    timeRemaining: 'restante',
     
     // Notes
-    notesPlaceholder: 'Escribe tu nota...',
+    notesPlaceholder: 'Empieza a escribir...',
     noteTitle: 'Título',
-    noteTitlePlaceholder: 'Título de la nota (opcional)',
-    noNotes: 'Sin notas',
+    noteTitlePlaceholder: 'Ponle un título a tu nota (opcional)',
+    noNotes: 'Aún no tienes notas',
     newNote: 'Nueva Nota',
     editNote: 'Editar Nota',
     noteColor: 'Color',
@@ -297,46 +412,55 @@ export const translations = {
     otherNotes: 'Notas',
     
     // Favorites
-    noFavorites: 'Sin favoritos',
-    addFavoritesHint: 'Toca el corazón para añadir favoritos',
+    noFavorites: 'Aún no tienes favoritos',
+    addFavoritesHint: 'Toca el corazón para guardar elementos aquí',
     addedToFavorites: 'Añadido a favoritos',
     removedFromFavorites: 'Eliminado de favoritos',
     
     // Drag & Drop
-    dragToReorder: 'Mantén pulsado para reorganizar',
+    dragToReorder: 'Mantén pulsado y arrastra para reorganizar',
     
     // Premium
     premium: 'Premium',
     premiumActive: 'Premium Activo',
-    trialActive: 'Período de Prueba',
+    trialActive: 'Prueba Gratuita',
     trialDaysLeft: 'días restantes',
-    trialExpired: 'Período de Prueba Expirado',
+    trialExpired: 'Prueba Finalizada',
     activationCode: 'Código de Activación',
-    enterActivationCode: 'Introducir código',
-    codeActivated: '¡Código activado!',
+    enterActivationCode: 'Introduce tu código',
+    codeActivated: '¡Código activado con éxito!',
     invalidCode: 'Código inválido',
-    codeAlreadyUsed: 'Código ya utilizado',
+    codeAlreadyUsed: 'Este código ya ha sido utilizado',
+    getPremium: 'Obtener Premium',
+    restorePurchase: 'Restaurar Compra',
     
     // Settings
     settings: 'Ajustes',
     language: 'Idioma',
-    backup: 'Copia en la Nube',
+    backup: 'Copia de Seguridad',
     backupInfo: 'Tus datos se guardan automáticamente',
     version: 'Versión',
+    about: 'Acerca de',
+    help: 'Ayuda y Soporte',
+    feedback: 'Enviar Comentarios',
+    rateApp: 'Valorar la App',
+    shareApp: 'Compartir con Amigos',
+    termsOfService: 'Términos de Servicio',
+    privacyPolicy: 'Política de Privacidad',
     
     // Cloud Backup Card
-    cloudBackupTitle: 'Copia de Seguridad',
-    cloudBackupSubtitle: 'Tus datos están seguros',
-    cloudBackupDescription: 'Todos tus enlaces, notas y ajustes se sincronizan automáticamente.',
-    cloudBackupIOS: 'iCloud Backup',
+    cloudBackupTitle: 'Copia de Seguridad Automática',
+    cloudBackupSubtitle: 'Tus datos están protegidos',
+    cloudBackupDescription: 'Todos tus enlaces, notas y ajustes se sincronizan automáticamente entre dispositivos.',
+    cloudBackupIOS: 'iCloud',
     cloudBackupAndroid: 'Google Backup',
     cloudBackupEnabled: 'Activado',
-    cloudBackupTip: 'Asegúrate de que la copia de seguridad esté activada.',
+    cloudBackupTip: 'Asegúrate de que la copia de seguridad esté activada en los ajustes del dispositivo.',
     
     // Notifications
     notifications: 'Notificaciones',
     weeklySummary: 'Resumen Semanal',
-    weeklySummaryInfo: 'Recibe un recordatorio para revisar tu contenido',
+    weeklySummaryInfo: 'Recibe un recordatorio semanal para revisar lo que has guardado',
     dayOfWeek: 'Día',
     time: 'Hora',
     selectDay: 'Seleccionar día',
@@ -344,34 +468,57 @@ export const translations = {
     weeklySummaryEnabled: 'Resumen semanal activado',
     weeklySummaryDisabled: 'Resumen semanal desactivado',
     
+    // Days of week
+    sunday: 'Domingo',
+    monday: 'Lunes',
+    tuesday: 'Martes',
+    wednesday: 'Miércoles',
+    thursday: 'Jueves',
+    friday: 'Viernes',
+    saturday: 'Sábado',
+    
     // Messages
     copied: '¡Copiado!',
     saved: '¡Guardado!',
     deleted: '¡Eliminado!',
-    error: 'Error',
+    error: 'Algo salió mal',
+    success: 'Éxito',
     
     // Reminders
     reminder: 'Recordatorio',
-    setReminder: 'Definir Recordatorio',
+    setReminder: 'Crear Recordatorio',
     reminderDate: 'Fecha',
     reminderTime: 'Hora',
     reminderLocation: 'Ubicación',
     reminderLocationPlaceholder: 'Añadir ubicación (opcional)',
-    reminderEnabled: 'Recordatorio activado',
-    noDate: 'Sin fecha',
-    noTime: 'Sin hora',
-    clearReminder: 'Borrar Recordatorio',
+    reminderEnabled: 'Recordatorio creado',
+    noDate: 'Sin fecha seleccionada',
+    noTime: 'Sin hora seleccionada',
+    clearReminder: 'Eliminar Recordatorio',
     editItem: 'Editar',
     moveToFolder: 'Mover a carpeta',
+    
+    // Empty States
+    emptyLinksTitle: 'Guarda tu primer enlace',
+    emptyLinksSubtitle: 'Pega cualquier URL para empezar',
+    emptyNotesTitle: 'Crea tu primera nota',
+    emptyNotesSubtitle: 'Toca el + para empezar a escribir',
+    emptyClipboardTitle: 'El portapapeles está vacío',
+    emptyClipboardSubtitle: 'Pega texto o activa el portapapeles inteligente',
+    emptyFavoritesTitle: 'Aún no tienes favoritos',
+    emptyFavoritesSubtitle: 'Toca el corazón en cualquier elemento para añadirlo aquí',
   },
-  
+
+  // ============================================
+  // FRANÇAIS (France)
+  // ============================================
   fr: {
     // Tabs
     tabLinks: 'Liens',
     tabNotes: 'Notes',
-    tabClipboard: 'Clipboard',
+    tabClipboard: 'Presse-papiers',
     tabFavorites: 'Favoris',
-    tabSettings: 'Paramètres',
+    tabSettings: 'Réglages',
     
     // General
     appName: 'Memor.ia',
@@ -382,33 +529,45 @@ export const translations = {
     copy: 'Copier',
     open: 'Ouvrir',
     search: 'Rechercher...',
-    all: 'Tous',
+    all: 'Tout',
+    done: 'Terminé',
+    confirm: 'Confirmer',
+    loading: 'Chargement...',
     
     // Folders
     allLinks: 'Tous les Liens',
     allNotes: 'Toutes les Notes',
-    allClipboards: 'Tous les Clips',
+    allClipboards: 'Tout le Presse-papiers',
     folders: 'Dossiers',
     newFolder: 'Nouveau Dossier',
     generalFolder: 'Général',
-    folderName: 'Nom',
-    selectFolder: 'Sélectionner dossier',
+    folderName: 'Nom du Dossier',
+    selectFolder: 'Choisir un dossier',
+    manageFolders: 'Gérer les Dossiers',
+    
+    // Links
+    addLink: 'Ajouter un Lien',
+    pasteLink: 'Collez un lien...',
+    noLinks: 'Aucun lien enregistré',
+    openInBrowser: 'Ouvrir dans le navigateur',
+    copyLink: 'Copier le lien',
     
     // Clipboard
-    clipboardPlaceholder: 'Collez le texte ici...',
-    noClipboardItems: 'Aucun élément',
+    clipboardPlaceholder: 'Collez votre texte ici...',
+    noClipboardItems: 'Rien ici pour le moment',
     chars: 'caractères',
-    smartClipboard: 'Smart Clipboard',
-    smartClipboardInfo: "Pendant qu'il est actif, enregistre tout ce que vous copiez.",
-    activate: 'Activer',
+    smartClipboard: 'Presse-papiers Intelligent',
+    smartClipboardInfo: 'Enregistre automatiquement tout ce que vous copiez tant qu\'il est actif.',
+    smartClipboardActivated: 'Presse-papiers intelligent activé',
+    activate: 'Démarrer',
     deactivate: 'Arrêter',
-    timeRemaining: 'restantes',
+    timeRemaining: 'restant',
     
     // Notes
-    notesPlaceholder: 'Écrivez votre note...',
+    notesPlaceholder: 'Commencez à écrire...',
     noteTitle: 'Titre',
-    noteTitlePlaceholder: 'Titre de la note (optionnel)',
-    noNotes: 'Aucune note',
+    noteTitlePlaceholder: 'Donnez un titre à votre note (facultatif)',
+    noNotes: 'Aucune note pour le moment',
     newNote: 'Nouvelle Note',
     editNote: 'Modifier la Note',
     noteColor: 'Couleur',
@@ -418,106 +577,509 @@ export const translations = {
     otherNotes: 'Notes',
     
     // Favorites
-    noFavorites: 'Pas de favoris',
-    addFavoritesHint: 'Appuyez sur le cœur pour ajouter des favoris',
+    noFavorites: 'Pas encore de favoris',
+    addFavoritesHint: 'Appuyez sur le cœur pour enregistrer des éléments ici',
     addedToFavorites: 'Ajouté aux favoris',
     removedFromFavorites: 'Retiré des favoris',
     
     // Drag & Drop
-    dragToReorder: 'Appuyez longuement pour réorganiser',
+    dragToReorder: 'Maintenez et glissez pour réorganiser',
     
     // Premium
     premium: 'Premium',
     premiumActive: 'Premium Actif',
-    trialActive: "Période d'Essai",
+    trialActive: 'Essai Gratuit',
     trialDaysLeft: 'jours restants',
-    trialExpired: "Période d'Essai Expirée",
-    activationCode: "Code d'Activation",
-    enterActivationCode: 'Entrer le code',
-    codeActivated: 'Code activé!',
+    trialExpired: 'Essai Terminé',
+    activationCode: 'Code d\'Activation',
+    enterActivationCode: 'Entrez votre code',
+    codeActivated: 'Code activé avec succès !',
     invalidCode: 'Code invalide',
-    codeAlreadyUsed: 'Code déjà utilisé',
+    codeAlreadyUsed: 'Ce code a déjà été utilisé',
+    getPremium: 'Passer Premium',
+    restorePurchase: 'Restaurer l\'Achat',
     
     // Settings
-    settings: 'Paramètres',
+    settings: 'Réglages',
     language: 'Langue',
     backup: 'Sauvegarde Cloud',
     backupInfo: 'Vos données sont sauvegardées automatiquement',
     version: 'Version',
+    about: 'À propos',
+    help: 'Aide et Support',
+    feedback: 'Envoyer un Avis',
+    rateApp: 'Noter l\'App',
+    shareApp: 'Partager avec des Amis',
+    termsOfService: 'Conditions d\'Utilisation',
+    privacyPolicy: 'Politique de Confidentialité',
     
     // Cloud Backup Card
     cloudBackupTitle: 'Sauvegarde Automatique',
-    cloudBackupSubtitle: 'Vos données sont en sécurité',
-    cloudBackupDescription: 'Tous vos liens, notes et paramètres sont synchronisés automatiquement.',
-    cloudBackupIOS: 'iCloud Backup',
+    cloudBackupSubtitle: 'Vos données sont protégées',
+    cloudBackupDescription: 'Tous vos liens, notes et réglages sont synchronisés automatiquement entre vos appareils.',
+    cloudBackupIOS: 'iCloud',
     cloudBackupAndroid: 'Google Backup',
     cloudBackupEnabled: 'Activé',
-    cloudBackupTip: 'Assurez-vous que la sauvegarde cloud est activée.',
+    cloudBackupTip: 'Assurez-vous que la sauvegarde cloud est activée dans les réglages de votre appareil.',
     
     // Notifications
     notifications: 'Notifications',
-    weeklySummary: 'Résumé Hebdomadaire',
-    weeklySummaryInfo: 'Recevez un rappel pour revoir votre contenu',
+    weeklySummary: 'Récapitulatif Hebdomadaire',
+    weeklySummaryInfo: 'Recevez un rappel hebdomadaire pour revoir ce que vous avez enregistré',
     dayOfWeek: 'Jour',
     time: 'Heure',
-    selectDay: 'Sélectionner le jour',
-    selectTime: "Sélectionner l'heure",
-    weeklySummaryEnabled: 'Résumé hebdomadaire activé',
-    weeklySummaryDisabled: 'Résumé hebdomadaire désactivé',
+    selectDay: 'Choisir le jour',
+    selectTime: 'Choisir l\'heure',
+    weeklySummaryEnabled: 'Récapitulatif hebdomadaire activé',
+    weeklySummaryDisabled: 'Récapitulatif hebdomadaire désactivé',
+    
+    // Days of week
+    sunday: 'Dimanche',
+    monday: 'Lundi',
+    tuesday: 'Mardi',
+    wednesday: 'Mercredi',
+    thursday: 'Jeudi',
+    friday: 'Vendredi',
+    saturday: 'Samedi',
     
     // Messages
-    copied: 'Copié!',
-    saved: 'Enregistré!',
-    deleted: 'Supprimé!',
-    error: 'Erreur',
+    copied: 'Copié !',
+    saved: 'Enregistré !',
+    deleted: 'Supprimé !',
+    error: 'Une erreur s\'est produite',
+    success: 'Succès',
     
     // Reminders
     reminder: 'Rappel',
-    setReminder: 'Définir un Rappel',
+    setReminder: 'Créer un Rappel',
     reminderDate: 'Date',
     reminderTime: 'Heure',
     reminderLocation: 'Lieu',
-    reminderLocationPlaceholder: 'Ajouter un lieu (optionnel)',
-    reminderEnabled: 'Rappel activé',
-    noDate: 'Pas de date',
-    noTime: "Pas d'heure",
-    clearReminder: 'Effacer le Rappel',
+    reminderLocationPlaceholder: 'Ajouter un lieu (facultatif)',
+    reminderEnabled: 'Rappel créé',
+    noDate: 'Aucune date sélectionnée',
+    noTime: 'Aucune heure sélectionnée',
+    clearReminder: 'Supprimer le Rappel',
     editItem: 'Modifier',
-    moveToFolder: 'Déplacer vers dossier',
+    moveToFolder: 'Déplacer vers un dossier',
+    
+    // Empty States
+    emptyLinksTitle: 'Enregistrez votre premier lien',
+    emptyLinksSubtitle: 'Collez n\'importe quelle URL pour commencer',
+    emptyNotesTitle: 'Créez votre première note',
+    emptyNotesSubtitle: 'Appuyez sur + pour commencer à écrire',
+    emptyClipboardTitle: 'Le presse-papiers est vide',
+    emptyClipboardSubtitle: 'Collez du texte ou activez le presse-papiers intelligent',
+    emptyFavoritesTitle: 'Pas encore de favoris',
+    emptyFavoritesSubtitle: 'Appuyez sur le cœur sur n\'importe quel élément pour l\'ajouter ici',
+  },
+
+  // ============================================
+  // DEUTSCH (Deutschland)
+  // ============================================
+  de: {
+    // Tabs
+    tabLinks: 'Links',
+    tabNotes: 'Notizen',
+    tabClipboard: 'Zwischenablage',
+    tabFavorites: 'Favoriten',
+    tabSettings: 'Einstellungen',
+    
+    // General
+    appName: 'Memor.ia',
+    save: 'Speichern',
+    cancel: 'Abbrechen',
+    delete: 'Löschen',
+    edit: 'Bearbeiten',
+    copy: 'Kopieren',
+    open: 'Öffnen',
+    search: 'Suchen...',
+    all: 'Alle',
+    done: 'Fertig',
+    confirm: 'Bestätigen',
+    loading: 'Wird geladen...',
+    
+    // Folders
+    allLinks: 'Alle Links',
+    allNotes: 'Alle Notizen',
+    allClipboards: 'Gesamte Zwischenablage',
+    folders: 'Ordner',
+    newFolder: 'Neuer Ordner',
+    generalFolder: 'Allgemein',
+    folderName: 'Ordnername',
+    selectFolder: 'Ordner wählen',
+    manageFolders: 'Ordner verwalten',
+    
+    // Links
+    addLink: 'Link hinzufügen',
+    pasteLink: 'Link einfügen...',
+    noLinks: 'Noch keine Links gespeichert',
+    openInBrowser: 'Im Browser öffnen',
+    copyLink: 'Link kopieren',
+    
+    // Clipboard
+    clipboardPlaceholder: 'Text hier einfügen...',
+    noClipboardItems: 'Noch nichts hier',
+    chars: 'Zeichen',
+    smartClipboard: 'Intelligente Zwischenablage',
+    smartClipboardInfo: 'Speichert automatisch alles, was du kopierst, solange sie aktiv ist.',
+    smartClipboardActivated: 'Intelligente Zwischenablage aktiviert',
+    activate: 'Starten',
+    deactivate: 'Stoppen',
+    timeRemaining: 'verbleibend',
+    
+    // Notes
+    notesPlaceholder: 'Beginne zu schreiben...',
+    noteTitle: 'Titel',
+    noteTitlePlaceholder: 'Gib deiner Notiz einen Titel (optional)',
+    noNotes: 'Noch keine Notizen',
+    newNote: 'Neue Notiz',
+    editNote: 'Notiz bearbeiten',
+    noteColor: 'Farbe',
+    pinNote: 'Anheften',
+    unpinNote: 'Lösen',
+    pinnedNotes: 'Angeheftet',
+    otherNotes: 'Notizen',
+    
+    // Favorites
+    noFavorites: 'Noch keine Favoriten',
+    addFavoritesHint: 'Tippe auf das Herz, um Elemente hier zu speichern',
+    addedToFavorites: 'Zu Favoriten hinzugefügt',
+    removedFromFavorites: 'Aus Favoriten entfernt',
+    
+    // Drag & Drop
+    dragToReorder: 'Gedrückt halten und ziehen zum Neuanordnen',
+    
+    // Premium
+    premium: 'Premium',
+    premiumActive: 'Premium Aktiv',
+    trialActive: 'Kostenlose Testversion',
+    trialDaysLeft: 'Tage verbleibend',
+    trialExpired: 'Testversion abgelaufen',
+    activationCode: 'Aktivierungscode',
+    enterActivationCode: 'Code eingeben',
+    codeActivated: 'Code erfolgreich aktiviert!',
+    invalidCode: 'Ungültiger Code',
+    codeAlreadyUsed: 'Dieser Code wurde bereits verwendet',
+    getPremium: 'Premium holen',
+    restorePurchase: 'Kauf wiederherstellen',
+    
+    // Settings
+    settings: 'Einstellungen',
+    language: 'Sprache',
+    backup: 'Cloud-Backup',
+    backupInfo: 'Deine Daten werden automatisch gesichert',
+    version: 'Version',
+    about: 'Über',
+    help: 'Hilfe & Support',
+    feedback: 'Feedback senden',
+    rateApp: 'App bewerten',
+    shareApp: 'Mit Freunden teilen',
+    termsOfService: 'Nutzungsbedingungen',
+    privacyPolicy: 'Datenschutzrichtlinie',
+    
+    // Cloud Backup Card
+    cloudBackupTitle: 'Automatisches Backup',
+    cloudBackupSubtitle: 'Deine Daten sind geschützt',
+    cloudBackupDescription: 'Alle deine Links, Notizen und Einstellungen werden automatisch zwischen Geräten synchronisiert.',
+    cloudBackupIOS: 'iCloud',
+    cloudBackupAndroid: 'Google Backup',
+    cloudBackupEnabled: 'Aktiviert',
+    cloudBackupTip: 'Stelle sicher, dass Cloud-Backup in deinen Geräteeinstellungen aktiviert ist.',
+    
+    // Notifications
+    notifications: 'Benachrichtigungen',
+    weeklySummary: 'Wöchentliche Zusammenfassung',
+    weeklySummaryInfo: 'Erhalte eine wöchentliche Erinnerung, um deine gespeicherten Inhalte zu überprüfen',
+    dayOfWeek: 'Tag',
+    time: 'Uhrzeit',
+    selectDay: 'Tag wählen',
+    selectTime: 'Uhrzeit wählen',
+    weeklySummaryEnabled: 'Wöchentliche Zusammenfassung aktiviert',
+    weeklySummaryDisabled: 'Wöchentliche Zusammenfassung deaktiviert',
+    
+    // Days of week
+    sunday: 'Sonntag',
+    monday: 'Montag',
+    tuesday: 'Dienstag',
+    wednesday: 'Mittwoch',
+    thursday: 'Donnerstag',
+    friday: 'Freitag',
+    saturday: 'Samstag',
+    
+    // Messages
+    copied: 'Kopiert!',
+    saved: 'Gespeichert!',
+    deleted: 'Gelöscht!',
+    error: 'Etwas ist schiefgelaufen',
+    success: 'Erfolg',
+    
+    // Reminders
+    reminder: 'Erinnerung',
+    setReminder: 'Erinnerung erstellen',
+    reminderDate: 'Datum',
+    reminderTime: 'Uhrzeit',
+    reminderLocation: 'Ort',
+    reminderLocationPlaceholder: 'Ort hinzufügen (optional)',
+    reminderEnabled: 'Erinnerung erstellt',
+    noDate: 'Kein Datum ausgewählt',
+    noTime: 'Keine Uhrzeit ausgewählt',
+    clearReminder: 'Erinnerung entfernen',
+    editItem: 'Bearbeiten',
+    moveToFolder: 'In Ordner verschieben',
+    
+    // Empty States
+    emptyLinksTitle: 'Speichere deinen ersten Link',
+    emptyLinksSubtitle: 'Füge eine URL ein, um loszulegen',
+    emptyNotesTitle: 'Erstelle deine erste Notiz',
+    emptyNotesSubtitle: 'Tippe auf +, um zu schreiben',
+    emptyClipboardTitle: 'Die Zwischenablage ist leer',
+    emptyClipboardSubtitle: 'Füge Text ein oder aktiviere die intelligente Zwischenablage',
+    emptyFavoritesTitle: 'Noch keine Favoriten',
+    emptyFavoritesSubtitle: 'Tippe auf das Herz bei einem Element, um es hier hinzuzufügen',
+  },
+
+  // ============================================
+  // ITALIANO (Italia)
+  // ============================================
+  it: {
+    // Tabs
+    tabLinks: 'Link',
+    tabNotes: 'Note',
+    tabClipboard: 'Appunti',
+    tabFavorites: 'Preferiti',
+    tabSettings: 'Impostazioni',
+    
+    // General
+    appName: 'Memor.ia',
+    save: 'Salva',
+    cancel: 'Annulla',
+    delete: 'Elimina',
+    edit: 'Modifica',
+    copy: 'Copia',
+    open: 'Apri',
+    search: 'Cerca...',
+    all: 'Tutto',
+    done: 'Fatto',
+    confirm: 'Conferma',
+    loading: 'Caricamento...',
+    
+    // Folders
+    allLinks: 'Tutti i Link',
+    allNotes: 'Tutte le Note',
+    allClipboards: 'Tutti gli Appunti',
+    folders: 'Cartelle',
+    newFolder: 'Nuova Cartella',
+    generalFolder: 'Generale',
+    folderName: 'Nome della Cartella',
+    selectFolder: 'Scegli una cartella',
+    manageFolders: 'Gestisci Cartelle',
+    
+    // Links
+    addLink: 'Aggiungi Link',
+    pasteLink: 'Incolla un link...',
+    noLinks: 'Nessun link salvato ancora',
+    openInBrowser: 'Apri nel browser',
+    copyLink: 'Copia link',
+    
+    // Clipboard
+    clipboardPlaceholder: 'Incolla il testo qui...',
+    noClipboardItems: 'Ancora niente qui',
+    chars: 'caratteri',
+    smartClipboard: 'Appunti Intelligenti',
+    smartClipboardInfo: 'Salva automaticamente tutto ciò che copi mentre è attivo.',
+    smartClipboardActivated: 'Appunti intelligenti attivati',
+    activate: 'Avvia',
+    deactivate: 'Ferma',
+    timeRemaining: 'rimanente',
+    
+    // Notes
+    notesPlaceholder: 'Inizia a scrivere...',
+    noteTitle: 'Titolo',
+    noteTitlePlaceholder: 'Dai un titolo alla tua nota (opzionale)',
+    noNotes: 'Nessuna nota ancora',
+    newNote: 'Nuova Nota',
+    editNote: 'Modifica Nota',
+    noteColor: 'Colore',
+    pinNote: 'Fissa',
+    unpinNote: 'Rimuovi fissaggio',
+    pinnedNotes: 'Fissate',
+    otherNotes: 'Note',
+    
+    // Favorites
+    noFavorites: 'Nessun preferito ancora',
+    addFavoritesHint: 'Tocca il cuore per salvare elementi qui',
+    addedToFavorites: 'Aggiunto ai preferiti',
+    removedFromFavorites: 'Rimosso dai preferiti',
+    
+    // Drag & Drop
+    dragToReorder: 'Tieni premuto e trascina per riordinare',
+    
+    // Premium
+    premium: 'Premium',
+    premiumActive: 'Premium Attivo',
+    trialActive: 'Prova Gratuita',
+    trialDaysLeft: 'giorni rimanenti',
+    trialExpired: 'Prova Terminata',
+    activationCode: 'Codice di Attivazione',
+    enterActivationCode: 'Inserisci il tuo codice',
+    codeActivated: 'Codice attivato con successo!',
+    invalidCode: 'Codice non valido',
+    codeAlreadyUsed: 'Questo codice è già stato utilizzato',
+    getPremium: 'Passa a Premium',
+    restorePurchase: 'Ripristina Acquisto',
+    
+    // Settings
+    settings: 'Impostazioni',
+    language: 'Lingua',
+    backup: 'Backup Cloud',
+    backupInfo: 'I tuoi dati vengono salvati automaticamente',
+    version: 'Versione',
+    about: 'Informazioni',
+    help: 'Aiuto e Supporto',
+    feedback: 'Invia Feedback',
+    rateApp: 'Valuta l\'App',
+    shareApp: 'Condividi con gli Amici',
+    termsOfService: 'Termini di Servizio',
+    privacyPolicy: 'Informativa sulla Privacy',
+    
+    // Cloud Backup Card
+    cloudBackupTitle: 'Backup Automatico',
+    cloudBackupSubtitle: 'I tuoi dati sono protetti',
+    cloudBackupDescription: 'Tutti i tuoi link, note e impostazioni vengono sincronizzati automaticamente tra i dispositivi.',
+    cloudBackupIOS: 'iCloud',
+    cloudBackupAndroid: 'Google Backup',
+    cloudBackupEnabled: 'Attivato',
+    cloudBackupTip: 'Assicurati che il backup cloud sia attivato nelle impostazioni del dispositivo.',
+    
+    // Notifications
+    notifications: 'Notifiche',
+    weeklySummary: 'Riepilogo Settimanale',
+    weeklySummaryInfo: 'Ricevi un promemoria settimanale per rivedere i contenuti salvati',
+    dayOfWeek: 'Giorno',
+    time: 'Ora',
+    selectDay: 'Seleziona giorno',
+    selectTime: 'Seleziona ora',
+    weeklySummaryEnabled: 'Riepilogo settimanale attivato',
+    weeklySummaryDisabled: 'Riepilogo settimanale disattivato',
+    
+    // Days of week
+    sunday: 'Domenica',
+    monday: 'Lunedì',
+    tuesday: 'Martedì',
+    wednesday: 'Mercoledì',
+    thursday: 'Giovedì',
+    friday: 'Venerdì',
+    saturday: 'Sabato',
+    
+    // Messages
+    copied: 'Copiato!',
+    saved: 'Salvato!',
+    deleted: 'Eliminato!',
+    error: 'Qualcosa è andato storto',
+    success: 'Successo',
+    
+    // Reminders
+    reminder: 'Promemoria',
+    setReminder: 'Crea Promemoria',
+    reminderDate: 'Data',
+    reminderTime: 'Ora',
+    reminderLocation: 'Luogo',
+    reminderLocationPlaceholder: 'Aggiungi un luogo (opzionale)',
+    reminderEnabled: 'Promemoria creato',
+    noDate: 'Nessuna data selezionata',
+    noTime: 'Nessun orario selezionato',
+    clearReminder: 'Rimuovi Promemoria',
+    editItem: 'Modifica',
+    moveToFolder: 'Sposta nella cartella',
+    
+    // Empty States
+    emptyLinksTitle: 'Salva il tuo primo link',
+    emptyLinksSubtitle: 'Incolla un URL per iniziare',
+    emptyNotesTitle: 'Crea la tua prima nota',
+    emptyNotesSubtitle: 'Tocca + per iniziare a scrivere',
+    emptyClipboardTitle: 'Gli appunti sono vuoti',
+    emptyClipboardSubtitle: 'Incolla del testo o attiva gli appunti intelligenti',
+    emptyFavoritesTitle: 'Nessun preferito ancora',
+    emptyFavoritesSubtitle: 'Tocca il cuore su qualsiasi elemento per aggiungerlo qui',
   },
 };
 
+/**
+ * Available languages with display info
+ * Total: 6 languages
+ */
 export const languages = [
-  { code: 'en', name: 'English', flag: '🇬🇧' },
-  { code: 'pt', name: 'Português', flag: '🇵🇹' },
-  { code: 'es', name: 'Español', flag: '🇪🇸' },
-  { code: 'fr', name: 'Français', flag: '🇫🇷' },
+  { code: 'en', name: 'English', nativeName: 'English (US)', flag: '🇺🇸' },
+  { code: 'pt', name: 'Portuguese', nativeName: 'Português (Portugal)', flag: '🇵🇹' },
+  { code: 'es', name: 'Spanish', nativeName: 'Español (España)', flag: '🇪🇸' },
+  { code: 'fr', name: 'French', nativeName: 'Français (France)', flag: '🇫🇷' },
+  { code: 'de', name: 'German', nativeName: 'Deutsch (Deutschland)', flag: '🇩🇪' },
+  { code: 'it', name: 'Italian', nativeName: 'Italiano (Italia)', flag: '🇮🇹' },
 ];
 
+/**
+ * Supported language codes
+ */
+const SUPPORTED_LANGUAGES = ['en', 'pt', 'es', 'fr', 'de', 'it'];
+
+/**
+ * Detects the user's language from device settings
+ * Falls back to English if not supported
+ */
 export const detectLanguage = () => {
   try {
     const locale = Localization.locale || Localization.getLocales()?.[0]?.languageCode || 'en';
     const langCode = typeof locale === 'string' ? locale.split('-')[0] : 'en';
-    return ['en', 'pt', 'es', 'fr'].includes(langCode) ? langCode : 'en';
+    return SUPPORTED_LANGUAGES.includes(langCode) ? langCode : 'en';
   } catch (error) {
     console.warn('Error detecting language:', error);
     return 'en';
   }
 };
 
+/**
+ * Gets the stored language preference or detects from device
+ */
 export const getStoredLanguage = async () => {
   try {
     const lang = await AsyncStorage.getItem('memoria-language');
-    return lang || detectLanguage();
+    if (lang && SUPPORTED_LANGUAGES.includes(lang)) {
+      return lang;
+    }
+    return detectLanguage();
   } catch (error) {
     return detectLanguage();
   }
 };
 
+/**
+ * Saves the language preference
+ */
 export const setLanguage = async (lang) => {
   try {
-    await AsyncStorage.setItem('memoria-language', lang);
+    if (SUPPORTED_LANGUAGES.includes(lang)) {
+      await AsyncStorage.setItem('memoria-language', lang);
+      return true;
+    }
+    return false;
   } catch (error) {
     console.error('Error setting language:', error);
+    return false;
   }
+};
+
+/**
+ * Gets translation for a key with fallback
+ */
+export const t = (key, lang = 'en') => {
+  const translation = translations[lang]?.[key];
+  if (translation) return translation;
+  
+  // Fallback to English
+  const fallback = translations.en?.[key];
+  if (fallback) return fallback;
+  
+  // Return key as last resort
+  return key;
 };
