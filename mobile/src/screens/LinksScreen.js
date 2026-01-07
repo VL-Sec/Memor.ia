@@ -217,7 +217,7 @@ export default function LinksScreen({ language }) {
           </View>
         </ScrollView>
       ) : (
-        <FlatList data={filteredLinks} keyExtractor={(item) => item.id} renderItem={renderLinkItem} contentContainerStyle={styles.listContent} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchData(); }} tintColor="#007AFF" />} />
+        <FlatList data={sortedLinks} keyExtractor={(item) => item.id} renderItem={renderLinkItem} contentContainerStyle={styles.listContent} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchData(); }} tintColor="#007AFF" />} />
       )}
       
       <Modal visible={showEditModal} animationType="slide" transparent={true} onRequestClose={closeEditModal}>
