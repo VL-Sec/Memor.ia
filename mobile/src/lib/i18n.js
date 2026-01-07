@@ -657,6 +657,9 @@ export const translations = {
     deleted: 'Supprimé !',
     error: 'Une erreur s\'est produite',
     success: 'Succès',
+    pinned: 'Épinglé en haut',
+    unpinned: 'Désépinglé',
+    pinToTop: 'Épingler en haut',
     
     // Reminders
     reminder: 'Rappel',
