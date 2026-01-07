@@ -27,7 +27,14 @@
     "plugins": [
       "expo-secure-store",
       "expo-localization",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#007AFF"
+        }
+      ]
     ],
     "extra": {
       "eas": {
