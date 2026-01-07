@@ -5,8 +5,9 @@ export const translations = {
   en: {
     // Tabs
     tabLinks: 'Links',
-    tabFavorites: 'Favorites',
+    tabNotes: 'Notes',
     tabClipboard: 'Clipboard',
+    tabFavorites: 'Favorites',
     tabSettings: 'Settings',
     
     // General
@@ -21,7 +22,8 @@ export const translations = {
     
     // Folders
     allLinks: 'All Links',
-    allClipboards: 'All Notes',
+    allNotes: 'All Notes',
+    allClipboards: 'All Clips',
     folders: 'Folders',
     newFolder: 'New Folder',
     generalFolder: 'General',
@@ -29,15 +31,27 @@ export const translations = {
     selectFolder: 'Select folder',
     
     // Clipboard
-    clipboardPlaceholder: 'Paste text or emojis here... 📋✨',
-    noClipboardItems: 'No notes yet',
+    clipboardPlaceholder: 'Paste text here...',
+    noClipboardItems: 'No items yet',
     chars: 'chars',
     smartClipboard: 'Smart Clipboard',
     smartClipboardInfo: 'While active, saves everything you copy.',
-    smartClipboardActivated: 'Smart Clipboard active for 2 minutes',
     activate: 'Activate',
     deactivate: 'Stop',
     timeRemaining: 'remaining',
+    
+    // Notes
+    notesPlaceholder: 'Write your note...',
+    noteTitle: 'Title',
+    noteTitlePlaceholder: 'Note title (optional)',
+    noNotes: 'No notes yet',
+    newNote: 'New Note',
+    editNote: 'Edit Note',
+    noteColor: 'Color',
+    pinNote: 'Pin',
+    unpinNote: 'Unpin',
+    pinnedNotes: 'Pinned',
+    otherNotes: 'Notes',
     
     // Premium
     premium: 'Premium',
@@ -61,13 +75,13 @@ export const translations = {
     // Cloud Backup Card
     cloudBackupTitle: 'Automatic Backup',
     cloudBackupSubtitle: 'Your data is safe',
-    cloudBackupDescription: 'All your links, notes and settings are automatically synced with your device\'s cloud backup.',
+    cloudBackupDescription: 'All your links, notes and settings are automatically synced.',
     cloudBackupIOS: 'iCloud Backup',
     cloudBackupAndroid: 'Google Backup',
     cloudBackupEnabled: 'Enabled',
     cloudBackupTip: 'Make sure cloud backup is enabled in your device settings.',
     
-    // Notifications - Weekly Summary
+    // Notifications
     notifications: 'Notifications',
     weeklySummary: 'Weekly Summary',
     weeklySummaryInfo: 'Receive a reminder to review your saved content',
@@ -77,8 +91,6 @@ export const translations = {
     selectTime: 'Select time',
     weeklySummaryEnabled: 'Weekly summary enabled',
     weeklySummaryDisabled: 'Weekly summary disabled',
-    permissionRequired: 'Permission required',
-    permissionMessage: 'Please enable notifications in settings',
     
     // Messages
     copied: 'Copied!',
@@ -94,10 +106,8 @@ export const translations = {
     reminderLocation: 'Location',
     reminderLocationPlaceholder: 'Add location (optional)',
     reminderEnabled: 'Reminder enabled',
-    reminderDisabled: 'Reminder removed',
     noDate: 'No date',
     noTime: 'No time',
-    noLocation: 'No location',
     clearReminder: 'Clear Reminder',
     editItem: 'Edit',
     moveToFolder: 'Move to folder',
@@ -106,8 +116,9 @@ export const translations = {
   pt: {
     // Tabs
     tabLinks: 'Links',
-    tabFavorites: 'Favoritos',
+    tabNotes: 'Notas',
     tabClipboard: 'Clipboard',
+    tabFavorites: 'Favoritos',
     tabSettings: 'Definições',
     
     // General
@@ -122,7 +133,8 @@ export const translations = {
     
     // Folders
     allLinks: 'Todos os Links',
-    allClipboards: 'Todas as Notas',
+    allNotes: 'Todas as Notas',
+    allClipboards: 'Todos os Clips',
     folders: 'Pastas',
     newFolder: 'Nova Pasta',
     generalFolder: 'Geral',
@@ -130,15 +142,27 @@ export const translations = {
     selectFolder: 'Selecionar pasta',
     
     // Clipboard
-    clipboardPlaceholder: 'Cola texto ou emojis aqui... 📋✨',
-    noClipboardItems: 'Ainda não tens notas',
+    clipboardPlaceholder: 'Cola o texto aqui...',
+    noClipboardItems: 'Ainda sem itens',
     chars: 'caracteres',
     smartClipboard: 'Smart Clipboard',
     smartClipboardInfo: 'Enquanto ativo, guarda tudo o que copiares.',
-    smartClipboardActivated: 'Smart Clipboard ativo por 2 minutos',
     activate: 'Ativar',
     deactivate: 'Parar',
     timeRemaining: 'restantes',
+    
+    // Notes
+    notesPlaceholder: 'Escreve a tua nota...',
+    noteTitle: 'Título',
+    noteTitlePlaceholder: 'Título da nota (opcional)',
+    noNotes: 'Ainda sem notas',
+    newNote: 'Nova Nota',
+    editNote: 'Editar Nota',
+    noteColor: 'Cor',
+    pinNote: 'Fixar',
+    unpinNote: 'Desafixar',
+    pinnedNotes: 'Fixadas',
+    otherNotes: 'Notas',
     
     // Premium
     premium: 'Premium',
@@ -162,13 +186,13 @@ export const translations = {
     // Cloud Backup Card
     cloudBackupTitle: 'Backup Automático',
     cloudBackupSubtitle: 'Os teus dados estão seguros',
-    cloudBackupDescription: 'Todos os teus links, notas e definições são sincronizados automaticamente com o backup na cloud do teu dispositivo.',
+    cloudBackupDescription: 'Todos os teus links, notas e definições são sincronizados automaticamente.',
     cloudBackupIOS: 'iCloud Backup',
     cloudBackupAndroid: 'Google Backup',
     cloudBackupEnabled: 'Ativado',
     cloudBackupTip: 'Certifica-te que o backup na cloud está ativado nas definições do dispositivo.',
     
-    // Notifications - Weekly Summary
+    // Notifications
     notifications: 'Notificações',
     weeklySummary: 'Resumo Semanal',
     weeklySummaryInfo: 'Recebe um lembrete para rever o conteúdo guardado',
@@ -178,8 +202,6 @@ export const translations = {
     selectTime: 'Selecionar hora',
     weeklySummaryEnabled: 'Resumo semanal ativado',
     weeklySummaryDisabled: 'Resumo semanal desativado',
-    permissionRequired: 'Permissão necessária',
-    permissionMessage: 'Ativa as notificações nas definições',
     
     // Messages
     copied: 'Copiado!',
@@ -195,10 +217,8 @@ export const translations = {
     reminderLocation: 'Local',
     reminderLocationPlaceholder: 'Adicionar local (opcional)',
     reminderEnabled: 'Lembrete ativado',
-    reminderDisabled: 'Lembrete removido',
     noDate: 'Sem data',
     noTime: 'Sem hora',
-    noLocation: 'Sem local',
     clearReminder: 'Limpar Lembrete',
     editItem: 'Editar',
     moveToFolder: 'Mover para pasta',
@@ -207,8 +227,9 @@ export const translations = {
   es: {
     // Tabs
     tabLinks: 'Enlaces',
-    tabFavorites: 'Favoritos',
+    tabNotes: 'Notas',
     tabClipboard: 'Clipboard',
+    tabFavorites: 'Favoritos',
     tabSettings: 'Ajustes',
     
     // General
@@ -223,23 +244,36 @@ export const translations = {
     
     // Folders
     allLinks: 'Todos los Enlaces',
-    allClipboards: 'Todas las Notas',
+    allNotes: 'Todas las Notas',
+    allClipboards: 'Todos los Clips',
     folders: 'Carpetas',
     newFolder: 'Nueva Carpeta',
     generalFolder: 'General',
-    folderName: 'Nombre de la Carpeta',
+    folderName: 'Nombre',
     selectFolder: 'Seleccionar carpeta',
     
     // Clipboard
-    clipboardPlaceholder: 'Pega texto o emojis aquí... 📋✨',
-    noClipboardItems: 'Aún no hay notas',
+    clipboardPlaceholder: 'Pega el texto aquí...',
+    noClipboardItems: 'Sin elementos',
     chars: 'caracteres',
     smartClipboard: 'Smart Clipboard',
     smartClipboardInfo: 'Mientras está activo, guarda todo lo que copies.',
-    smartClipboardActivated: 'Smart Clipboard activo por 2 minutos',
     activate: 'Activar',
     deactivate: 'Parar',
     timeRemaining: 'restantes',
+    
+    // Notes
+    notesPlaceholder: 'Escribe tu nota...',
+    noteTitle: 'Título',
+    noteTitlePlaceholder: 'Título de la nota (opcional)',
+    noNotes: 'Sin notas',
+    newNote: 'Nueva Nota',
+    editNote: 'Editar Nota',
+    noteColor: 'Color',
+    pinNote: 'Fijar',
+    unpinNote: 'Desfijar',
+    pinnedNotes: 'Fijadas',
+    otherNotes: 'Notas',
     
     // Premium
     premium: 'Premium',
@@ -261,26 +295,24 @@ export const translations = {
     version: 'Versión',
     
     // Cloud Backup Card
-    cloudBackupTitle: 'Copia de Seguridad Automática',
+    cloudBackupTitle: 'Copia de Seguridad',
     cloudBackupSubtitle: 'Tus datos están seguros',
-    cloudBackupDescription: 'Todos tus enlaces, notas y ajustes se sincronizan automáticamente con la copia de seguridad en la nube de tu dispositivo.',
+    cloudBackupDescription: 'Todos tus enlaces, notas y ajustes se sincronizan automáticamente.',
     cloudBackupIOS: 'iCloud Backup',
     cloudBackupAndroid: 'Google Backup',
     cloudBackupEnabled: 'Activado',
-    cloudBackupTip: 'Asegúrate de que la copia de seguridad en la nube esté activada en los ajustes del dispositivo.',
+    cloudBackupTip: 'Asegúrate de que la copia de seguridad esté activada.',
     
-    // Notifications - Weekly Summary
+    // Notifications
     notifications: 'Notificaciones',
     weeklySummary: 'Resumen Semanal',
-    weeklySummaryInfo: 'Recibe un recordatorio para revisar tu contenido guardado',
+    weeklySummaryInfo: 'Recibe un recordatorio para revisar tu contenido',
     dayOfWeek: 'Día',
     time: 'Hora',
     selectDay: 'Seleccionar día',
     selectTime: 'Seleccionar hora',
     weeklySummaryEnabled: 'Resumen semanal activado',
     weeklySummaryDisabled: 'Resumen semanal desactivado',
-    permissionRequired: 'Permiso requerido',
-    permissionMessage: 'Activa las notificaciones en ajustes',
     
     // Messages
     copied: '¡Copiado!',
@@ -296,10 +328,8 @@ export const translations = {
     reminderLocation: 'Ubicación',
     reminderLocationPlaceholder: 'Añadir ubicación (opcional)',
     reminderEnabled: 'Recordatorio activado',
-    reminderDisabled: 'Recordatorio eliminado',
     noDate: 'Sin fecha',
     noTime: 'Sin hora',
-    noLocation: 'Sin ubicación',
     clearReminder: 'Borrar Recordatorio',
     editItem: 'Editar',
     moveToFolder: 'Mover a carpeta',
@@ -308,8 +338,9 @@ export const translations = {
   fr: {
     // Tabs
     tabLinks: 'Liens',
-    tabFavorites: 'Favoris',
+    tabNotes: 'Notes',
     tabClipboard: 'Clipboard',
+    tabFavorites: 'Favoris',
     tabSettings: 'Paramètres',
     
     // General
@@ -324,31 +355,44 @@ export const translations = {
     
     // Folders
     allLinks: 'Tous les Liens',
-    allClipboards: 'Toutes les Notes',
+    allNotes: 'Toutes les Notes',
+    allClipboards: 'Tous les Clips',
     folders: 'Dossiers',
     newFolder: 'Nouveau Dossier',
     generalFolder: 'Général',
-    folderName: 'Nom du Dossier',
+    folderName: 'Nom',
     selectFolder: 'Sélectionner dossier',
     
     // Clipboard
-    clipboardPlaceholder: 'Collez du texte ou des emojis ici... 📋✨',
-    noClipboardItems: 'Pas encore de notes',
+    clipboardPlaceholder: 'Collez le texte ici...',
+    noClipboardItems: 'Aucun élément',
     chars: 'caractères',
     smartClipboard: 'Smart Clipboard',
-    smartClipboardInfo: 'Pendant qu\'il est actif, enregistre tout ce que vous copiez.',
-    smartClipboardActivated: 'Smart Clipboard actif pendant 2 minutes',
+    smartClipboardInfo: "Pendant qu'il est actif, enregistre tout ce que vous copiez.",
     activate: 'Activer',
     deactivate: 'Arrêter',
     timeRemaining: 'restantes',
     
+    // Notes
+    notesPlaceholder: 'Écrivez votre note...',
+    noteTitle: 'Titre',
+    noteTitlePlaceholder: 'Titre de la note (optionnel)',
+    noNotes: 'Aucune note',
+    newNote: 'Nouvelle Note',
+    editNote: 'Modifier la Note',
+    noteColor: 'Couleur',
+    pinNote: 'Épingler',
+    unpinNote: 'Désépingler',
+    pinnedNotes: 'Épinglées',
+    otherNotes: 'Notes',
+    
     // Premium
     premium: 'Premium',
     premiumActive: 'Premium Actif',
-    trialActive: 'Période d\'Essai',
+    trialActive: "Période d'Essai",
     trialDaysLeft: 'jours restants',
-    trialExpired: 'Période d\'Essai Expirée',
-    activationCode: 'Code d\'Activation',
+    trialExpired: "Période d'Essai Expirée",
+    activationCode: "Code d'Activation",
     enterActivationCode: 'Entrer le code',
     codeActivated: 'Code activé!',
     invalidCode: 'Code invalide',
@@ -364,24 +408,22 @@ export const translations = {
     // Cloud Backup Card
     cloudBackupTitle: 'Sauvegarde Automatique',
     cloudBackupSubtitle: 'Vos données sont en sécurité',
-    cloudBackupDescription: 'Tous vos liens, notes et paramètres sont automatiquement synchronisés avec la sauvegarde cloud de votre appareil.',
+    cloudBackupDescription: 'Tous vos liens, notes et paramètres sont synchronisés automatiquement.',
     cloudBackupIOS: 'iCloud Backup',
     cloudBackupAndroid: 'Google Backup',
     cloudBackupEnabled: 'Activé',
-    cloudBackupTip: 'Assurez-vous que la sauvegarde cloud est activée dans les paramètres de votre appareil.',
+    cloudBackupTip: 'Assurez-vous que la sauvegarde cloud est activée.',
     
-    // Notifications - Weekly Summary
+    // Notifications
     notifications: 'Notifications',
     weeklySummary: 'Résumé Hebdomadaire',
-    weeklySummaryInfo: 'Recevez un rappel pour revoir votre contenu enregistré',
+    weeklySummaryInfo: 'Recevez un rappel pour revoir votre contenu',
     dayOfWeek: 'Jour',
     time: 'Heure',
     selectDay: 'Sélectionner le jour',
-    selectTime: 'Sélectionner l\'heure',
+    selectTime: "Sélectionner l'heure",
     weeklySummaryEnabled: 'Résumé hebdomadaire activé',
     weeklySummaryDisabled: 'Résumé hebdomadaire désactivé',
-    permissionRequired: 'Permission requise',
-    permissionMessage: 'Activez les notifications dans les paramètres',
     
     // Messages
     copied: 'Copié!',
@@ -397,10 +439,8 @@ export const translations = {
     reminderLocation: 'Lieu',
     reminderLocationPlaceholder: 'Ajouter un lieu (optionnel)',
     reminderEnabled: 'Rappel activé',
-    reminderDisabled: 'Rappel supprimé',
     noDate: 'Pas de date',
-    noTime: 'Pas d\'heure',
-    noLocation: 'Pas de lieu',
+    noTime: "Pas d'heure",
     clearReminder: 'Effacer le Rappel',
     editItem: 'Modifier',
     moveToFolder: 'Déplacer vers dossier',
@@ -416,10 +456,7 @@ export const languages = [
 
 export const detectLanguage = () => {
   const locale = Localization.locale.split('-')[0];
-  if (['en', 'pt', 'es', 'fr'].includes(locale)) {
-    return locale;
-  }
-  return 'en';
+  return ['en', 'pt', 'es', 'fr'].includes(locale) ? locale : 'en';
 };
 
 export const getStoredLanguage = async () => {
