@@ -28,7 +28,6 @@
       "expo-secure-store",
       "expo-localization",
       "expo-font",
-      "react-native-gesture-handler",
       [
         "expo-notifications",
         {
