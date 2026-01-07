@@ -825,6 +825,9 @@ export const translations = {
     deleted: 'Gelöscht!',
     error: 'Etwas ist schiefgelaufen',
     success: 'Erfolg',
+    pinned: 'Oben angeheftet',
+    unpinned: 'Losgelöst',
+    pinToTop: 'Oben anheften',
     
     // Reminders
     reminder: 'Erinnerung',
