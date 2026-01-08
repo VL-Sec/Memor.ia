@@ -3,7 +3,7 @@ import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
@@ -18,6 +18,100 @@ import SettingsScreen from './src/screens/SettingsScreen';
 import { translations, getStoredLanguage } from './src/lib/i18n';
 import { getPremiumStatus } from './src/lib/premium';
 import { getUserId } from './src/lib/userManager';
+
+// Configure notifications
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
+
+const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+// Custom Tab Bar Component for perfect distribution
+function CustomTabBar({ state, descriptors, navigation, insets }) {
+  return (
+    <View style={[
+      customTabBarStyles.container, 
+      { paddingBottom: Math.max(insets.bottom, 10) }
+    ]}>
+      {state.routes.map((route, index) => {
+        const { options } = descriptors[route.key];
+        const label = options.title || route.name;
+        const isFocused = state.index === index;
+
+        let iconName;
+        if (route.name === 'Links') iconName = isFocused ? 'link' : 'link-outline';
+        else if (route.name === 'Clipboard') iconName = isFocused ? 'clipboard' : 'clipboard-outline';
+        else if (route.name === 'Notes') iconName = isFocused ? 'document-text' : 'document-text-outline';
+        else if (route.name === 'Favorites') iconName = isFocused ? 'heart' : 'heart-outline';
+
+        const onPress = () => {
+          const event = navigation.emit({
+            type: 'tabPress',
+            target: route.key,
+            canPreventDefault: true,
+          });
+
+          if (!isFocused && !event.defaultPrevented) {
+            navigation.navigate(route.name);
+          }
+        };
+
+        return (
+          <TouchableOpacity
+            key={route.key}
+            accessibilityRole="button"
+            accessibilityState={isFocused ? { selected: true } : {}}
+            accessibilityLabel={options.tabBarAccessibilityLabel}
+            testID={options.tabBarTestID}
+            onPress={onPress}
+            style={customTabBarStyles.tab}
+          >
+            <Ionicons 
+              name={iconName} 
+              size={24} 
+              color={isFocused ? '#007AFF' : '#8E8E93'} 
+            />
+            <Text style={[
+              customTabBarStyles.label,
+              { color: isFocused ? '#007AFF' : '#8E8E93' }
+            ]}>
+              {label}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+}
+
+const customTabBarStyles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    backgroundColor: '#1C1C1E',
+    borderTopWidth: 0.5,
+    borderTopColor: '#2C2C2E',
+    paddingTop: 8,
+    width: SCREEN_WIDTH,
+  },
+  tab: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 6,
+  },
+  label: {
+    fontSize: 10,
+    fontWeight: '600',
+    marginTop: 4,
+  },
+});
 
 // Configure notifications
 Notifications.setNotificationHandler({
