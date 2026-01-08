@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Modal, Switch, Platform, Linking, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -12,7 +13,6 @@ import Constants from 'expo-constants';
 import { translations, languages, setLanguage as saveLanguage } from '../lib/i18n';
 import { activatePremium, getPremiumStatus } from '../lib/premium';
 import { supabase } from '../lib/supabase';
-import CustomHeader from '../components/CustomHeader';
 
 const API_URL = 'https://linknote-hub.preview.emergentagent.com';
 const TERMS_URL = 'https://linknote-hub.preview.emergentagent.com/terms';
