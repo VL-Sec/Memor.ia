@@ -170,7 +170,6 @@ function AppContent({ language, setLanguage, premiumStatus, setPremiumStatus, re
             else if (route.name === 'Clipboard') iconName = focused ? 'clipboard' : 'clipboard-outline';
             else if (route.name === 'Notes') iconName = focused ? 'document-text' : 'document-text-outline';
             else if (route.name === 'Favorites') iconName = focused ? 'heart' : 'heart-outline';
-            else if (route.name === 'Settings') iconName = focused ? 'settings' : 'settings-outline';
             return <Ionicons name={iconName} size={22} color={color} />;
           },
           tabBarActiveTintColor: '#007AFF',
@@ -182,6 +181,9 @@ function AppContent({ language, setLanguage, premiumStatus, setPremiumStatus, re
             height: 55 + Math.max(insets.bottom, 10),
             paddingBottom: Math.max(insets.bottom, 10),
             paddingTop: 6,
+          },
+          tabBarItemStyle: {
+            flex: 1,
           },
           tabBarLabelStyle: {
             fontSize: 10,
