@@ -29,6 +29,7 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
   const [editingItem, setEditingItem] = useState(null);
   const [editContent, setEditContent] = useState('');
 
+  const insets = useSafeAreaInsets();
   const t = translations[language] || translations.en;
 
   // Reload when screen is focused
