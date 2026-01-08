@@ -822,6 +822,8 @@ export const translations = {
     weeklySummaryEnabled: 'Wöchentliche Zusammenfassung aktiviert',
     weeklySummaryDisabled: 'Wöchentliche Zusammenfassung deaktiviert',
     notificationPermissionRequired: 'Bitte aktiviere Benachrichtigungen in deinen Geräteeinstellungen, um wöchentliche Zusammenfassungen zu erhalten.',
+    expoGoNotSupported: 'Benachrichtigungen sind in Expo Go nicht verfügbar. Bitte verwende die veröffentlichte App, um diese Funktion zu aktivieren.',
+    notificationError: 'Benachrichtigungen konnten nicht aktiviert werden. Bitte versuche es später erneut.',
     
     // Days of week
     sunday: 'Sonntag',
