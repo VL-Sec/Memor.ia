@@ -40,6 +40,8 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [editContent, setEditContent] = useState('');
+  const [editFolderId, setEditFolderId] = useState(null);
+  const [showFolderPicker, setShowFolderPicker] = useState(false);
   
   // Folder management modal state
   const [showFolderModal, setShowFolderModal] = useState(false);
