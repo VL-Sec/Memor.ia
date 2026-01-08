@@ -296,8 +296,9 @@ export default function LinksScreen({ language, refreshKey }) {
           </TouchableOpacity>
         </View>
 
-        {/* Folder section - Clean style without title */}
+        {/* Folder section with title */}
         <View style={styles.folderSection}>
+          <Text style={styles.folderSectionTitle}>{t.folders || 'Pastas'}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.folderList} contentContainerStyle={styles.folderListContent}>
             <TouchableOpacity style={[styles.folderChip, selectedFolder === 'all' && styles.folderChipActive]} onPress={() => setSelectedFolder('all')}>
               <Text style={[styles.folderChipText, selectedFolder === 'all' && styles.folderChipTextActive]}>{t.allLinks || 'Todos'}</Text>
