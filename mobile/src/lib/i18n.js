@@ -309,6 +309,8 @@ export const translations = {
     weeklySummaryEnabled: 'Resumo semanal ativado',
     weeklySummaryDisabled: 'Resumo semanal desativado',
     notificationPermissionRequired: 'Ativa as notificações nas definições do dispositivo para receberes resumos semanais.',
+    expoGoNotSupported: 'As notificações não estão disponíveis no Expo Go. Por favor, usa a app publicada para ativar esta funcionalidade.',
+    notificationError: 'Não foi possível ativar as notificações. Tenta novamente mais tarde.',
     
     // Days of week
     sunday: 'Domingo',
