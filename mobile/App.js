@@ -139,6 +139,9 @@ export default function App() {
     );
   }
 
+  // Tab bar height calculation
+  const TAB_BAR_HEIGHT = 60;
+
   return (
     <SafeAreaProvider>
       <NavigationContainer theme={theme}>
@@ -146,14 +149,14 @@ export default function App() {
         <Tab.Navigator
           screenOptions={({ route }) => ({
             headerShown: false,
-            tabBarIcon: ({ focused, color, size }) => {
+            tabBarIcon: ({ focused, color }) => {
               let iconName;
               if (route.name === 'Links') iconName = focused ? 'link' : 'link-outline';
               else if (route.name === 'Clipboard') iconName = focused ? 'clipboard' : 'clipboard-outline';
               else if (route.name === 'Notes') iconName = focused ? 'document-text' : 'document-text-outline';
               else if (route.name === 'Favorites') iconName = focused ? 'heart' : 'heart-outline';
               else if (route.name === 'Settings') iconName = focused ? 'settings' : 'settings-outline';
-              return <Ionicons name={iconName} size={24} color={color} />;
+              return <Ionicons name={iconName} size={22} color={color} />;
             },
             tabBarActiveTintColor: '#007AFF',
             tabBarInactiveTintColor: '#8E8E93',
@@ -161,18 +164,13 @@ export default function App() {
               backgroundColor: '#1C1C1E', 
               borderTopColor: '#2C2C2E',
               borderTopWidth: 0.5,
-              height: 85,
-              paddingBottom: 25,
+              height: TAB_BAR_HEIGHT + (Platform.OS === 'ios' ? 34 : 20),
+              paddingBottom: Platform.OS === 'ios' ? 34 : 20,
               paddingTop: 8,
-              paddingHorizontal: 10,
             },
             tabBarLabelStyle: {
               fontSize: 10,
               fontWeight: '500',
-              marginTop: 2,
-            },
-            tabBarIconStyle: {
-              marginTop: 4,
             },
           })}
         >
