@@ -358,11 +358,11 @@ export default function LinksScreen({ language, refreshKey }) {
               </View>
               
               {/* Title */}
-              <Text style={styles.inputLabel}>{t.title || 'Título'}</Text>
-              <TextInput style={styles.textInput} value={editTitle} onChangeText={setEditTitle} placeholder={t.titlePlaceholder || 'Nome do link'} placeholderTextColor="#8E8E93" />
+              <Text style={styles.inputLabel}>{t.linkTitle || t.title || 'Título'}</Text>
+              <TextInput style={styles.textInput} value={editTitle} onChangeText={setEditTitle} placeholder={t.linkTitlePlaceholder || 'Nome do link'} placeholderTextColor="#8E8E93" />
               
               {/* Move to folder */}
-              <Text style={styles.inputLabel}>{t.moveToFolder}</Text>
+              <Text style={styles.inputLabel}>{t.moveToFolder || 'Mover para:'}</Text>
               <TouchableOpacity style={styles.pickerButton} onPress={() => setShowFolderPicker(true)}>
                 <Ionicons name="folder-outline" size={20} color="#007AFF" />
                 <Text style={styles.pickerButtonText}>
