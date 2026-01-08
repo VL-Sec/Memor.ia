@@ -644,6 +644,7 @@ export const translations = {
     selectTime: 'Choisir l\'heure',
     weeklySummaryEnabled: 'Récapitulatif hebdomadaire activé',
     weeklySummaryDisabled: 'Récapitulatif hebdomadaire désactivé',
+    notificationPermissionRequired: 'Veuillez activer les notifications dans les réglages de votre appareil pour recevoir les récapitulatifs hebdomadaires.',
     
     // Days of week
     sunday: 'Dimanche',
