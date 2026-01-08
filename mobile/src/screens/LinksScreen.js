@@ -293,7 +293,8 @@ export default function LinksScreen({ language }) {
           </View>
         </View>
       </Modal>
-    </View>
+      </View>
+    </>
   );
 }
 
