@@ -101,16 +101,16 @@ export default function FavoritesScreen({ language }) {
     const itemType = getItemType(item);
     const isLink = itemType === 'link';
     return (
-      <TouchableOpacity style={styles.card} onPress={() => isLink ? handleOpenLink(item.url) : handleCopyContent(item.content)}>
+      <TouchableOpacity style={styles.card} onPress={() => isLink ? handleOpenLink(item.url) : handleCopyContent(item.content || '')}>
         {isLink && item.imageUrl && <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />}
         <View style={styles.cardContent}>
           <View style={styles.cardHeader}>
             <Ionicons name={getItemIcon(itemType)} size={16} color="#8E8E93" />
             <Text style={styles.cardType}>{getItemLabel(itemType)}</Text>
           </View>
-          <Text style={styles.cardTitle} numberOfLines={2}>{item.title || item.content?.slice(0, 50)}</Text>
-          {isLink && <Text style={styles.cardUrl} numberOfLines={1}>{item.url}</Text>}
-          {!isLink && <Text style={styles.cardPreview} numberOfLines={2}>{item.content}</Text>}
+          <Text style={styles.cardTitle} numberOfLines={2}>{item.title || item.content?.slice(0, 50) || ''}</Text>
+          {isLink && <Text style={styles.cardUrl} numberOfLines={1}>{item.url || ''}</Text>}
+          {!isLink && <Text style={styles.cardPreview} numberOfLines={2}>{item.content || ''}</Text>}
         </View>
         <TouchableOpacity style={styles.favoriteButton} onPress={() => handleRemoveFavorite(item)}>
           <Ionicons name="heart" size={24} color="#FF3B30" />
