@@ -542,28 +542,45 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
           </View>
         </View>
 
-        {/* 4. Folder filter */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.folderList}>
-          <TouchableOpacity 
-            style={[styles.folderChip, selectedFolder === 'all' && styles.folderChipActive]} 
-            onPress={() => setSelectedFolder('all')}
-          >
-            <Text style={[styles.folderChipText, selectedFolder === 'all' && styles.folderChipTextActive]}>
-              {t.allClipboards || 'Todos'}
-            </Text>
-          </TouchableOpacity>
-          {folders.map(folder => (
+        {/* 4. Folder filter - Improved visibility */}
+        <View style={styles.folderSection}>
+          <View style={styles.folderHeader}>
+            <Text style={styles.folderSectionTitle}>{t.folders || 'Pastas'}</Text>
+            <TouchableOpacity style={styles.addFolderBtn} onPress={() => openFolderModal()}>
+              <Ionicons name="add-circle" size={24} color="#007AFF" />
+            </TouchableOpacity>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.folderList} contentContainerStyle={styles.folderListContent}>
             <TouchableOpacity 
-              key={folder.id} 
-              style={[styles.folderChip, selectedFolder === folder.id && styles.folderChipActive]} 
-              onPress={() => setSelectedFolder(folder.id)}
+              style={[styles.folderChip, selectedFolder === 'all' && styles.folderChipActive]} 
+              onPress={() => setSelectedFolder('all')}
             >
-              <Text style={[styles.folderChipText, selectedFolder === folder.id && styles.folderChipTextActive]}>
-                {folder.isDefault ? t.generalFolder : folder.name}
+              <Text style={[styles.folderChipText, selectedFolder === 'all' && styles.folderChipTextActive]}>
+                {t.allClipboards || 'Todos'}
               </Text>
             </TouchableOpacity>
-          ))}
-        </ScrollView>
+            {folders.map(folder => (
+              <TouchableOpacity 
+                key={folder.id} 
+                style={[styles.folderChip, selectedFolder === folder.id && styles.folderChipActive]} 
+                onPress={() => setSelectedFolder(folder.id)}
+                onLongPress={() => !folder.isDefault && openFolderModal(folder)}
+              >
+                <Text style={[styles.folderChipText, selectedFolder === folder.id && styles.folderChipTextActive]}>
+                  {folder.isDefault ? (t.generalFolder || 'Geral') : folder.name}
+                </Text>
+                {!folder.isDefault && selectedFolder === folder.id && (
+                  <TouchableOpacity 
+                    style={styles.folderDeleteBtn} 
+                    onPress={() => handleDeleteFolder(folder)}
+                  >
+                    <Ionicons name="close-circle" size={16} color="#FF3B30" />
+                  </TouchableOpacity>
+                )}
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
 
         {/* 5. Notes list */}
         {sortedNotes.length === 0 ? (
