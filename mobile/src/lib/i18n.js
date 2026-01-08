@@ -333,6 +333,9 @@ export const translations = {
     // Drag & Drop
     dragToReorder: 'Mantém premido e arrasta para reorganizar',
     
+    // Folders
+    createNewFolder: 'Criar nova pasta',
+    
     // Premium
     premium: 'Premium',
     premiumActive: 'Premium Ativo',
