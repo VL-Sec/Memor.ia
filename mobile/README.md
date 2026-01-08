@@ -95,7 +95,7 @@ eas submit --platform ios
 - Uso único
 
 ### Admin Dashboard
-- URL: https://link-fixer-6.preview.emergentagent.com/admin
+- URL: https://memofix.preview.emergentagent.com/admin
 - Criar e gerir códigos de influencers
 
 ## 📁 Estrutura

@@ -1,242 +1,168 @@
 <analysis>
 <original_problem_statement>
-The user's goal is to build a premium link and snippet manager app called Memor.ia with a primary focus on a React Native (Expo) mobile application.
+The user initially reported a list of critical bugs in their Memor.ia app, a premium link and snippet manager. The most critical issues included:
+1.  **Pin is Not Persistent:** Pinned items lost their state after an app reload. This was the highest priority bug.
+2.  **UI Layout is Broken:**
+    *   **Safe Area:** The bottom tab bar was partially hidden by the system navigation bar, and modals overlapped with the top status bar.
+    *   **Tab Bar Distribution:** The 4 icons in the bottom tab bar were not evenly spaced.
+3.  **Smart Clipboard Not Working:** The feature was not capturing all copied items.
+4.  **Missing Features:** The user requested a comprehensive folder management system (create/edit/delete) and the ability to add reminders to items.
 
-**Initial Feature Requests:**
-1.  **Customizable Weekly Summary:** Allow users to select the day and time for their weekly summary notification.
-2.  **Cloud Backup Info:** Add an informational card in the Settings screen about native OS cloud backup.
-3.  **Link Reminders:** Option to set a reminder when editing a link.
-4.  **Notes Screen:** A new, separate Notes section in the tab bar for plain text notes.
-5.  **UI Fix:** Change placeholder text in the Clipboard input.
-
-**New Feature Requests This Session:**
-1.  **Favorites System:** Add a favorite (heart icon) feature to Notes and Clipboard items. Favorited items should appear in the Favorites screen, similar to how links work.
-2.  **Drag-and-Drop Reordering:** Allow users to reorder items in the Links, Clipboard, and Notes screens.
-3.  **Auto-Dismissing Toasts:** Toast notifications should disappear automatically after 3 seconds but retain a manual close button.
-4.  **Public Legal Pages:** Create public, multi-language pages for Terms of Service and Privacy Policy to be used for the Play Store.
-5.  **Improved Translations:** Review and improve all translations to be more natural (not literal). Add more languages (German and Italian were added).
+Over the course of the session, the user provided significant additional feedback and feature requests, including:
+- A complete overhaul of the authentication system to use a privacy-friendly, unique device ID instead of a hardcoded demo user.
+- Adding date/time-based reminders with local notifications to Notes, in addition to Links.
+- Numerous UI/UX refinements, such as changing the tap area for links, moving the Smart Clipboard UI into a modal, and adding a copy URL function in the edit screen.
 </original_problem_statement>
 
 **User's preferred language**: português
 
 **what currently exists?**
-The project consists of a Next.js web application (serving as an admin panel and for static pages like Terms of Service) and a React Native (Expo) mobile app in the  directory.
+The project is a React Native (Expo) mobile app. A significant number of critical bugs have been fixed and major features have been implemented in this session.
 
-Several features were implemented in the mobile app, including a new Notes screen, improved translations for 6 languages, and the UI for link reminders and weekly summaries.
-
-However, the project is currently in a **broken state**. An attempt to implement a drag-and-drop feature using  and  led to a cascade of dependency conflicts and build failures. The user is unable to build a working APK or run the app with . The last set of actions taken by the agent was to begin a major refactor to *remove* the drag-and-drop functionality to restore stability.
+- **Authentication:** The app has been refactored to use a unique device ID () generated and stored locally on the user's device via a new  module. This  is now passed as a prop to all main screens and used for all data operations, replacing a hardcoded .
+- **Persistence:** The root cause of the pin persistence bug was identified and fixed: an  column was added to the  table in Supabase.
+- **UI:** The critical Safe Area bug with the bottom tab bar has been fixed by refactoring  to use the  hook. The navigation structure was also changed to a Stack Navigator containing the Tab Navigator to resolve layout issues.
+- **Features:**
+    - A full folder management system (create, update, delete, move items) has been implemented for both the Links and Clipboard screens.
+    - A date/time-based reminder system using a picker and local notifications has been fully implemented for the .
+    - The Smart Clipboard has been fixed to capture all new clipboard entries and its UI has been moved to a modal, accessible from a new header icon.
 
 **Last working item**:
-- Last item agent was working: The agent was in the middle of removing the problematic drag-and-drop feature to fix the broken build. This involved:
-    1.  Removing  and  from .
-    2.  Rewriting the , , , and  to use a standard  instead of .
-    3.  Removing  from .
-    The agent was about to remove the now-unnecessary dependencies from  and the plugin from  when the session ended.
+- Last item agent was working: Implementing **reminders for Notes**. The user requested that the same reminder functionality (date/time picker with local notifications) available for Links also be added to the Notes screen. The agent had begun this task by passing the necessary  prop and was in the process of adding the state, UI elements to the modal, and saving logic to .
 - Status: **IN PROGRESS**
 - Agent Testing Done: N
-- Which testing method agent to use? Once the refactor is complete, the user needs to test by generating a build ().  has also been failing due to these dependency issues.
+- Which testing method agent to use? The next agent should complete the feature and then provide the user with manual testing instructions, as this involves UI and local notifications.
 - User Testing Done: N
 
 **All Pending/In progress Issue list**:
-- Issue 1: **(P0 - HIGHEST) Mobile App Build is Broken**
-  - Description: The mobile app cannot be built or started due to severe dependency conflicts originating from the  and  libraries, which were added to implement drag-and-drop. This has resulted in a series of 
-up to date, audited 314 packages in 3s
-
-50 packages are looking for funding
-  run `npm fund` for details
-
-4 vulnerabilities (2 high, 2 critical)
-
-To address issues that do not require attention, run:
-  npm audit fix
-
-To address all issues, run:
-  npm audit fix --force
-
-Run `npm audit` for details. errors,  mismatches, and ultimately a  error on EAS.
-  - Attempted fixes:
-    - Updating/downgrading  and  versions. (Failed)
-    - Adding  to . (Failed)
-    - Adding the  dependency. (Failed, package version not found).
-    - The current, in-progress fix is to completely remove the drag-and-drop feature and its dependencies.
+- Issue 1: **(P1) Implement Exact Time for Weekly Summary**
+  - Description: In , the Resumo Semanal (Weekly Summary) notification time can only be set on an hourly basis. The user requested (Msg 348) the ability to select an exact hour and minute.
+  - Attempted fixes: None.
   - Next debug checklist:
-    1.  Complete the removal of drag-and-drop functionality.
-    2.  Read  and .
-    3.  Remove all traces of , , and .
-    4.  Ensure  no longer references the .
-    5.  Guide the user through , cleaning , and 
-up to date, audited 314 packages in 2s
+    1.  In , modify the component used for time selection. Instead of a simple hour picker, use a  with .
+    2.  Update the  function to correctly store the full date/time object in .
+    3.  Ensure the background task that schedules the summary notification can correctly parse and use the exact time.
+  - Why fix this issue and what will be achieved with the fix?: This provides a more granular and user-friendly control over a core notification feature.
+  - Status: NOT STARTED
+  - Is recurring issue? N
+  - Should Test frontend/backend/both after fix? Frontend (manual testing by user).
+  - Blocked on other issue: None.
 
-50 packages are looking for funding
-  run `npm fund` for details
-
-4 vulnerabilities (2 high, 2 critical)
-
-To address issues that do not require attention, run:
-  npm audit fix
-
-To address all issues, run:
-  npm audit fix --force
-
-Run `npm audit` for details..
-    6.  Guide the user to attempt env: load .env
-env: export NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_ANON_KEY MONGO_URL NEXT_PUBLIC_BASE_URL
-Starting project at /app first. If successful, proceed to .
-  - Why fix this issue and what will be achieved with the fix?: This is a critical blocker. Fixing it will make the app buildable again, allowing the user to test all the other features that have been implemented. It will restore the project to a stable state.
-  - Status: IN PROGRESS
-  - Is recurring issue? Y (The project has been plagued by dependency and build issues).
-  - Should Test frontend/backend/both after fix? Frontend (user will test the mobile app build).
-  - Blocked on other issue: No. This is the primary blocker.
+- Issue 2: **(P2 - Verification) Tab Bar Icon Distribution**
+  - Description: The user repeatedly reported that the four icons in the bottom tab bar were not distributed evenly. The agent implemented a fix (Msg 244) by refactoring the navigation, which *should* have resolved it.
+  - Attempted fixes: The  was removed from the  and placed in a parent  so it no longer influences the tab bar's layout.
+  - Next debug checklist:
+    1.  This is a verification task. The next agent must explicitly ask the user to confirm if the spacing of the four tab bar icons is now correct and even.
+    2.  If the issue persists, inspect the  in  and ensure there are no conflicting styles.
+  - Why fix this issue and what will be achieved with the fix?: Fixes a persistent and visually jarring UI bug in the app's main navigation.
+  - Status: USER VERIFICATION PENDING
+  - Is recurring issue? Y
+  - Should Test frontend/backend/both after fix? Frontend.
+  - Blocked on other issue: None.
 
 **In progress Task List**:
-- Task 1: **(P0) Complete the Removal of Drag-and-Drop Functionality**
-  - Where to resume: The screens have been reverted to use . The agent needs to finalize the cleanup by removing the related dependencies and plugins from  and .
-  - What will be achieved with this?: A stable, buildable application, albeit without the drag-and-drop feature. This resolves Issue 1.
+- Task 1: **(P0) Finish Implementing Reminders in NotesScreen**
+  - Description: Add the date/time reminder functionality to , mirroring the implementation in .
+  - Where to resume:
+    1.  Open .
+    2.  Add state variables for the reminder date and the date picker's visibility:  and .
+    3.  In the edit/create modal JSX, add the UI for setting a reminder (a toggle switch, and the date/time picker buttons), copying the structure from .
+    4.  Update  to include the  value when creating or updating a note in AsyncStorage.
+    5.  Implement the logic to schedule a local notification when a reminder is set.
+    6.  Update the  function to display a badge if a note has a pending reminder.
+  - What will be achieved with this?: Feature parity between Notes and Links, fulfilling a direct user request.
   - Status: IN PROGRESS
   - Should Test frontend/backend/both after fix? Frontend.
-  - Blocked on something: No.
+  - Blocked on something: None.
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks:**
-  - **(P1) Implement Favorites for Notes & Clipboard:** The UI/logic for this was added during the large bulk-write but may have been broken by the subsequent refactor. This needs to be re-verified and implemented correctly on the now-simplified screens.
-  - **(P2) Implement Auto-Dismissing Toasts:** This was requested but needs to be verified after the app is stable.
-  - **(P2) Update Terms/Privacy URLs:** The user will provide public URLs from a Notion page. The agent needs to update the links in  when they are provided.
-
-- **Future Tasks:**
-  - **(P3) Re-implement Drag-and-Drop:** This feature was requested by the user but caused the build to break. It should be re-attempted *after* the app is stable, using a carefully researched and tested library compatible with the current Expo SDK.
-  - **(P3) Implement Anonymous Metrics Backend:** A carry-over task from the previous session to build a backend for tracking aggregate usage metrics.
-  - **(P4) Implement Native Cloud Backups:** A critical, user-requested feature to store data in iCloud/Android Backup.
+    - (P2) Perform a comprehensive review of all translations in  to ensure accuracy and context, as requested by the user in Msg 391.
 
 **Completed work in this session**
-- **New Mobile App Features (Pending Final Build & Test):**
-  - **Customizable Weekly Summary:** Implemented in .
-  - **Cloud Backup Info Card:** Added a static card to .
-  - **Link Reminders:** Added functionality in .
-  - **Notes Screen:** Created a new screen at  and added to navigation in .
-  - **Internationalization (i18n):**
-    - Refactored and improved translations in .
-    - Expanded language support from 4 to 6 languages (English, Portuguese, Spanish, French, German, Italian).
-  - **Web Legal Pages:** Created multi-language Terms of Service () and Privacy Policy () pages.
-
-- **Bug Fixes:**
-  - Fixed a  crash by adding a fallback for  in .
-  - Replaced deprecated  with  in .
-
-- **Environment & Git Workflow:**
-  - Successfully guided the user through multiple complex Git branch-fixing scenarios using HEAD is now at 7aceb00 auto-commit for eb62fd99-aa20-4ddd-b63e-bcebac1110fe and , eventually consolidating all work onto the  branch.
-  - The user is now proficient in running , 
-up to date, audited 314 packages in 3s
-
-50 packages are looking for funding
-  run `npm fund` for details
-
-4 vulnerabilities (2 high, 2 critical)
-
-To address issues that do not require attention, run:
-  npm audit fix
-
-To address all issues, run:
-  npm audit fix --force
-
-Run `npm audit` for details., and  commands, but requires very clear instructions on which directory to run them in.
+- **Authentication & Security:**
+  - Implemented a privacy-friendly unique device ID system using  and a new  module.
+  - Removed all instances of the hardcoded  from the codebase (, , ).
+- **Core Bug Fixes:**
+  - **Pin Persistence:** Resolved the critical bug where pin status was not saved by guiding the user to add the  column to the  table in Supabase.
+  - **Safe Area:** Fixed the bottom tab bar layout by refactoring  to use  and the  hook.
+- **Feature Development & Refactoring:**
+  - **Folder Management:** Added a complete system for creating, editing, and deleting folders in  and .
+  - **Reminders (Links):** Implemented a date/time-based reminder feature in  with a  and local notifications.
+  - **Smart Clipboard:**
+    - Fixed the bug where only the last copied item was saved.
+    - Refactored the UI from a static card to a modal, accessible via a new header icon on the .
+- **UI/UX Improvements:**
+  - Added a delete button to link items in .
+  - Added a Copy URL feature to the link edit modal.
+  - Added a Move to Folder option in the  edit modal.
+  - Prevented accidental link opening by separating the tap areas for actions vs. opening the link.
+  - Fixed an issue where folder chips were cut off in .
+  - Added and updated dozens of translation strings in  for new features.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Frontend (Mobile):** React Native, Expo SDK 54, React Navigation
-- **Build System:** Expo Application Services (EAS) Build ()
-- **Dependency Management:** NPM,  is required. The dependency tree is very fragile.
-- **Internationalization (i18n):** Using  with a custom JSON structure for 6 languages.
-- **Version Control:** Git. The user's workflow is prone to branch divergence, requiring HEAD is now at 7aceb00 auto-commit for eb62fd99-aa20-4ddd-b63e-bcebac1110fe frequently.
+- **Frontend:** React Native, Expo SDK 54, React Navigation
+- **State Management:** Local screen state (, , ).  was used to solve a closure issue with  in the Smart Clipboard.
+- **Navigation:** A  now acts as the parent for the  and the modal . This was a key architectural change to fix UI bugs.
+- **Persistence:**
+    - **AsyncStorage:** Used for Notes and the new unique .
+    - **Supabase:** Used for Links and Folders.
+- **Local Notifications:** The  library is used for reminders.
+- **Authentication:** A custom, privacy-focused device ID system. No traditional login.
 
 **key DB schema**
-- No changes were made to the database schema in this session.
+-  (Supabase table): . The  column was added in this session.
+-  (Supabase table): 
+- **AsyncStorage Keys:**
+    - : Stores the unique device ID.
+    - : Stores all notes for a given user.
 
 **All files of reference**
-- : **CRITICAL FILE.** The source of the build issues. It was modified multiple times and is currently in a state of flux, pending the final cleanup of drag-and-drop dependencies.
-- : Modified to add/remove plugins. The  was incorrectly added and then removed.
-- : Needs to have the  removed.
-- : Heavily modified to add languages and improve translations.
-- : All screen files were rewritten to add new features, and then rewritten again to remove the .
+- : **Currently being edited.** Needs reminder functionality to be completed.
+- : A good reference for how the reminder functionality should work.
+- : Needs to be updated for the Weekly Summary exact time selection.
+- : Contains the new top-level navigation and auth initialization logic.
+- : The new module for handling the device's unique ID.
 
 **Critical Info for New Agent**
-- **PRIORITY #1 IS STABILITY:** The user is very frustrated with the constant build and dependency errors. Do not attempt any new features until the app is stable and the user can successfully build a working APK.
-- **DRAG-AND-DROP IS THE CULPRIT:** The  and  libraries are the source of all recent problems. The current strategy is to **remove them completely**. Do not try to fix them. Finish the removal process first.
-- **BE EXTREMELY CLEAR WITH COMMANDS:** The user has expressed frustration about not knowing which directory to run commands in. Always specify the full context (e.g., In the directory, run...).
-- **WORKFLOW:** The established (though painful) workflow is:
-    1. Agent pushes code.
-    2. User runs  (or ).
-    3. User runs , then , then 
-up to date, audited 314 packages in 3s
-
-50 packages are looking for funding
-  run `npm fund` for details
-
-4 vulnerabilities (2 high, 2 critical)
-
-To address issues that do not require attention, run:
-  npm audit fix
-
-To address all issues, run:
-  npm audit fix --force
-
-Run `npm audit` for details..
-    4. User runs env: load .env
-env: export NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_ANON_KEY MONGO_URL NEXT_PUBLIC_BASE_URL
-Starting project at /app or .
-- **USER WILL PROVIDE URLS LATER:** The user has deferred the task of creating permanent public URLs for the legal pages. This is a pending task that relies on user input.
+- **MUST RESPOND IN PORTUGUÊS.**
+- **Your immediate priority (P0) is to complete the reminder implementation in .** Use  as a direct template for this feature.
+- **A major auth refactor was just completed.** All data operations now depend on the  prop passed down from . Ensure you use this  in all interactions with Supabase and AsyncStorage.
+- The user is technically savvy and provides very specific, detailed feedback. Pay close attention to their requests.
+- After completing the P0 task, address the pending issue of adding exact time selection for the Weekly Summary in Settings.
+- Finally, explicitly ask the user for verification on the tab bar icon spacing, as this has been a recurring problem.
 
 **Last 10 User Messages and any pending HUMAN messages**
-10. **User (Msg 239):** Reports Unknown command: "error"
-
-To see a list of supported npm commands, run:
-  npm help for , a dependency the agent tried to add. (This led to the decision to remove drag-and-drop).
-9.  **User (Msg 235):** Reports  from EAS with a Gradle error. (This was a key failure).
-8.  **User (Msg 229):** Reports  errors about version mismatches for  and . (Agent tried to suppress this).
-7.  **User (Msg 223):** Asks if the app is ready for an APK build without errors. (Agent confirmed, but it failed).
-6.  **User (Msg 217):** Reports  error from .
-5.  **User (Msg 215):** Asks for clarification on which directory to run  in, expressing frustration.
-4.  **User (Msg 211):** Reports  warning about incompatible package versions.
-3.  **User (Msg 200):** Asks if they should install TypeScript dependencies, as prompted by .
-2.  **User (Msg 199):** Reports an error from  about TypeScript files.
-1.  **User (Msg 197):** Asks what to do about a prompt to install TypeScript.
+- 10. **(Msg 391)**: **(CRITICAL REQUEST)** Asks to replace  with a unique, anonymous device ID system. Also requests reminders for Notes and a full translation review. (IN PROGRESS)
+- 9. **(Msg 348)**: Reports that the reminder UI opens location instead of a date/time picker, asks for weekly summary to have exact time, and notes that folder chips are cut off in Favorites. (PARTIALLY RESOLVED - Link Reminders and Favorites UI fixed, Weekly Summary pending).
+- 8. **(Msg 311)**: Asks for a review of all new language translations and a general security check. (RESOLVED - Agent added translations and performed a check).
+- 7. **(Msg 294)**: Confirms folder logic (Todos shows all) and requests the ability to see and copy the URL from within the link edit modal. (RESOLVED).
+- 6. **(Msg 263)**: Reports that the Move to menu in Links still contains Geral, and asks to add a Move to option to the Clipboard edit modal. (RESOLVED).
+- 5. **(Msg 240)**: Confirms the tab bar safe area is fixed, but icon distribution is still wrong. Reports that the Smart Clipboard only saves the last item. (RESOLVED).
+- 4. **(Msg 221)**: **(FRUSTRATED)** Sends another screenshot showing the tab bar is still broken (too low and unevenly spaced). (PARTIALLY RESOLVED - Safe area fixed, distribution pending verification).
+- 3. **(Msg 186)**: Requests 3 UI changes: remove 'x' from folder chips, fix link tap area, and move Smart Clipboard to a header modal. (RESOLVED).
+- 2. **(Msg 159)**: Provides very specific requirements for folder logic (Todos is default, no Geral, user-created folders only). (RESOLVED).
+- 1. **(Msg 142)**: Reports safe area issue with the Guardar button in the link edit modal and requests a delete button for link items. (RESOLVED).
 
 **Project Health Check:**
-- **Broken:**
-  - The mobile app's build process ().
-  - The local development server ().
-- **Mocked:**
-  - The Admin Dashboard metrics are still mocked from a previous session.
-- **Fragile:**
-  - The entire mobile app dependency management system. It requires 
-up to date, audited 314 packages in 3s
-
-50 packages are looking for funding
-  run `npm fund` for details
-
-4 vulnerabilities (2 high, 2 critical)
-
-To address issues that do not require attention, run:
-  npm audit fix
-
-To address all issues, run:
-  npm audit fix --force
-
-Run `npm audit` for details. and is highly sensitive to changes in native modules.
-  - The Git workflow between the user and agent is prone to errors.
+- **Improving:** The project started in a Broken state but has moved to a much healthier state. Most critical bugs have been resolved, and significant requested features are now implemented. The remaining tasks are primarily feature completion and refinement rather than critical bug fixes.
 
 **3rd Party Integrations**
-- **Supabase:** Used for the backend database.
-- **Expo (EAS):** Used for building the React Native application.
+- **Supabase:** Used as the backend database for Links, Clipboard items, and Folders.
+- **Expo (EAS Build):** Used for building the app.
+- **Expo Notifications:** Used for scheduling local reminders.
+- **:** Used for date and time selection for reminders.
 
 **Testing status**
 - Testing agent used after significant changes: NO
 - Troubleshoot agent used after agent stuck in loop: NO
 - Test files created: None
-- Known regressions: The drag-and-drop feature, which was partially implemented, is being removed.
+- Known regressions: The tab bar icon distribution has been a recurring UI bug that required multiple fix attempts. Its current status needs user verification.
 
 **What agent forgot to execute**
-The agent failed to properly research the compatibility of  and  with the project's Expo SDK version before implementing them. This led to a try-and-fail cycle of debugging that wasted a lot of time and frustrated the user. A more cautious approach, like creating a small test branch to validate complex native dependencies, was overlooked. The decision to remove the feature was correct but was made too late in the process.
+- From the user's request in Msg 348, the agent fixed the Link Reminders and the Favorites UI, but did not implement the requested change for the **Weekly Summary** to allow selecting an exact time. This is now a pending issue.
 
 </analysis>
