@@ -19,7 +19,7 @@ import { translations, getStoredLanguage } from './src/lib/i18n';
 import { getPremiumStatus } from './src/lib/premium';
 import { getUserId } from './src/lib/userManager';
 
-// Configure notifications
+// Configure notifications (only once)
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -28,102 +28,12 @@ Notifications.setNotificationHandler({
   }),
 });
 
+// Create navigators (only once)
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
+// Get screen width for tab calculation
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-
-// Custom Tab Bar Component for perfect distribution
-function CustomTabBar({ state, descriptors, navigation, insets }) {
-  return (
-    <View style={[
-      customTabBarStyles.container, 
-      { paddingBottom: Math.max(insets.bottom, 10) }
-    ]}>
-      {state.routes.map((route, index) => {
-        const { options } = descriptors[route.key];
-        const label = options.title || route.name;
-        const isFocused = state.index === index;
-
-        let iconName;
-        if (route.name === 'Links') iconName = isFocused ? 'link' : 'link-outline';
-        else if (route.name === 'Clipboard') iconName = isFocused ? 'clipboard' : 'clipboard-outline';
-        else if (route.name === 'Notes') iconName = isFocused ? 'document-text' : 'document-text-outline';
-        else if (route.name === 'Favorites') iconName = isFocused ? 'heart' : 'heart-outline';
-
-        const onPress = () => {
-          const event = navigation.emit({
-            type: 'tabPress',
-            target: route.key,
-            canPreventDefault: true,
-          });
-
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name);
-          }
-        };
-
-        return (
-          <TouchableOpacity
-            key={route.key}
-            accessibilityRole="button"
-            accessibilityState={isFocused ? { selected: true } : {}}
-            accessibilityLabel={options.tabBarAccessibilityLabel}
-            testID={options.tabBarTestID}
-            onPress={onPress}
-            style={customTabBarStyles.tab}
-          >
-            <Ionicons 
-              name={iconName} 
-              size={24} 
-              color={isFocused ? '#007AFF' : '#8E8E93'} 
-            />
-            <Text style={[
-              customTabBarStyles.label,
-              { color: isFocused ? '#007AFF' : '#8E8E93' }
-            ]}>
-              {label}
-            </Text>
-          </TouchableOpacity>
-        );
-      })}
-    </View>
-  );
-}
-
-const customTabBarStyles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    backgroundColor: '#1C1C1E',
-    borderTopWidth: 0.5,
-    borderTopColor: '#2C2C2E',
-    paddingTop: 8,
-    width: SCREEN_WIDTH,
-  },
-  tab: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 6,
-  },
-  label: {
-    fontSize: 10,
-    fontWeight: '600',
-    marginTop: 4,
-  },
-});
-
-// Configure notifications
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
-
-const Tab = createBottomTabNavigator();
-const Stack = createNativeStackNavigator();
 
 // Extend DarkTheme
 const theme = {
@@ -140,7 +50,118 @@ const theme = {
   },
 };
 
-// Custom Toast component
+// ============================================
+// CUSTOM TAB BAR - Perfect 4-way distribution
+// ============================================
+function CustomTabBar({ state, descriptors, navigation, insets }) {
+  return (
+    <View style={[
+      tabBarStyles.container, 
+      { 
+        paddingBottom: Math.max(insets.bottom, 10),
+        width: '100%',
+      }
+    ]}>
+      {state.routes.map((route, index) => {
+        const { options } = descriptors[route.key];
+        const label = options.title || route.name;
+        const isFocused = state.index === index;
+
+        let iconName;
+        switch (route.name) {
+          case 'Links':
+            iconName = isFocused ? 'link' : 'link-outline';
+            break;
+          case 'Clipboard':
+            iconName = isFocused ? 'clipboard' : 'clipboard-outline';
+            break;
+          case 'Notes':
+            iconName = isFocused ? 'document-text' : 'document-text-outline';
+            break;
+          case 'Favorites':
+            iconName = isFocused ? 'heart' : 'heart-outline';
+            break;
+          default:
+            iconName = 'help-outline';
+        }
+
+        const onPress = () => {
+          const event = navigation.emit({
+            type: 'tabPress',
+            target: route.key,
+            canPreventDefault: true,
+          });
+
+          if (!isFocused && !event.defaultPrevented) {
+            navigation.navigate(route.name);
+          }
+        };
+
+        const onLongPress = () => {
+          navigation.emit({
+            type: 'tabLongPress',
+            target: route.key,
+          });
+        };
+
+        return (
+          <TouchableOpacity
+            key={route.key}
+            accessibilityRole="button"
+            accessibilityState={isFocused ? { selected: true } : {}}
+            accessibilityLabel={options.tabBarAccessibilityLabel}
+            testID={options.tabBarTestID}
+            onPress={onPress}
+            onLongPress={onLongPress}
+            style={tabBarStyles.tab}
+            activeOpacity={0.7}
+          >
+            <Ionicons 
+              name={iconName} 
+              size={24} 
+              color={isFocused ? '#007AFF' : '#8E8E93'} 
+            />
+            <Text 
+              style={[
+                tabBarStyles.label,
+                { color: isFocused ? '#007AFF' : '#8E8E93' }
+              ]}
+              numberOfLines={1}
+            >
+              {label}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+}
+
+const tabBarStyles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    backgroundColor: '#1C1C1E',
+    borderTopWidth: 0.5,
+    borderTopColor: '#2C2C2E',
+    paddingTop: 8,
+  },
+  tab: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 6,
+  },
+  label: {
+    fontSize: 10,
+    fontWeight: '600',
+    marginTop: 4,
+    textAlign: 'center',
+  },
+});
+
+// ============================================
+// CUSTOM TOAST
+// ============================================
 const CustomToast = ({ text1, text2, type, hide }) => {
   const borderColor = type === 'success' ? '#34C759' : type === 'error' ? '#FF3B30' : '#007AFF';
   return (
@@ -198,6 +219,117 @@ const toastStyles = StyleSheet.create({
   },
 });
 
+// ============================================
+// TAB NAVIGATOR - Only 4 tabs
+// ============================================
+function TabNavigator({ language, userId, premiumStatus, refreshKey, triggerRefresh, t, insets }) {
+  return (
+    <Tab.Navigator
+      tabBar={(props) => <CustomTabBar {...props} insets={insets} />}
+      screenOptions={{
+        headerShown: false,
+      }}
+      sceneContainerStyle={{ backgroundColor: '#000000' }}
+    >
+      <Tab.Screen name="Links" options={{ title: 'Links' }}>
+        {(props) => (
+          <LinksScreen 
+            {...props} 
+            language={language} 
+            userId={userId} 
+            premiumStatus={premiumStatus} 
+            refreshKey={refreshKey} 
+          />
+        )}
+      </Tab.Screen>
+      <Tab.Screen name="Clipboard" options={{ title: 'Clipboard' }}>
+        {(props) => (
+          <ClipboardScreen 
+            {...props} 
+            language={language} 
+            userId={userId} 
+            premiumStatus={premiumStatus} 
+            refreshKey={refreshKey} 
+            triggerRefresh={triggerRefresh} 
+          />
+        )}
+      </Tab.Screen>
+      <Tab.Screen name="Notes" options={{ title: 'Notas' }}>
+        {(props) => (
+          <NotesScreen 
+            {...props} 
+            language={language} 
+            userId={userId} 
+            refreshKey={refreshKey} 
+            triggerRefresh={triggerRefresh} 
+          />
+        )}
+      </Tab.Screen>
+      <Tab.Screen name="Favorites" options={{ title: 'Favoritos' }}>
+        {(props) => (
+          <FavoritesScreen 
+            {...props} 
+            language={language} 
+            userId={userId} 
+            refreshKey={refreshKey} 
+          />
+        )}
+      </Tab.Screen>
+    </Tab.Navigator>
+  );
+}
+
+// ============================================
+// MAIN APP CONTENT
+// ============================================
+function AppContent({ language, setLanguage, premiumStatus, setPremiumStatus, refreshKey, triggerRefresh, userId, t }) {
+  const insets = useSafeAreaInsets();
+  
+  return (
+    <NavigationContainer theme={theme}>
+      <StatusBar style="light" />
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="MainTabs">
+          {(props) => (
+            <TabNavigator 
+              {...props} 
+              language={language} 
+              userId={userId} 
+              premiumStatus={premiumStatus} 
+              refreshKey={refreshKey} 
+              triggerRefresh={triggerRefresh}
+              t={t}
+              insets={insets}
+            />
+          )}
+        </Stack.Screen>
+        <Stack.Screen 
+          name="Settings" 
+          options={{ 
+            presentation: 'card',
+            animation: 'slide_from_right',
+          }}
+        >
+          {(props) => (
+            <SettingsScreen 
+              {...props} 
+              language={language} 
+              userId={userId} 
+              setLanguage={setLanguage} 
+              premiumStatus={premiumStatus} 
+              setPremiumStatus={setPremiumStatus} 
+            />
+          )}
+        </Stack.Screen>
+      </Stack.Navigator>
+      <Toast config={toastConfig} visibilityTime={3000} autoHide={true} />
+    </NavigationContainer>
+  );
+}
+
+// ============================================
+// MAIN APP COMPONENT
+// ============================================
 export default function App() {
   const [language, setLanguage] = useState('en');
   const [premiumStatus, setPremiumStatus] = useState(null);
@@ -271,80 +403,21 @@ export default function App() {
   );
 }
 
-// Tab Navigator - ONLY 4 tabs, no Settings
-function TabNavigator({ language, userId, premiumStatus, refreshKey, triggerRefresh, t, insets }) {
-  return (
-    <Tab.Navigator
-      tabBar={(props) => <CustomTabBar {...props} insets={insets} />}
-      screenOptions={{
-        headerShown: false,
-      }}
-      sceneContainerStyle={{ backgroundColor: '#000000' }}
-    >
-      <Tab.Screen name="Links" options={{ title: 'Links' }}>
-        {(props) => <LinksScreen {...props} language={language} userId={userId} premiumStatus={premiumStatus} refreshKey={refreshKey} />}
-      </Tab.Screen>
-      <Tab.Screen name="Clipboard" options={{ title: 'Clipboard' }}>
-        {(props) => <ClipboardScreen {...props} language={language} userId={userId} premiumStatus={premiumStatus} refreshKey={refreshKey} triggerRefresh={triggerRefresh} />}
-      </Tab.Screen>
-      <Tab.Screen name="Notes" options={{ title: 'Notas' }}>
-        {(props) => <NotesScreen {...props} language={language} userId={userId} refreshKey={refreshKey} triggerRefresh={triggerRefresh} />}
-      </Tab.Screen>
-      <Tab.Screen name="Favorites" options={{ title: 'Favoritos' }}>
-        {(props) => <FavoritesScreen {...props} language={language} userId={userId} refreshKey={refreshKey} />}
-      </Tab.Screen>
-    </Tab.Navigator>
-  );
-}
-
-// Main App Content with Stack Navigator
-function AppContent({ language, setLanguage, premiumStatus, setPremiumStatus, refreshKey, triggerRefresh, userId, t }) {
-  const insets = useSafeAreaInsets();
-  
-  return (
-    <NavigationContainer theme={theme}>
-      <StatusBar style="light" />
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="MainTabs">
-          {(props) => (
-            <TabNavigator 
-              {...props} 
-              language={language} 
-              userId={userId} 
-              premiumStatus={premiumStatus} 
-              refreshKey={refreshKey} 
-              triggerRefresh={triggerRefresh}
-              t={t}
-              insets={insets}
-            />
-          )}
-        </Stack.Screen>
-        <Stack.Screen 
-          name="Settings" 
-          options={{ 
-            presentation: 'card',
-            animation: 'slide_from_right',
-          }}
-        >
-          {(props) => (
-            <SettingsScreen 
-              {...props} 
-              language={language} 
-              userId={userId} 
-              setLanguage={setLanguage} 
-              premiumStatus={premiumStatus} 
-              setPremiumStatus={setPremiumStatus} 
-            />
-          )}
-        </Stack.Screen>
-      </Stack.Navigator>
-      <Toast config={toastConfig} visibilityTime={3000} autoHide={true} />
-    </NavigationContainer>
-  );
-}
-
 const styles = StyleSheet.create({
-  loadingContainer: { flex: 1, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' },
-  loadingText: { color: '#FFFFFF', fontSize: 24, fontWeight: '700', marginTop: 20 },
-  errorText: { color: '#FF3B30', fontSize: 16 },
+  loadingContainer: { 
+    flex: 1, 
+    backgroundColor: '#000', 
+    justifyContent: 'center', 
+    alignItems: 'center' 
+  },
+  loadingText: { 
+    color: '#FFFFFF', 
+    fontSize: 24, 
+    fontWeight: '700', 
+    marginTop: 20 
+  },
+  errorText: { 
+    color: '#FF3B30', 
+    fontSize: 16 
+  },
 });
