@@ -292,6 +292,10 @@ export const translations = {
     deactivate: 'Parar',
     timeRemaining: 'restante',
     
+    // Links
+    linkTitle: 'Título',
+    linkTitlePlaceholder: 'Nome do link',
+    
     // Notes
     notesPlaceholder: 'Começa a escrever...',
     noteTitle: 'Título',
