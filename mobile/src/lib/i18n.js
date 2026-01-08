@@ -505,6 +505,10 @@ export const translations = {
     deactivate: 'Detener',
     timeRemaining: 'restante',
     
+    // Links
+    linkTitle: 'Título',
+    linkTitlePlaceholder: 'Nombre del enlace',
+    
     // Notes
     notesPlaceholder: 'Empieza a escribir...',
     noteTitle: 'Título',
