@@ -1,13 +1,11 @@
 import React from 'react';
-import { View, Text, SafeAreaView, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 
 export default function CustomHeader({ title }) {
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <Text style={styles.title}>{title}</Text>
-      </View>
-    </SafeAreaView>
+    <View style={styles.container}>
+      <Text style={styles.title}>{title}</Text>
+    </View>
   );
 }
 
