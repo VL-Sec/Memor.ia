@@ -982,6 +982,7 @@ export const translations = {
     selectTime: 'Seleziona ora',
     weeklySummaryEnabled: 'Riepilogo settimanale attivato',
     weeklySummaryDisabled: 'Riepilogo settimanale disattivato',
+    notificationPermissionRequired: 'Attiva le notifiche nelle impostazioni del dispositivo per ricevere i riepiloghi settimanali.',
     
     // Days of week
     sunday: 'Domenica',
