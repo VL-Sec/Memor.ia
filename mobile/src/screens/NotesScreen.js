@@ -631,4 +631,10 @@ const styles = StyleSheet.create({
   reminderHint: { color: '#8E8E93', fontSize: 13, textAlign: 'center', fontStyle: 'italic' },
   reminderBadge: { backgroundColor: 'rgba(52, 199, 89, 0.2)', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10, flexDirection: 'row', alignItems: 'center', gap: 4 },
   reminderBadgeText: { color: '#34C759', fontSize: 12 },
+  // iOS Picker Modal styles
+  pickerModalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.6)', justifyContent: 'flex-end' },
+  pickerModalContent: { backgroundColor: '#1C1C1E', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingBottom: 30 },
+  pickerModalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: '#2C2C2E' },
+  pickerModalTitle: { color: '#FFFFFF', fontSize: 18, fontWeight: '600' },
+  pickerDoneText: { color: '#007AFF', fontSize: 17, fontWeight: '600' },
 });
