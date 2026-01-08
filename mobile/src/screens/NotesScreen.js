@@ -432,9 +432,81 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
                 </TouchableOpacity>
               ))}
             </View>
+
+            {/* Reminder Section */}
+            <View style={styles.reminderSection}>
+              <View style={styles.reminderHeader}>
+                <View style={styles.reminderHeaderLeft}>
+                  <Ionicons name="notifications-outline" size={24} color="#34C759" />
+                  <Text style={styles.reminderTitle}>{t.setReminder || 'Lembrete'}</Text>
+                </View>
+                <Switch 
+                  value={reminderEnabled} 
+                  onValueChange={setReminderEnabled} 
+                  trackColor={{ false: '#3A3A3C', true: '#34C759' }} 
+                  thumbColor="#FFFFFF" 
+                />
+              </View>
+              {reminderEnabled && (
+                <View style={styles.reminderOptions}>
+                  <View style={styles.dateTimeRow}>
+                    <TouchableOpacity style={styles.dateTimeButton} onPress={() => setShowDatePicker(true)}>
+                      <Ionicons name="calendar-outline" size={20} color="#007AFF" />
+                      <Text style={styles.dateTimeText}>
+                        {reminderDate.toLocaleDateString(language === 'pt' ? 'pt-PT' : language)}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.dateTimeButton} onPress={() => setShowTimePicker(true)}>
+                      <Ionicons name="time-outline" size={20} color="#007AFF" />
+                      <Text style={styles.dateTimeText}>
+                        {reminderDate.toLocaleTimeString(language === 'pt' ? 'pt-PT' : language, { hour: '2-digit', minute: '2-digit' })}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <Text style={styles.reminderHint}>
+                    {t.reminderHint || 'Vais receber uma notificação nesta data e hora'}
+                  </Text>
+                </View>
+              )}
+            </View>
           </ScrollView>
         </View>
       </Modal>
+
+      {/* Date Picker */}
+      {showDatePicker && (
+        <DateTimePicker
+          value={reminderDate}
+          mode="date"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={(event, selectedDate) => {
+            setShowDatePicker(Platform.OS === 'ios');
+            if (selectedDate) {
+              const newDate = new Date(reminderDate);
+              newDate.setFullYear(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+              setReminderDate(newDate);
+            }
+          }}
+          minimumDate={new Date()}
+        />
+      )}
+
+      {/* Time Picker */}
+      {showTimePicker && (
+        <DateTimePicker
+          value={reminderDate}
+          mode="time"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={(event, selectedTime) => {
+            setShowTimePicker(Platform.OS === 'ios');
+            if (selectedTime) {
+              const newDate = new Date(reminderDate);
+              newDate.setHours(selectedTime.getHours(), selectedTime.getMinutes());
+              setReminderDate(newDate);
+            }
+          }}
+        />
+      )}
       </View>
     </SafeAreaView>
   );
