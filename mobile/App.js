@@ -275,47 +275,22 @@ export default function App() {
 function TabNavigator({ language, userId, premiumStatus, refreshKey, triggerRefresh, t, insets }) {
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
+      tabBar={(props) => <CustomTabBar {...props} insets={insets} />}
+      screenOptions={{
         headerShown: false,
-        tabBarIcon: ({ focused, color }) => {
-          let iconName;
-          if (route.name === 'Links') iconName = focused ? 'link' : 'link-outline';
-          else if (route.name === 'Clipboard') iconName = focused ? 'clipboard' : 'clipboard-outline';
-          else if (route.name === 'Notes') iconName = focused ? 'document-text' : 'document-text-outline';
-          else if (route.name === 'Favorites') iconName = focused ? 'heart' : 'heart-outline';
-          return <Ionicons name={iconName} size={24} color={color} />;
-        },
-        tabBarActiveTintColor: '#007AFF',
-        tabBarInactiveTintColor: '#8E8E93',
-        tabBarStyle: { 
-          backgroundColor: '#1C1C1E', 
-          borderTopColor: '#2C2C2E',
-          borderTopWidth: 0.5,
-          height: 60 + Math.max(insets.bottom, 10),
-          paddingBottom: Math.max(insets.bottom, 10),
-          paddingTop: 8,
-        },
-        tabBarItemStyle: {
-          flex: 1,
-        },
-        tabBarLabelStyle: {
-          fontSize: 10,
-          fontWeight: '600',
-        },
-        tabBarAllowFontScaling: false,
-      })}
+      }}
       sceneContainerStyle={{ backgroundColor: '#000000' }}
     >
-      <Tab.Screen name="Links" options={{ title: t.tabLinks || 'Links' }}>
+      <Tab.Screen name="Links" options={{ title: 'Links' }}>
         {(props) => <LinksScreen {...props} language={language} userId={userId} premiumStatus={premiumStatus} refreshKey={refreshKey} />}
       </Tab.Screen>
       <Tab.Screen name="Clipboard" options={{ title: 'Clipboard' }}>
         {(props) => <ClipboardScreen {...props} language={language} userId={userId} premiumStatus={premiumStatus} refreshKey={refreshKey} triggerRefresh={triggerRefresh} />}
       </Tab.Screen>
-      <Tab.Screen name="Notes" options={{ title: t.tabNotes || 'Notas' }}>
+      <Tab.Screen name="Notes" options={{ title: 'Notas' }}>
         {(props) => <NotesScreen {...props} language={language} userId={userId} refreshKey={refreshKey} triggerRefresh={triggerRefresh} />}
       </Tab.Screen>
-      <Tab.Screen name="Favorites" options={{ title: t.tabFavorites || 'Favoritos' }}>
+      <Tab.Screen name="Favorites" options={{ title: 'Favoritos' }}>
         {(props) => <FavoritesScreen {...props} language={language} userId={userId} refreshKey={refreshKey} />}
       </Tab.Screen>
     </Tab.Navigator>
