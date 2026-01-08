@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
@@ -28,8 +29,13 @@ Notifications.setNotificationHandler({
 });
 
 const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 
-// Extend DarkTheme to ensure all required properties exist
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const TAB_COUNT = 4;
+const TAB_WIDTH = SCREEN_WIDTH / TAB_COUNT;
+
+// Extend DarkTheme
 const theme = {
   ...DarkTheme,
   dark: true,
@@ -113,7 +119,6 @@ export default function App() {
   useEffect(() => {
     const init = async () => {
       try {
-        // Get or create unique user ID for this device
         const uid = await getUserId();
         setUserId(uid);
         console.log('User ID initialized:', uid);
@@ -123,7 +128,6 @@ export default function App() {
         const status = await getPremiumStatus();
         setPremiumStatus(status);
         
-        // Request notification permissions
         const { status: notifStatus } = await Notifications.requestPermissionsAsync();
         if (notifStatus !== 'granted') {
           console.log('Notification permissions not granted');
@@ -138,7 +142,6 @@ export default function App() {
     init();
   }, []);
 
-  // Function to trigger refresh across all screens
   const triggerRefresh = useCallback(() => {
     setRefreshKey(prev => prev + 1);
   }, []);
@@ -178,67 +181,99 @@ export default function App() {
   );
 }
 
-// Separate component to use safe area insets
+// Tab Navigator - ONLY 4 tabs, no Settings
+function TabNavigator({ language, userId, premiumStatus, refreshKey, triggerRefresh, t, insets }) {
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarIcon: ({ focused, color }) => {
+          let iconName;
+          if (route.name === 'Links') iconName = focused ? 'link' : 'link-outline';
+          else if (route.name === 'Clipboard') iconName = focused ? 'clipboard' : 'clipboard-outline';
+          else if (route.name === 'Notes') iconName = focused ? 'document-text' : 'document-text-outline';
+          else if (route.name === 'Favorites') iconName = focused ? 'heart' : 'heart-outline';
+          return <Ionicons name={iconName} size={22} color={color} />;
+        },
+        tabBarActiveTintColor: '#007AFF',
+        tabBarInactiveTintColor: '#8E8E93',
+        tabBarStyle: { 
+          backgroundColor: '#1C1C1E', 
+          borderTopColor: '#2C2C2E',
+          borderTopWidth: 0.5,
+          height: 55 + Math.max(insets.bottom, 10),
+          paddingBottom: Math.max(insets.bottom, 10),
+          paddingTop: 6,
+          paddingHorizontal: 0,
+        },
+        tabBarItemStyle: {
+          width: TAB_WIDTH,
+          minWidth: TAB_WIDTH,
+          maxWidth: TAB_WIDTH,
+        },
+        tabBarLabelStyle: {
+          fontSize: 10,
+          fontWeight: '500',
+        },
+      })}
+    >
+      <Tab.Screen name="Links" options={{ title: t.tabLinks || 'Links' }}>
+        {(props) => <LinksScreen {...props} language={language} userId={userId} premiumStatus={premiumStatus} refreshKey={refreshKey} />}
+      </Tab.Screen>
+      <Tab.Screen name="Clipboard" options={{ title: t.tabClipboard || 'Área' }}>
+        {(props) => <ClipboardScreen {...props} language={language} userId={userId} premiumStatus={premiumStatus} refreshKey={refreshKey} triggerRefresh={triggerRefresh} />}
+      </Tab.Screen>
+      <Tab.Screen name="Notes" options={{ title: t.tabNotes || 'Notas' }}>
+        {(props) => <NotesScreen {...props} language={language} userId={userId} refreshKey={refreshKey} triggerRefresh={triggerRefresh} />}
+      </Tab.Screen>
+      <Tab.Screen name="Favorites" options={{ title: t.tabFavorites || 'Favoritos' }}>
+        {(props) => <FavoritesScreen {...props} language={language} userId={userId} refreshKey={refreshKey} />}
+      </Tab.Screen>
+    </Tab.Navigator>
+  );
+}
+
+// Main App Content with Stack Navigator
 function AppContent({ language, setLanguage, premiumStatus, setPremiumStatus, refreshKey, triggerRefresh, userId, t }) {
   const insets = useSafeAreaInsets();
   
   return (
     <NavigationContainer theme={theme}>
       <StatusBar style="light" />
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          headerShown: false,
-          tabBarIcon: ({ focused, color }) => {
-            let iconName;
-            if (route.name === 'Links') iconName = focused ? 'link' : 'link-outline';
-            else if (route.name === 'Clipboard') iconName = focused ? 'clipboard' : 'clipboard-outline';
-            else if (route.name === 'Notes') iconName = focused ? 'document-text' : 'document-text-outline';
-            else if (route.name === 'Favorites') iconName = focused ? 'heart' : 'heart-outline';
-            return <Ionicons name={iconName} size={22} color={color} />;
-          },
-          tabBarActiveTintColor: '#007AFF',
-          tabBarInactiveTintColor: '#8E8E93',
-          tabBarStyle: { 
-            backgroundColor: '#1C1C1E', 
-            borderTopColor: '#2C2C2E',
-            borderTopWidth: 0.5,
-            height: 55 + Math.max(insets.bottom, 10),
-            paddingBottom: Math.max(insets.bottom, 10),
-            paddingTop: 6,
-          },
-          tabBarItemStyle: {
-            flex: 1,
-          },
-          tabBarLabelStyle: {
-            fontSize: 10,
-            fontWeight: '500',
-          },
-        })}
-      >
-        {/* Order: Links → Clipboard → Notes → Favorites */}
-        <Tab.Screen name="Links" options={{ title: t.tabLinks || 'Links' }}>
-          {(props) => <LinksScreen {...props} language={language} userId={userId} premiumStatus={premiumStatus} refreshKey={refreshKey} />}
-        </Tab.Screen>
-        <Tab.Screen name="Clipboard" options={{ title: t.tabClipboard || 'Área' }}>
-          {(props) => <ClipboardScreen {...props} language={language} userId={userId} premiumStatus={premiumStatus} refreshKey={refreshKey} triggerRefresh={triggerRefresh} />}
-        </Tab.Screen>
-        <Tab.Screen name="Notes" options={{ title: t.tabNotes || 'Notas' }}>
-          {(props) => <NotesScreen {...props} language={language} userId={userId} refreshKey={refreshKey} triggerRefresh={triggerRefresh} />}
-        </Tab.Screen>
-        <Tab.Screen name="Favorites" options={{ title: t.tabFavorites || 'Favoritos' }}>
-          {(props) => <FavoritesScreen {...props} language={language} userId={userId} refreshKey={refreshKey} />}
-        </Tab.Screen>
-        {/* Settings - Hidden from tab bar, accessed via header icon */}
-        <Tab.Screen 
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="MainTabs">
+          {(props) => (
+            <TabNavigator 
+              {...props} 
+              language={language} 
+              userId={userId} 
+              premiumStatus={premiumStatus} 
+              refreshKey={refreshKey} 
+              triggerRefresh={triggerRefresh}
+              t={t}
+              insets={insets}
+            />
+          )}
+        </Stack.Screen>
+        <Stack.Screen 
           name="Settings" 
           options={{ 
-            tabBarButton: () => null,
-            tabBarStyle: { display: 'none' },
+            presentation: 'card',
+            animation: 'slide_from_right',
           }}
         >
-          {(props) => <SettingsScreen {...props} language={language} userId={userId} setLanguage={setLanguage} premiumStatus={premiumStatus} setPremiumStatus={setPremiumStatus} />}
-        </Tab.Screen>
-      </Tab.Navigator>
+          {(props) => (
+            <SettingsScreen 
+              {...props} 
+              language={language} 
+              userId={userId} 
+              setLanguage={setLanguage} 
+              premiumStatus={premiumStatus} 
+              setPremiumStatus={setPremiumStatus} 
+            />
+          )}
+        </Stack.Screen>
+      </Stack.Navigator>
       <Toast config={toastConfig} visibilityTime={3000} autoHide={true} />
     </NavigationContainer>
   );
