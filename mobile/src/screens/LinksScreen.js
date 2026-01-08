@@ -147,18 +147,32 @@ export default function LinksScreen({ language, userId, refreshKey }) {
         return null;
       }
       
-      const trigger = date;
+      // Calculate seconds until the notification
+      const now = new Date();
+      const triggerDate = new Date(date);
+      const seconds = Math.floor((triggerDate.getTime() - now.getTime()) / 1000);
+      
+      if (seconds <= 0) {
+        Toast.show({ type: 'error', text1: t.reminderInPast || 'A data deve ser no futuro' });
+        return null;
+      }
+      
       const notificationId = await Notifications.scheduleNotificationAsync({
         content: {
           title: t.reminder || 'Lembrete',
           body: title || t.reminderBody || 'Tens um link para ver!',
           sound: true,
         },
-        trigger,
+        trigger: {
+          seconds: seconds,
+        },
       });
+      
+      Toast.show({ type: 'success', text1: t.reminderSet || 'Lembrete definido' });
       return notificationId;
     } catch (error) {
       console.error('Error scheduling notification:', error);
+      Toast.show({ type: 'error', text1: t.errorSchedulingReminder || 'Erro ao criar lembrete' });
       return null;
     }
   };
