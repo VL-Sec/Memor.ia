@@ -14,7 +14,10 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.memoria.app"
+      "bundleIdentifier": "com.memoria.app",
+      "infoPlist": {
+        "NSUserTrackingUsageDescription": "This app does not track you. This permission is not used."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -22,7 +25,12 @@
         "backgroundColor": "#000000"
       },
       "package": "com.memoria.app",
-      "permissions": ["INTERNET"]
+      "permissions": [
+        "INTERNET",
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE",
+        "SCHEDULE_EXACT_ALARM"
+      ]
     },
     "plugins": [
       "expo-secure-store",
