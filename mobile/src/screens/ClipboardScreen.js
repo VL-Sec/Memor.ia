@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert, RefreshControl, ScrollView, FlatList, AppState } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert, RefreshControl, ScrollView, FlatList, AppState, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -23,6 +23,11 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
   const [timeLeft, setTimeLeft] = useState(0);
   const lastClipboardContent = useRef('');
   const appState = useRef(AppState.currentState);
+  
+  // Edit modal state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+  const [editContent, setEditContent] = useState('');
 
   const t = translations[language] || translations.en;
 
@@ -69,7 +74,6 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
         const content = await Clipboard.getStringAsync();
         if (content && content !== lastClipboardContent.current && content.trim().length > 0) {
           lastClipboardContent.current = content;
-          // Auto-save clipboard content
           await autoSaveClipboard(content);
         }
       } catch (error) {
@@ -78,9 +82,7 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
     };
 
     if (smartClipboardActive) {
-      // Check clipboard every 2 seconds when active
       clipboardInterval = setInterval(checkClipboard, 2000);
-      // Also check when app comes to foreground
       const subscription = AppState.addEventListener('change', (nextAppState) => {
         if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
           checkClipboard();
@@ -176,7 +178,7 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
 
   const handleCopyNote = async (content) => {
     await Clipboard.setStringAsync(content);
-    lastClipboardContent.current = content; // Don't re-save what we just copied
+    lastClipboardContent.current = content;
     Toast.show({ type: 'success', text1: t.copied });
   };
 
@@ -229,8 +231,38 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
     }
   };
 
+  // Edit functions
+  const openEditModal = (item) => {
+    setEditingItem(item);
+    setEditContent(item.content || '');
+    setShowEditModal(true);
+  };
+
+  const closeEditModal = () => {
+    setShowEditModal(false);
+    setEditingItem(null);
+    setEditContent('');
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingItem || !editContent.trim()) return;
+    try {
+      const updateData = { 
+        content: editContent,
+        title: editContent.slice(0, 50) + (editContent.length > 50 ? '...' : ''),
+      };
+      await supabase.from('links').update(updateData).eq('id', editingItem.id);
+      setNotes(notes.map(n => n.id === editingItem.id ? { ...n, ...updateData } : n));
+      Toast.show({ type: 'success', text1: t.saved });
+      closeEditModal();
+      if (triggerRefresh) triggerRefresh();
+    } catch (error) {
+      console.error('Error saving edit:', error);
+      Toast.show({ type: 'error', text1: t.error });
+    }
+  };
+
   const activateSmartClipboard = async () => {
-    // Get current clipboard content so we don't save it immediately
     try {
       const currentContent = await Clipboard.getStringAsync();
       lastClipboardContent.current = currentContent || '';
@@ -239,7 +271,7 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
     }
     
     setSmartClipboardActive(true);
-    setTimeLeft(120); // 2 minutes
+    setTimeLeft(120);
     Toast.show({ 
       type: 'success', 
       text1: t.smartClipboard || 'Área de Transferência Inteligente', 
@@ -269,7 +301,6 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
     return matchesFolder && matchesSearch;
   });
 
-  // Sort: pinned items first, then by date
   const sortedNotes = [...filteredNotes].sort((a, b) => {
     if (a.isPinned && !b.isPinned) return -1;
     if (!a.isPinned && b.isPinned) return 1;
@@ -279,19 +310,15 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
   const renderNoteItem = ({ item }) => {
     const folder = folders.find(f => f.id === item.folderId);
     return (
-      <View style={styles.noteCard}>
+      <TouchableOpacity style={styles.noteCard} onPress={() => openEditModal(item)}>
         <View style={styles.noteContent}>
-          <View style={styles.noteHeader}>
-            <Text style={styles.noteText} numberOfLines={3}>{item.content || ''}</Text>
-          </View>
+          <Text style={styles.noteText} numberOfLines={3}>{item.content || ''}</Text>
           <View style={styles.noteMeta}>
-            <Text style={styles.noteChars}>{item.content?.length || 0} {t.chars}</Text>
             <View style={styles.folderBadge}>
               <Text style={styles.folderBadgeText}>
                 {folder?.isDefault ? t.generalFolder : folder?.name || t.generalFolder}
               </Text>
             </View>
-            {/* Status indicators */}
             {item.isPinned && (
               <Ionicons name="pin" size={14} color="#FFD60A" style={{ marginLeft: 4 }} />
             )}
@@ -315,14 +342,14 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
               color={item.isFavorite ? "#FF3B30" : "#8E8E93"} 
             />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.copyButton} onPress={() => handleCopyNote(item.content || '')}>
-            <Ionicons name="copy" size={18} color="#FFFFFF" />
+          <TouchableOpacity style={styles.actionBtn} onPress={() => handleCopyNote(item.content || '')}>
+            <Ionicons name="copy-outline" size={20} color="#8E8E93" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionBtn} onPress={() => handleDeleteNote(item.id)}>
-            <Ionicons name="trash-outline" size={18} color="#FF3B30" />
+            <Ionicons name="trash-outline" size={20} color="#FF3B30" />
           </TouchableOpacity>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -341,7 +368,7 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
             multiline 
           />
           <View style={styles.addActions}>
-            <Text style={styles.charCount}>{newContent.length} {t.chars}</Text>
+            <View />
             <TouchableOpacity 
               style={[styles.saveButton, !newContent.trim() && styles.saveButtonDisabled]} 
               onPress={handleAddNote} 
@@ -443,6 +470,38 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
             } 
           />
         )}
+
+        {/* Edit Modal */}
+        <Modal
+          visible={showEditModal}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={closeEditModal}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <TouchableOpacity onPress={closeEditModal}>
+                  <Ionicons name="close" size={28} color="#FFFFFF" />
+                </TouchableOpacity>
+                <Text style={styles.modalTitle}>{t.edit || 'Editar'}</Text>
+                <TouchableOpacity onPress={handleSaveEdit}>
+                  <Text style={styles.saveText}>{t.save || 'Guardar'}</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.modalBody}>
+                <TextInput
+                  style={styles.editInput}
+                  value={editContent}
+                  onChangeText={setEditContent}
+                  multiline
+                  textAlignVertical="top"
+                  autoFocus
+                />
+              </View>
+            </View>
+          </View>
+        </Modal>
       </View>
     </SafeAreaView>
   );
@@ -454,7 +513,6 @@ const styles = StyleSheet.create({
   addContainer: { backgroundColor: '#1C1C1E', margin: 16, borderRadius: 16, padding: 12 },
   addInput: { color: '#FFFFFF', fontSize: 16, minHeight: 80, textAlignVertical: 'top' },
   addActions: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 },
-  charCount: { color: '#8E8E93', fontSize: 12 },
   saveButton: { backgroundColor: '#007AFF', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, gap: 4 },
   saveButtonDisabled: { opacity: 0.5 },
   saveButtonText: { color: '#FFFFFF', fontWeight: '600' },
@@ -478,15 +536,20 @@ const styles = StyleSheet.create({
   listContent: { padding: 16, paddingTop: 8, paddingBottom: 100 },
   noteCard: { backgroundColor: '#1C1C1E', borderRadius: 16, marginBottom: 12, padding: 12, flexDirection: 'row' },
   noteContent: { flex: 1 },
-  noteHeader: { flexDirection: 'row', alignItems: 'flex-start' },
-  noteText: { color: '#FFFFFF', fontSize: 15, lineHeight: 22, marginBottom: 8, flex: 1 },
+  noteText: { color: '#FFFFFF', fontSize: 15, lineHeight: 22, marginBottom: 8 },
   noteMeta: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  noteChars: { color: '#8E8E93', fontSize: 12 },
   folderBadge: { backgroundColor: 'rgba(0, 122, 255, 0.2)', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 },
   folderBadgeText: { color: '#007AFF', fontSize: 11 },
-  actionButtons: { justifyContent: 'center', alignItems: 'center', gap: 6, marginLeft: 8 },
+  actionButtons: { justifyContent: 'center', alignItems: 'center', gap: 8, marginLeft: 8 },
   actionBtn: { padding: 6 },
-  copyButton: { backgroundColor: '#007AFF', padding: 8, borderRadius: 8 },
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
   emptyText: { color: '#8E8E93', fontSize: 16, marginTop: 16 },
+  // Modal styles
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.9)' },
+  modalContent: { flex: 1, backgroundColor: '#000000' },
+  modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, borderBottomWidth: 1, borderBottomColor: '#2C2C2E' },
+  modalTitle: { color: '#FFFFFF', fontSize: 18, fontWeight: '600' },
+  saveText: { color: '#007AFF', fontSize: 17, fontWeight: '600' },
+  modalBody: { flex: 1, padding: 16 },
+  editInput: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 16, color: '#FFFFFF', fontSize: 16, flex: 1, textAlignVertical: 'top' },
 });
