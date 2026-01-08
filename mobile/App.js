@@ -108,14 +108,26 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     const init = async () => {
       try {
+        // Get or create unique user ID for this device
+        const uid = await getUserId();
+        setUserId(uid);
+        console.log('User ID initialized:', uid);
+        
         const lang = await getStoredLanguage();
         setLanguage(lang);
         const status = await getPremiumStatus();
         setPremiumStatus(status);
+        
+        // Request notification permissions
+        const { status: notifStatus } = await Notifications.requestPermissionsAsync();
+        if (notifStatus !== 'granted') {
+          console.log('Notification permissions not granted');
+        }
       } catch (e) {
         console.error('Init error:', e);
         setError(e.message);
