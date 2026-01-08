@@ -137,14 +137,28 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
         return null;
       }
       
+      // Calculate seconds until the notification
+      const now = new Date();
+      const triggerDate = new Date(date);
+      const seconds = Math.floor((triggerDate.getTime() - now.getTime()) / 1000);
+      
+      if (seconds <= 0) {
+        Toast.show({ type: 'error', text1: t.reminderInPast || 'A data deve ser no futuro' });
+        return null;
+      }
+      
       const notificationId = await Notifications.scheduleNotificationAsync({
         content: {
           title: title || t.reminder || 'Lembrete',
           body: body || t.noteReminderBody || 'Tens uma nota para rever!',
           sound: true,
         },
-        trigger: date,
+        trigger: {
+          seconds: seconds,
+        },
       });
+      
+      Toast.show({ type: 'success', text1: t.reminderSet || 'Lembrete definido' });
       return notificationId;
     } catch (error) {
       console.error('Error scheduling notification:', error);
