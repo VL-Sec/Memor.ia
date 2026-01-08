@@ -119,6 +119,13 @@ export const translations = {
     getPremium: 'Get Premium',
     restorePurchase: 'Restore Purchase',
     
+    // Reminders
+    setReminder: 'Reminder',
+    reminderHint: 'You will receive a notification at this date and time',
+    notificationPermissionDenied: 'Notification permission denied',
+    reminderBody: 'You have a link to check!',
+    reminderSet: 'Reminder set',
+    
     // Settings
     settings: 'Settings',
     language: 'Language',
