@@ -296,16 +296,37 @@ export default function LinksScreen({ language, refreshKey }) {
           </TouchableOpacity>
         </View>
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.folderList}>
-          <TouchableOpacity style={[styles.folderChip, selectedFolder === 'all' && styles.folderChipActive]} onPress={() => setSelectedFolder('all')}>
-            <Text style={[styles.folderChipText, selectedFolder === 'all' && styles.folderChipTextActive]}>{t.allLinks}</Text>
-          </TouchableOpacity>
-          {folders.map(folder => (
-            <TouchableOpacity key={folder.id} style={[styles.folderChip, selectedFolder === folder.id && styles.folderChipActive]} onPress={() => setSelectedFolder(folder.id)}>
-              <Text style={[styles.folderChipText, selectedFolder === folder.id && styles.folderChipTextActive]}>{folder.isDefault ? t.generalFolder : folder.name}</Text>
+        {/* Folder section - Improved visibility */}
+        <View style={styles.folderSection}>
+          <View style={styles.folderHeader}>
+            <Text style={styles.folderSectionTitle}>{t.folders || 'Pastas'}</Text>
+            <TouchableOpacity style={styles.addFolderBtn} onPress={() => openFolderModal()}>
+              <Ionicons name="add-circle" size={24} color="#007AFF" />
             </TouchableOpacity>
-          ))}
-      </ScrollView>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.folderList} contentContainerStyle={styles.folderListContent}>
+            <TouchableOpacity style={[styles.folderChip, selectedFolder === 'all' && styles.folderChipActive]} onPress={() => setSelectedFolder('all')}>
+              <Text style={[styles.folderChipText, selectedFolder === 'all' && styles.folderChipTextActive]}>{t.allLinks || 'Todos'}</Text>
+            </TouchableOpacity>
+            {folders.map(folder => (
+              <TouchableOpacity 
+                key={folder.id} 
+                style={[styles.folderChip, selectedFolder === folder.id && styles.folderChipActive]} 
+                onPress={() => setSelectedFolder(folder.id)}
+                onLongPress={() => !folder.isDefault && openFolderModal(folder)}
+              >
+                <Text style={[styles.folderChipText, selectedFolder === folder.id && styles.folderChipTextActive]}>
+                  {folder.isDefault ? (t.generalFolder || 'Geral') : folder.name}
+                </Text>
+                {!folder.isDefault && selectedFolder === folder.id && (
+                  <TouchableOpacity style={styles.folderDeleteBtn} onPress={() => handleDeleteFolder(folder)}>
+                    <Ionicons name="close-circle" size={16} color="#FF3B30" />
+                  </TouchableOpacity>
+                )}
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
 
       {filteredLinks.length === 0 ? (
         <ScrollView style={{ flex: 1 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchData(); }} tintColor="#007AFF" />}>
@@ -337,7 +358,7 @@ export default function LinksScreen({ language, refreshKey }) {
                 <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
               </TouchableOpacity>
               <View style={styles.reminderSection}>
-                <View style={styles.reminderHeader}>
+                <View style={styles.reminderHeader}>>
                   <View style={styles.reminderHeaderLeft}>
                     <Ionicons name="pin-outline" size={24} color="#FFD60A" />
                     <Text style={styles.reminderTitle}>{t.pinToTop || 'Fixar no topo'}</Text>
