@@ -325,6 +325,18 @@ export const translations = {
     cloudBackupEnabled: 'Ativado',
     cloudBackupTip: 'Certifica-te de que a cópia de segurança está ativada nas definições do dispositivo.',
     
+    // Platform-specific backup
+    iCloudBackup: 'Backup iCloud',
+    googleBackup: 'Backup Google',
+    systemBackupSubtitle: 'Backup automático do sistema',
+    iCloudBackupDescription: 'Os dados da app são automaticamente incluídos no backup do iCloud. Ao reinstalar a app ou trocar de iPhone, os teus dados serão restaurados.',
+    googleBackupDescription: 'Os dados da app são automaticamente incluídos no backup do Google. Ao reinstalar a app ou trocar de telemóvel, os teus dados serão restaurados.',
+    iCloudBackupTip: 'Certifica-te de que o backup do iCloud está ativado em Definições > [O Teu Nome] > iCloud > Backup',
+    googleBackupTip: 'Certifica-te de que o backup está ativado em Definições > Google > Backup',
+    openSettings: 'Abrir Definições',
+    manualBackup: 'Backup Manual',
+    general: 'Geral',
+    
     // Notifications
     notifications: 'Notificações',
     weeklySummary: 'Resumo Semanal',
