@@ -197,28 +197,70 @@ export default function LinksScreen({ language, userId, refreshKey }) {
   };
 
   const handleSaveEdit = async () => {
-    if (!editingItem) return;
     try {
       let reminderData = null;
       
-      if (editingItem.reminder?.notificationId) {
-        await cancelNotification(editingItem.reminder.notificationId);
-      }
-      
+      // Schedule notification if reminder is enabled
       if (reminderEnabled && reminderDate > new Date()) {
-        const notificationId = await scheduleNotification(editTitle || editingItem.title, reminderDate);
-        reminderData = { 
-          date: reminderDate.toISOString(), 
-          notificationId 
-        };
+        const notificationId = await scheduleNotification(editTitle || editUrl, reminderDate);
+        if (notificationId) {
+          reminderData = { 
+            date: reminderDate.toISOString(), 
+            notificationId 
+          };
+        }
       }
       
-      const updateData = { title: editTitle, folderId: editFolderId || null, reminder: reminderData, isPinned: isPinnedEdit };
-      await supabase.from('links').update(updateData).eq('id', editingItem.id);
-      setLinks(links.map(l => l.id === editingItem.id ? { ...l, ...updateData } : l));
-      Toast.show({ type: 'success', text1: t.saved });
+      if (isAddingNew) {
+        // Creating new link
+        if (!editUrl.trim()) {
+          Toast.show({ type: 'error', text1: t.urlRequired || 'URL é obrigatório' });
+          return;
+        }
+        
+        const newLink = { 
+          id: generateId(), 
+          userId: userId, 
+          url: editUrl, 
+          title: editTitle || editUrl, 
+          contentType: 'link', 
+          tags: [], 
+          isFavorite: false, 
+          isPinned: isPinnedEdit,
+          folderId: editFolderId || null,
+          reminder: reminderData,
+          createdAt: new Date().toISOString() 
+        };
+        
+        const { error } = await supabase.from('links').insert([newLink]);
+        if (error) throw error;
+        
+        setLinks([newLink, ...links]);
+        Toast.show({ type: 'success', text1: t.saved });
+      } else {
+        // Editing existing link
+        if (!editingItem) return;
+        
+        // Cancel existing notification if any
+        if (editingItem.reminder?.notificationId) {
+          await cancelNotification(editingItem.reminder.notificationId);
+        }
+        
+        const updateData = { 
+          title: editTitle, 
+          folderId: editFolderId || null, 
+          reminder: reminderData, 
+          isPinned: isPinnedEdit 
+        };
+        
+        await supabase.from('links').update(updateData).eq('id', editingItem.id);
+        setLinks(links.map(l => l.id === editingItem.id ? { ...l, ...updateData } : l));
+        Toast.show({ type: 'success', text1: t.saved });
+      }
+      
       closeEditModal();
     } catch (error) {
+      console.error('Error saving:', error);
       Toast.show({ type: 'error', text1: t.error });
     }
   };
