@@ -713,18 +713,16 @@ const styles = StyleSheet.create({
   saveButton: { backgroundColor: '#007AFF', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, gap: 4 },
   saveButtonDisabled: { opacity: 0.5 },
   saveButtonText: { color: '#FFFFFF', fontWeight: '600' },
-  // Folder section - Improved visibility
+  // Folder section - Clean style without title
   folderSection: { marginHorizontal: 16, marginBottom: 12 },
-  folderHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  folderSectionTitle: { color: '#8E8E93', fontSize: 13, fontWeight: '600', textTransform: 'uppercase' },
-  addFolderBtn: { padding: 4 },
   folderList: { maxHeight: 50 },
-  folderListContent: { paddingRight: 16 },
+  folderListContent: { paddingRight: 16, alignItems: 'center' },
   folderChip: { backgroundColor: '#2C2C2E', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20, marginRight: 10, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#3A3A3C' },
   folderChipActive: { backgroundColor: '#007AFF', borderColor: '#007AFF' },
   folderChipText: { color: '#FFFFFF', fontSize: 14, fontWeight: '500' },
   folderChipTextActive: { color: '#FFFFFF' },
   folderDeleteBtn: { marginLeft: 6 },
+  addFolderChip: { backgroundColor: '#2C2C2E', width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#3A3A3C' },
   // List
   listContent: { padding: 16, paddingTop: 8, paddingBottom: 100 },
   noteCard: { backgroundColor: '#1C1C1E', borderRadius: 16, marginBottom: 12, padding: 12, flexDirection: 'row' },
