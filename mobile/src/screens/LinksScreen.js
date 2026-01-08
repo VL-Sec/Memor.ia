@@ -240,25 +240,27 @@ export default function LinksScreen({ language, refreshKey }) {
     const folder = folders.find(f => f.id === item.folderId);
     const hasReminder = item.reminder && item.reminder.location;
     return (
-      <TouchableOpacity style={styles.linkCard} onPress={() => handleOpenLink(item.url || '')}>
-        {item.imageUrl && <Image source={{ uri: item.imageUrl }} style={styles.linkImage} />}
-        <View style={styles.linkContent}>
-          <View style={styles.linkTitleRow}>
-            <Text style={styles.linkTitle} numberOfLines={2}>{item.title || item.url || ''}</Text>
-          </View>
-          <Text style={styles.linkUrl} numberOfLines={1}>{item.url || ''}</Text>
-          <View style={styles.linkMeta}>
-            <View style={styles.folderBadge}>
-              <Text style={styles.folderBadgeText}>{folder?.isDefault ? t.generalFolder : folder?.name || t.generalFolder}</Text>
+      <View style={styles.linkCard}>
+        <TouchableOpacity style={styles.linkTouchable} onPress={() => handleOpenLink(item.url || '')}>
+          {item.imageUrl && <Image source={{ uri: item.imageUrl }} style={styles.linkImage} />}
+          <View style={styles.linkContent}>
+            <View style={styles.linkTitleRow}>
+              <Text style={styles.linkTitle} numberOfLines={2}>{item.title || item.url || ''}</Text>
             </View>
-            {hasReminder && (
-              <View style={styles.reminderBadge}>
-                <Ionicons name="location" size={12} color="#FFD60A" />
-                <Text style={styles.reminderBadgeText}>{t.reminder}</Text>
+            <Text style={styles.linkUrl} numberOfLines={1}>{item.url || ''}</Text>
+            <View style={styles.linkMeta}>
+              <View style={styles.folderBadge}>
+                <Text style={styles.folderBadgeText}>{folder?.isDefault ? t.generalFolder : folder?.name || t.generalFolder}</Text>
               </View>
-            )}
+              {hasReminder && (
+                <View style={styles.reminderBadge}>
+                  <Ionicons name="location" size={12} color="#FFD60A" />
+                  <Text style={styles.reminderBadgeText}>{t.reminder}</Text>
+                </View>
+              )}
+            </View>
           </View>
-        </View>
+        </TouchableOpacity>
         <View style={styles.linkActions}>
           <TouchableOpacity style={styles.actionBtn} onPress={() => handleTogglePin(item)}>
             <Ionicons name="pin" size={20} color={item.isPinned ? "#FFD60A" : "#8E8E93"} />
@@ -273,7 +275,7 @@ export default function LinksScreen({ language, refreshKey }) {
             <Ionicons name="trash-outline" size={18} color="#FF3B30" />
           </TouchableOpacity>
         </View>
-      </TouchableOpacity>
+      </View>
     );
   };
 
