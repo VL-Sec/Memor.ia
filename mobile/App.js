@@ -54,8 +54,16 @@ const theme = {
 // CUSTOM TAB BAR - Perfect 4-way distribution
 // ============================================
 function CustomTabBar({ state, descriptors, navigation, insets }) {
+  // DEBUG: Log number of routes
+  console.log('=== TAB BAR DEBUG ===');
+  console.log('Number of routes:', state.routes.length);
+  console.log('Route names:', state.routes.map(r => r.name));
+  console.log('Screen width:', SCREEN_WIDTH);
+  
   // Calculate exact width for each tab
   const tabWidth = SCREEN_WIDTH / state.routes.length;
+  console.log('Tab width:', tabWidth);
+  console.log('=== END DEBUG ===');
   
   return (
     <View style={[
