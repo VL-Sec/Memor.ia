@@ -186,28 +186,30 @@ export default function LinksScreen({ language }) {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color="#8E8E93" />
-        <TextInput style={styles.searchInput} placeholder={t.search} placeholderTextColor="#8E8E93" value={searchQuery} onChangeText={setSearchQuery} />
-      </View>
-      
-      <View style={styles.addContainer}>
-        <TextInput style={styles.addInput} placeholder="https://..." placeholderTextColor="#8E8E93" value={newUrl} onChangeText={setNewUrl} autoCapitalize="none" keyboardType="url" />
-        <TouchableOpacity style={styles.addButton} onPress={handleAddLink}>
-          <Ionicons name="add" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.folderList}>
-        <TouchableOpacity style={[styles.folderChip, selectedFolder === 'all' && styles.folderChipActive]} onPress={() => setSelectedFolder('all')}>
-          <Text style={[styles.folderChipText, selectedFolder === 'all' && styles.folderChipTextActive]}>{t.allLinks}</Text>
-        </TouchableOpacity>
-        {folders.map(folder => (
-          <TouchableOpacity key={folder.id} style={[styles.folderChip, selectedFolder === folder.id && styles.folderChipActive]} onPress={() => setSelectedFolder(folder.id)}>
-            <Text style={[styles.folderChipText, selectedFolder === folder.id && styles.folderChipTextActive]}>{folder.isDefault ? t.generalFolder : folder.name}</Text>
+    <>
+      <CustomHeader title="Memor.ia" />
+      <View style={styles.container}>
+        <View style={styles.searchContainer}>
+          <Ionicons name="search" size={20} color="#8E8E93" />
+          <TextInput style={styles.searchInput} placeholder={t.search} placeholderTextColor="#8E8E93" value={searchQuery} onChangeText={setSearchQuery} />
+        </View>
+        
+        <View style={styles.addContainer}>
+          <TextInput style={styles.addInput} placeholder="https://..." placeholderTextColor="#8E8E93" value={newUrl} onChangeText={setNewUrl} autoCapitalize="none" keyboardType="url" />
+          <TouchableOpacity style={styles.addButton} onPress={handleAddLink}>
+            <Ionicons name="add" size={24} color="#FFFFFF" />
           </TouchableOpacity>
-        ))}
+        </View>
+
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.folderList}>
+          <TouchableOpacity style={[styles.folderChip, selectedFolder === 'all' && styles.folderChipActive]} onPress={() => setSelectedFolder('all')}>
+            <Text style={[styles.folderChipText, selectedFolder === 'all' && styles.folderChipTextActive]}>{t.allLinks}</Text>
+          </TouchableOpacity>
+          {folders.map(folder => (
+            <TouchableOpacity key={folder.id} style={[styles.folderChip, selectedFolder === folder.id && styles.folderChipActive]} onPress={() => setSelectedFolder(folder.id)}>
+              <Text style={[styles.folderChipText, selectedFolder === folder.id && styles.folderChipTextActive]}>{folder.isDefault ? t.generalFolder : folder.name}</Text>
+            </TouchableOpacity>
+          ))}
       </ScrollView>
 
       {filteredLinks.length === 0 ? (
