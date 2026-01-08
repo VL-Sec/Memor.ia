@@ -306,17 +306,17 @@ export default function LinksScreen({ language, refreshKey }) {
             <TouchableOpacity style={[styles.folderChip, selectedFolder === 'all' && styles.folderChipActive]} onPress={() => setSelectedFolder('all')}>
               <Text style={[styles.folderChipText, selectedFolder === 'all' && styles.folderChipTextActive]}>{t.allLinks || 'Todos'}</Text>
             </TouchableOpacity>
-            {folders.map(folder => (
+            {folders.filter(folder => !folder.isDefault).map(folder => (
               <TouchableOpacity 
                 key={folder.id} 
                 style={[styles.folderChip, selectedFolder === folder.id && styles.folderChipActive]} 
                 onPress={() => setSelectedFolder(folder.id)}
-                onLongPress={() => !folder.isDefault && openFolderModal(folder)}
+                onLongPress={() => openFolderModal(folder)}
               >
                 <Text style={[styles.folderChipText, selectedFolder === folder.id && styles.folderChipTextActive]}>
-                  {folder.isDefault ? (t.generalFolder || 'Geral') : folder.name}
+                  {folder.name}
                 </Text>
-                {!folder.isDefault && selectedFolder === folder.id && (
+                {selectedFolder === folder.id && (
                   <TouchableOpacity style={styles.folderDeleteBtn} onPress={() => handleDeleteFolder(folder)}>
                     <Ionicons name="close-circle" size={16} color="#FF3B30" />
                   </TouchableOpacity>
