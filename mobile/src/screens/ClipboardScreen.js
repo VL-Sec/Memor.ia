@@ -644,6 +644,49 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
             </View>
           </View>
         </Modal>
+
+        {/* Folder Management Modal */}
+        <Modal
+          visible={showFolderModal}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={closeFolderModal}
+        >
+          <View style={styles.folderModalOverlay}>
+            <View style={styles.folderModalContent}>
+              <View style={styles.folderModalHeader}>
+                <Text style={styles.folderModalTitle}>
+                  {editingFolder ? (t.editFolder || 'Editar Pasta') : (t.newFolder || 'Nova Pasta')}
+                </Text>
+                <TouchableOpacity onPress={closeFolderModal}>
+                  <Ionicons name="close" size={28} color="#FFFFFF" />
+                </TouchableOpacity>
+              </View>
+              <TextInput
+                style={styles.folderNameInput}
+                placeholder={t.folderNamePlaceholder || 'Nome da pasta'}
+                placeholderTextColor="#8E8E93"
+                value={folderName}
+                onChangeText={setFolderName}
+                autoFocus
+              />
+              <View style={styles.folderModalActions}>
+                {editingFolder && !editingFolder.isDefault && (
+                  <TouchableOpacity 
+                    style={styles.deleteFolderBtn} 
+                    onPress={() => { closeFolderModal(); handleDeleteFolder(editingFolder); }}
+                  >
+                    <Ionicons name="trash-outline" size={20} color="#FF3B30" />
+                    <Text style={styles.deleteFolderText}>{t.delete || 'Eliminar'}</Text>
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity style={styles.saveFolderBtn} onPress={handleSaveFolder}>
+                  <Text style={styles.saveFolderText}>{t.save || 'Guardar'}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </View>
     </SafeAreaView>
   );
