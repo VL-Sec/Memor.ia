@@ -78,17 +78,21 @@ export default function LinksScreen({ language, userId, refreshKey }) {
     if (!newUrl.trim()) return;
     let url = newUrl.trim();
     if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
-    try {
-      const defaultFolder = folders.find(f => f.isDefault);
-      const newLink = { id: generateId(), userId: userId, url, title: url, contentType: 'link', tags: [], isFavorite: false, folderId: selectedFolder !== 'all' ? selectedFolder : defaultFolder?.id, createdAt: new Date().toISOString() };
-      const { error } = await supabase.from('links').insert([newLink]);
-      if (error) throw error;
-      setLinks([newLink, ...links]);
-      setNewUrl('');
-      Toast.show({ type: 'success', text1: t.saved });
-    } catch (error) {
-      Toast.show({ type: 'error', text1: t.error });
-    }
+    
+    // Open modal for complete configuration
+    setIsAddingNew(true);
+    setEditingItem(null);
+    setEditUrl(url);
+    setEditTitle(url);
+    setEditFolderId(selectedFolder !== 'all' ? selectedFolder : '');
+    setIsPinnedEdit(false);
+    setReminderEnabled(false);
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(9, 0, 0, 0);
+    setReminderDate(tomorrow);
+    setNewUrl('');
+    setShowEditModal(true);
   };
 
   const handleOpenLink = (url) => { Linking.openURL(url); };
