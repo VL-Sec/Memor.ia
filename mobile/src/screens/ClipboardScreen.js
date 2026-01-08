@@ -189,7 +189,7 @@ export default function ClipboardScreen({ language }) {
   };
 
   return (
-    <>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
       <CustomHeader title={t.tabClipboard || 'Clipboard'} />
       <View style={styles.container}>
         <View style={styles.addContainer}>
