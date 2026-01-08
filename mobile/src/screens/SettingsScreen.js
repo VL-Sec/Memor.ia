@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
   premiumCardExpired: { backgroundColor: 'rgba(255, 59, 48, 0.1)', borderColor: '#FF3B30' },
   premiumIcon: { width: 60, height: 60, borderRadius: 30, backgroundColor: 'rgba(255, 255, 255, 0.1)', justifyContent: 'center', alignItems: 'center' },
   premiumContent: { flex: 1, marginLeft: 16 },
-  premiumTitle: { color: '#FFFFFF', fontSize: 20, fontWeight: 'bold' },
+  premiumTitle: { color: '#FFFFFF', fontSize: 20, fontWeight: '700' },
   premiumSubtitle: { color: '#8E8E93', fontSize: 14, marginTop: 4 },
   activateButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#007AFF', marginHorizontal: 16, marginBottom: 16, padding: 16, borderRadius: 16, gap: 8 },
   activateButtonText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
