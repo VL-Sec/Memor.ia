@@ -11,6 +11,12 @@ import { supabase, generateId } from '../lib/supabase';
 import { translations } from '../lib/i18n';
 import CustomHeader from '../components/CustomHeader';
 
+// Helper function to format date according to user's system locale (with year)
+const formatDateLocale = (dateStr) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: 'numeric' });
+};
+
 export default function LinksScreen({ language, userId, refreshKey }) {
   const [links, setLinks] = useState([]);
   const [folders, setFolders] = useState([]);
@@ -41,7 +47,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
   useFocusEffect(
     useCallback(() => {
       fetchData();
-    }, [])
+    }, [userId])
   );
 
   // Also reload when refreshKey changes
@@ -52,6 +58,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
   }, [refreshKey]);
 
   const fetchData = async () => {
+    if (!userId) return;
     try {
       const { data: foldersData } = await supabase.from('folders').select('*').eq('userId', userId).eq('folderType', 'link').order('createdAt', { ascending: false });
       const { data: linksData } = await supabase.from('links').select('*').eq('userId', userId).eq('contentType', 'link').order('createdAt', { ascending: false });
@@ -84,7 +91,8 @@ export default function LinksScreen({ language, userId, refreshKey }) {
 
   const handleOpenLink = (url) => { Linking.openURL(url); };
 
-  const handleDeleteLink = (id) => {
+  const handleDeleteLink = (id, e) => {
+    if (e) e.stopPropagation();
     Alert.alert(t.delete, '', [
       { text: t.cancel, style: 'cancel' },
       { text: t.delete, style: 'destructive', onPress: async () => {
@@ -97,7 +105,8 @@ export default function LinksScreen({ language, userId, refreshKey }) {
     ]);
   };
 
-  const handleToggleFavorite = async (item) => {
+  const handleToggleFavorite = async (item, e) => {
+    if (e) e.stopPropagation();
     try {
       const newValue = !item.isFavorite;
       await supabase.from('links').update({ isFavorite: newValue }).eq('id', item.id);
@@ -106,7 +115,8 @@ export default function LinksScreen({ language, userId, refreshKey }) {
     } catch (error) {}
   };
 
-  const openEditModal = (item) => {
+  const openEditModal = (item, e) => {
+    if (e) e.stopPropagation();
     setEditingItem(item);
     setEditTitle(item.title || '');
     setEditFolderId(item.folderId || '');
@@ -116,7 +126,6 @@ export default function LinksScreen({ language, userId, refreshKey }) {
       setReminderDate(new Date(item.reminder.date));
     } else {
       setReminderEnabled(false);
-      // Set default to tomorrow at 9:00
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       tomorrow.setHours(9, 0, 0, 0);
@@ -169,7 +178,6 @@ export default function LinksScreen({ language, userId, refreshKey }) {
     try {
       let reminderData = null;
       
-      // Cancel existing notification if any
       if (editingItem.reminder?.notificationId) {
         await cancelNotification(editingItem.reminder.notificationId);
       }
@@ -192,7 +200,8 @@ export default function LinksScreen({ language, userId, refreshKey }) {
     }
   };
 
-  const handleTogglePin = async (item) => {
+  const handleTogglePin = async (item, e) => {
+    if (e) e.stopPropagation();
     try {
       const newValue = !item.isPinned;
       await supabase.from('links').update({ isPinned: newValue }).eq('id', item.id);
@@ -259,7 +268,6 @@ export default function LinksScreen({ language, userId, refreshKey }) {
           style: 'destructive',
           onPress: async () => {
             try {
-              // Set folderId to null for items in this folder
               await supabase.from('links').update({ folderId: null }).eq('folderId', folder.id);
               await supabase.from('folders').delete().eq('id', folder.id);
               setFolders(folders.filter(f => f.id !== folder.id));
@@ -281,7 +289,6 @@ export default function LinksScreen({ language, userId, refreshKey }) {
     return matchesFolder && matchesSearch;
   });
 
-  // Sort: pinned items first, then by date
   const sortedLinks = [...filteredLinks].sort((a, b) => {
     if (a.isPinned && !b.isPinned) return -1;
     if (!a.isPinned && b.isPinned) return 1;
@@ -291,12 +298,17 @@ export default function LinksScreen({ language, userId, refreshKey }) {
   const renderLinkItem = ({ item }) => {
     const folder = folders.find(f => f.id === item.folderId);
     const hasReminder = item.reminder && item.reminder.date;
-    const reminderDate = hasReminder ? new Date(item.reminder.date) : null;
-    const isReminderPast = reminderDate && reminderDate < new Date();
+    const reminderDateObj = hasReminder ? new Date(item.reminder.date) : null;
+    const isReminderPast = reminderDateObj && reminderDateObj < new Date();
     
     return (
       <View style={styles.linkCard}>
-        <TouchableOpacity style={styles.linkTouchable} onPress={() => handleOpenLink(item.url || '')}>
+        {/* Main content area - opens link */}
+        <TouchableOpacity 
+          style={styles.linkTouchable} 
+          onPress={() => handleOpenLink(item.url || '')}
+          activeOpacity={0.7}
+        >
           {item.imageUrl && <Image source={{ uri: item.imageUrl }} style={styles.linkImage} />}
           <View style={styles.linkContent}>
             <View style={styles.linkTitleRow}>
@@ -311,24 +323,42 @@ export default function LinksScreen({ language, userId, refreshKey }) {
                 <View style={styles.reminderBadge}>
                   <Ionicons name="notifications" size={12} color="#34C759" />
                   <Text style={styles.reminderBadgeText}>
-                    {reminderDate.toLocaleDateString(language === 'pt' ? 'pt-PT' : language, { day: '2-digit', month: '2-digit' })}
+                    {formatDateLocale(item.reminder.date)}
                   </Text>
                 </View>
               )}
             </View>
           </View>
         </TouchableOpacity>
+        
+        {/* Action buttons - separate touch zone */}
         <View style={styles.linkActions}>
-          <TouchableOpacity style={styles.actionBtn} onPress={() => handleTogglePin(item)}>
+          <TouchableOpacity 
+            style={styles.actionBtn} 
+            onPress={(e) => handleTogglePin(item, e)}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
             <Ionicons name="pin" size={20} color={item.isPinned ? "#FFD60A" : "#8E8E93"} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionBtn} onPress={() => handleToggleFavorite(item)}>
+          <TouchableOpacity 
+            style={styles.actionBtn} 
+            onPress={(e) => handleToggleFavorite(item, e)}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
             <Ionicons name={item.isFavorite ? 'heart' : 'heart-outline'} size={20} color={item.isFavorite ? '#FF3B30' : '#8E8E93'} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionBtn} onPress={() => openEditModal(item)}>
+          <TouchableOpacity 
+            style={styles.actionBtn} 
+            onPress={(e) => openEditModal(item, e)}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
             <Ionicons name="pencil-outline" size={18} color="#8E8E93" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionBtn} onPress={() => handleDeleteLink(item.id)}>
+          <TouchableOpacity 
+            style={styles.actionBtn} 
+            onPress={(e) => handleDeleteLink(item.id, e)}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
             <Ionicons name="trash-outline" size={18} color="#FF3B30" />
           </TouchableOpacity>
         </View>
@@ -352,7 +382,6 @@ export default function LinksScreen({ language, userId, refreshKey }) {
           </TouchableOpacity>
         </View>
 
-        {/* Folder section with title */}
         <View style={styles.folderSection}>
           <Text style={styles.folderSectionTitle}>{t.folders || 'Pastas'}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.folderList} contentContainerStyle={styles.folderListContent}>
@@ -398,7 +427,6 @@ export default function LinksScreen({ language, userId, refreshKey }) {
               </TouchableOpacity>
             </View>
             <ScrollView style={styles.modalBody} contentContainerStyle={styles.modalBodyContent}>
-              {/* URL Section - View and Copy */}
               <Text style={styles.inputLabel}>URL</Text>
               <View style={styles.urlContainer}>
                 <Text style={styles.urlText} numberOfLines={2}>{editingItem?.url}</Text>
@@ -413,11 +441,9 @@ export default function LinksScreen({ language, userId, refreshKey }) {
                 </TouchableOpacity>
               </View>
               
-              {/* Title */}
               <Text style={styles.inputLabel}>{t.linkTitle || t.title || 'Título'}</Text>
               <TextInput style={styles.textInput} value={editTitle} onChangeText={setEditTitle} placeholder={t.linkTitlePlaceholder || 'Nome do link'} placeholderTextColor="#8E8E93" />
               
-              {/* Move to folder */}
               <Text style={styles.inputLabel}>{t.moveToFolder || 'Mover para:'}</Text>
               <TouchableOpacity style={styles.pickerButton} onPress={() => setShowFolderPicker(true)}>
                 <Ionicons name="folder-outline" size={20} color="#007AFF" />
@@ -429,7 +455,6 @@ export default function LinksScreen({ language, userId, refreshKey }) {
                 <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
               </TouchableOpacity>
               
-              {/* Pin toggle */}
               <View style={styles.reminderSection}>
                 <View style={styles.reminderHeader}>
                   <View style={styles.reminderHeaderLeft}>
@@ -440,7 +465,6 @@ export default function LinksScreen({ language, userId, refreshKey }) {
                 </View>
               </View>
               
-              {/* Reminder toggle with date/time picker */}
               <View style={styles.reminderSection}>
                 <View style={styles.reminderHeader}>
                   <View style={styles.reminderHeaderLeft}>
@@ -455,13 +479,13 @@ export default function LinksScreen({ language, userId, refreshKey }) {
                       <TouchableOpacity style={styles.dateTimeButton} onPress={() => setShowDatePicker(true)}>
                         <Ionicons name="calendar-outline" size={20} color="#007AFF" />
                         <Text style={styles.dateTimeText}>
-                          {reminderDate.toLocaleDateString(language === 'pt' ? 'pt-PT' : language)}
+                          {reminderDate.toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: 'numeric' })}
                         </Text>
                       </TouchableOpacity>
                       <TouchableOpacity style={styles.dateTimeButton} onPress={() => setShowTimePicker(true)}>
                         <Ionicons name="time-outline" size={20} color="#007AFF" />
                         <Text style={styles.dateTimeText}>
-                          {reminderDate.toLocaleTimeString(language === 'pt' ? 'pt-PT' : language, { hour: '2-digit', minute: '2-digit' })}
+                          {reminderDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
                         </Text>
                       </TouchableOpacity>
                     </View>
@@ -480,7 +504,6 @@ export default function LinksScreen({ language, userId, refreshKey }) {
         </View>
       </Modal>
 
-      {/* Date Picker Modal */}
       {showDatePicker && (
         <DateTimePicker
           value={reminderDate}
@@ -498,7 +521,6 @@ export default function LinksScreen({ language, userId, refreshKey }) {
         />
       )}
 
-      {/* Time Picker Modal */}
       {showTimePicker && (
         <DateTimePicker
           value={reminderDate}
@@ -525,7 +547,6 @@ export default function LinksScreen({ language, userId, refreshKey }) {
               </TouchableOpacity>
             </View>
             <ScrollView>
-              {/* "Todos" option - means no specific folder */}
               <TouchableOpacity 
                 style={[styles.folderOption, !editFolderId && styles.folderOptionActive]} 
                 onPress={() => { setEditFolderId(null); setShowFolderPicker(false); }}
@@ -534,7 +555,6 @@ export default function LinksScreen({ language, userId, refreshKey }) {
                 <Text style={styles.folderOptionName}>{t.allLinks || 'Todos'}</Text>
                 {!editFolderId && <Ionicons name="checkmark" size={24} color="#007AFF" />}
               </TouchableOpacity>
-              {/* Only user-created folders (not default) */}
               {folders.filter(f => !f.isDefault).map((folder) => (
                 <TouchableOpacity 
                   key={folder.id} 
@@ -551,7 +571,6 @@ export default function LinksScreen({ language, userId, refreshKey }) {
         </View>
       </Modal>
 
-      {/* Folder Management Modal */}
       <Modal visible={showFolderModal} animationType="slide" transparent={true} onRequestClose={closeFolderModal}>
         <View style={styles.folderModalOverlay}>
           <View style={styles.folderModalContent}>
@@ -598,7 +617,6 @@ const styles = StyleSheet.create({
   addContainer: { flexDirection: 'row', marginHorizontal: 16, marginBottom: 8, gap: 8 },
   addInput: { flex: 1, backgroundColor: '#1C1C1E', paddingHorizontal: 16, borderRadius: 12, height: 44, color: '#FFFFFF', fontSize: 16 },
   addButton: { backgroundColor: '#007AFF', width: 44, height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
-  // Folder section with title
   folderSection: { marginHorizontal: 16, marginBottom: 12 },
   folderSectionTitle: { color: '#8E8E93', fontSize: 13, fontWeight: '600', textTransform: 'uppercase', marginBottom: 8 },
   folderList: { maxHeight: 50 },
@@ -610,6 +628,7 @@ const styles = StyleSheet.create({
   folderDeleteBtn: { marginLeft: 6 },
   addFolderChip: { backgroundColor: '#2C2C2E', width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#3A3A3C' },
   listContent: { padding: 16, paddingTop: 8, paddingBottom: 100 },
+  // Link card with separate touch zones
   linkCard: { backgroundColor: '#1C1C1E', borderRadius: 16, marginBottom: 12, flexDirection: 'row', overflow: 'hidden' },
   linkTouchable: { flex: 1, flexDirection: 'row' },
   linkImage: { width: 80, height: 80 },
@@ -622,8 +641,9 @@ const styles = StyleSheet.create({
   folderBadgeText: { color: '#007AFF', fontSize: 12 },
   reminderBadge: { backgroundColor: 'rgba(52, 199, 89, 0.2)', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10, flexDirection: 'row', alignItems: 'center', gap: 4 },
   reminderBadgeText: { color: '#34C759', fontSize: 12 },
-  linkActions: { justifyContent: 'center', alignItems: 'center', paddingRight: 8, gap: 4 },
-  actionBtn: { padding: 4 },
+  // Actions column - separate touch zone
+  linkActions: { justifyContent: 'center', alignItems: 'center', paddingHorizontal: 8, gap: 4, backgroundColor: '#1C1C1E', borderLeftWidth: 1, borderLeftColor: '#2C2C2E' },
+  actionBtn: { padding: 6 },
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
   emptyText: { color: '#8E8E93', fontSize: 16, marginTop: 16 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.8)', justifyContent: 'flex-end' },
@@ -633,7 +653,6 @@ const styles = StyleSheet.create({
   modalBody: { flexGrow: 1 },
   modalBodyContent: { padding: 20, paddingBottom: 40 },
   inputLabel: { color: '#8E8E93', fontSize: 14, marginBottom: 8, textTransform: 'uppercase' },
-  // URL container with copy button
   urlContainer: { backgroundColor: '#000000', borderRadius: 12, padding: 16, flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
   urlText: { flex: 1, color: '#007AFF', fontSize: 14 },
   copyUrlButton: { padding: 8, marginLeft: 8 },
@@ -645,7 +664,6 @@ const styles = StyleSheet.create({
   reminderHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   reminderTitle: { color: '#FFFFFF', fontSize: 18, fontWeight: '600' },
   reminderOptions: { marginTop: 16, borderTopWidth: 1, borderTopColor: '#2C2C2E', paddingTop: 16 },
-  // Date/Time picker styles
   dateTimeRow: { flexDirection: 'row', gap: 12, marginBottom: 12 },
   dateTimeButton: { flex: 1, backgroundColor: '#1C1C1E', borderRadius: 12, padding: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   dateTimeText: { color: '#FFFFFF', fontSize: 16, fontWeight: '500' },
@@ -657,7 +675,6 @@ const styles = StyleSheet.create({
   folderOptionActive: { backgroundColor: 'rgba(0, 122, 255, 0.1)' },
   folderOptionIcon: { fontSize: 24, marginRight: 12 },
   folderOptionName: { flex: 1, color: '#FFFFFF', fontSize: 16 },
-  // Folder Modal
   folderModalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.8)', justifyContent: 'center', alignItems: 'center', padding: 20 },
   folderModalContent: { backgroundColor: '#1C1C1E', borderRadius: 20, width: '100%', maxWidth: 400, padding: 20 },
   folderModalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },

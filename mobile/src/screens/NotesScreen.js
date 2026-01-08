@@ -21,7 +21,17 @@ const NOTE_COLORS = [
   { id: 'pink', color: '#FF2D92', name: 'Pink' },
 ];
 
-const STORAGE_KEY = 'memoria-notes';
+// Helper function to format date according to user's system locale (with year)
+const formatDateLocale = (dateStr) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+};
+
+// Helper function to format date for badges (shorter)
+const formatDateShort = (dateStr) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: '2-digit' });
+};
 
 export default function NotesScreen({ language, userId, refreshKey, triggerRefresh }) {
   const [notes, setNotes] = useState([]);
@@ -41,12 +51,15 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
   
   const insets = useSafeAreaInsets();
   const t = translations[language] || translations.en;
+  
+  // Dynamic storage key based on userId
+  const getStorageKey = () => `memoria-notes-${userId || 'default'}`;
 
   // Load notes when screen is focused (for sync with Favorites)
   useFocusEffect(
     useCallback(() => {
       loadNotes();
-    }, [])
+    }, [userId])
   );
 
   // Also reload when refreshKey changes
@@ -58,10 +71,12 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
 
   const loadNotes = async () => {
     try {
-      const data = await AsyncStorage.getItem(STORAGE_KEY);
+      const data = await AsyncStorage.getItem(getStorageKey());
       if (data) {
         const parsedNotes = JSON.parse(data);
         setNotes(parsedNotes);
+      } else {
+        setNotes([]);
       }
     } catch (error) {
       console.error('Error loading notes:', error);
@@ -72,7 +87,7 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
 
   const saveNotes = async (newNotes) => {
     try {
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newNotes));
+      await AsyncStorage.setItem(getStorageKey(), JSON.stringify(newNotes));
       setNotes(newNotes);
       // Trigger refresh on other screens
       if (triggerRefresh) triggerRefresh();
@@ -219,6 +234,11 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
           text: t.delete,
           style: 'destructive',
           onPress: async () => {
+            const noteToDelete = notes.find(n => n.id === noteId);
+            // Cancel notification if exists
+            if (noteToDelete?.reminder?.notificationId) {
+              await cancelNotification(noteToDelete.reminder.notificationId);
+            }
             const filteredNotes = notes.filter(n => n.id !== noteId);
             await saveNotes(filteredNotes);
             Toast.show({ type: 'success', text1: t.deleted });
@@ -228,7 +248,9 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
     );
   };
 
-  const handleTogglePin = async (noteId) => {
+  // Action handlers - prevent event propagation
+  const handleTogglePin = async (noteId, e) => {
+    if (e) e.stopPropagation();
     const note = notes.find(n => n.id === noteId);
     const newPinState = !note.isPinned;
     const updatedNotes = notes.map(n =>
@@ -241,7 +263,8 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
     });
   };
 
-  const handleToggleFavorite = async (noteId) => {
+  const handleToggleFavorite = async (noteId, e) => {
+    if (e) e.stopPropagation();
     const note = notes.find(n => n.id === noteId);
     const newFavoriteState = !note.isFavorite;
     const updatedNotes = notes.map(n =>
@@ -254,7 +277,8 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
     });
   };
 
-  const handleCopyNote = async (content) => {
+  const handleCopyNote = async (content, e) => {
+    if (e) e.stopPropagation();
     try {
       const Clipboard = require('expo-clipboard');
       await Clipboard.setStringAsync(content);
@@ -262,6 +286,11 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
     } catch (error) {
       console.error('Error copying:', error);
     }
+  };
+
+  const handleDeleteAction = (noteId, e) => {
+    if (e) e.stopPropagation();
+    handleDeleteNote(noteId);
   };
 
   const getColorById = (id) => {
@@ -282,58 +311,70 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
     return new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt);
   });
 
-  const formatDate = (dateStr) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
-  };
-
   const renderNoteItem = ({ item }) => {
     const hasReminder = item.reminder && item.reminder.date;
     const reminderDateObj = hasReminder ? new Date(item.reminder.date) : null;
     const isReminderPast = reminderDateObj && reminderDateObj < new Date();
     
     return (
-      <TouchableOpacity 
-        style={[
-          styles.noteCard, 
-          { borderLeftColor: getColorById(item.color), borderLeftWidth: 4 }
-        ]}
-        onPress={() => openEditNote(item)}
-      >
-        <View style={styles.noteHeader}>
-          {item.title ? (
-            <Text style={styles.noteTitle} numberOfLines={1}>{item.title}</Text>
-          ) : null}
-        </View>
-        <Text style={styles.noteContent} numberOfLines={4}>{item.content || ''}</Text>
-        <View style={styles.noteFooter}>
+      <View style={[styles.noteCard, { borderLeftColor: getColorById(item.color), borderLeftWidth: 4 }]}>
+        {/* Main content area - opens edit modal */}
+        <TouchableOpacity 
+          style={styles.noteMainContent}
+          onPress={() => openEditNote(item)}
+          activeOpacity={0.7}
+        >
+          <View style={styles.noteHeader}>
+            {item.title ? (
+              <Text style={styles.noteTitle} numberOfLines={1}>{item.title}</Text>
+            ) : null}
+          </View>
+          <Text style={styles.noteContent} numberOfLines={4}>{item.content || ''}</Text>
           <View style={styles.noteMetaRow}>
-            <Text style={styles.noteDate}>{formatDate(item.updatedAt || item.createdAt)}</Text>
+            <Text style={styles.noteDate}>{formatDateLocale(item.updatedAt || item.createdAt)}</Text>
             {hasReminder && !isReminderPast && (
               <View style={styles.reminderBadge}>
                 <Ionicons name="notifications" size={12} color="#34C759" />
                 <Text style={styles.reminderBadgeText}>
-                  {reminderDateObj.toLocaleDateString(language === 'pt' ? 'pt-PT' : language, { day: '2-digit', month: '2-digit' })}
+                  {formatDateShort(item.reminder.date)}
                 </Text>
               </View>
             )}
           </View>
-          <View style={styles.noteActions}>
-            <TouchableOpacity onPress={() => handleCopyNote(item.content || '')} style={styles.actionButton}>
-              <Ionicons name="copy-outline" size={18} color="#8E8E93" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleToggleFavorite(item.id)} style={styles.actionButton}>
-              <Ionicons name={item.isFavorite ? "heart" : "heart-outline"} size={18} color={item.isFavorite ? "#FF3B30" : "#8E8E93"} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleTogglePin(item.id)} style={styles.actionButton}>
-              <Ionicons name="pin" size={18} color={item.isPinned ? "#FFD60A" : "#8E8E93"} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleDeleteNote(item.id)} style={styles.actionButton}>
-              <Ionicons name="trash-outline" size={18} color="#FF3B30" />
-            </TouchableOpacity>
-          </View>
+        </TouchableOpacity>
+        
+        {/* Action buttons - separate touch zone */}
+        <View style={styles.noteActionsColumn}>
+          <TouchableOpacity 
+            onPress={(e) => handleCopyNote(item.content || '', e)} 
+            style={styles.actionButton}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Ionicons name="copy-outline" size={18} color="#8E8E93" />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={(e) => handleToggleFavorite(item.id, e)} 
+            style={styles.actionButton}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Ionicons name={item.isFavorite ? "heart" : "heart-outline"} size={18} color={item.isFavorite ? "#FF3B30" : "#8E8E93"} />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={(e) => handleTogglePin(item.id, e)} 
+            style={styles.actionButton}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Ionicons name="pin" size={18} color={item.isPinned ? "#FFD60A" : "#8E8E93"} />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={(e) => handleDeleteAction(item.id, e)} 
+            style={styles.actionButton}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Ionicons name="trash-outline" size={18} color="#FF3B30" />
+          </TouchableOpacity>
         </View>
-      </TouchableOpacity>
+      </View>
     );
   };
 
@@ -469,13 +510,13 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
                     <TouchableOpacity style={styles.dateTimeButton} onPress={() => setShowDatePicker(true)}>
                       <Ionicons name="calendar-outline" size={20} color="#007AFF" />
                       <Text style={styles.dateTimeText}>
-                        {reminderDate.toLocaleDateString(language === 'pt' ? 'pt-PT' : language)}
+                        {reminderDate.toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: 'numeric' })}
                       </Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.dateTimeButton} onPress={() => setShowTimePicker(true)}>
                       <Ionicons name="time-outline" size={20} color="#007AFF" />
                       <Text style={styles.dateTimeText}>
-                        {reminderDate.toLocaleTimeString(language === 'pt' ? 'pt-PT' : language, { hour: '2-digit', minute: '2-digit' })}
+                        {reminderDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -594,15 +635,17 @@ const styles = StyleSheet.create({
   searchInput: { flex: 1, marginLeft: 8, color: '#FFFFFF', fontSize: 16 },
   scrollView: { flex: 1, paddingHorizontal: 16 },
   listContent: { paddingHorizontal: 16, paddingBottom: 100 },
-  noteCard: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 16, marginBottom: 10 },
+  // Note card with separate touch zones
+  noteCard: { backgroundColor: '#1C1C1E', borderRadius: 12, marginBottom: 10, flexDirection: 'row', overflow: 'hidden' },
+  noteMainContent: { flex: 1, padding: 16 },
   noteHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   noteTitle: { color: '#FFFFFF', fontSize: 18, fontWeight: '600', flex: 1 },
   noteContent: { color: '#CCCCCC', fontSize: 15, lineHeight: 22 },
-  noteFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#2C2C2E' },
-  noteMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  noteMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#2C2C2E' },
   noteDate: { color: '#8E8E93', fontSize: 12 },
-  noteActions: { flexDirection: 'row', gap: 12 },
-  actionButton: { padding: 4 },
+  // Actions column - separate touch zone
+  noteActionsColumn: { justifyContent: 'center', alignItems: 'center', paddingHorizontal: 8, gap: 4, backgroundColor: '#1C1C1E', borderLeftWidth: 1, borderLeftColor: '#2C2C2E' },
+  actionButton: { padding: 8 },
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 100 },
   emptyText: { color: '#8E8E93', fontSize: 16, marginTop: 16 },
   fab: { position: 'absolute', bottom: 24, right: 24, width: 56, height: 56, borderRadius: 28, backgroundColor: '#007AFF', justifyContent: 'center', alignItems: 'center', shadowColor: '#007AFF', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 8 },
