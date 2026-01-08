@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
 import { supabase } from '../lib/supabase';
 import { translations } from '../lib/i18n';
+import CustomHeader from '../components/CustomHeader';
 
 const DEMO_USER = 'demo_user';
 const LOCAL_NOTES_KEY = 'memoria-notes';
