@@ -187,7 +187,7 @@ export default function LinksScreen({ language }) {
   };
 
   return (
-    <>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
       <CustomHeader title="Memor.ia" />
       <View style={styles.container}>
         <View style={styles.searchContainer}>
