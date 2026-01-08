@@ -128,7 +128,7 @@ export default function FavoritesScreen({ language }) {
   );
 
   return (
-    <>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
       <CustomHeader title={t.tabFavorites || 'Favorites'} />
       <View style={styles.container}>
         <View style={styles.searchContainer}>
