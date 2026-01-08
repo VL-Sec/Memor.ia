@@ -157,7 +157,13 @@ export default function App() {
             },
             tabBarActiveTintColor: '#007AFF',
             tabBarInactiveTintColor: '#8E8E93',
-            tabBarStyle: { backgroundColor: '#1C1C1E', borderTopColor: '#2C2C2E', paddingTop: 5, height: 85 },
+            tabBarStyle: { 
+              backgroundColor: '#1C1C1E', 
+              borderTopColor: '#2C2C2E', 
+              paddingTop: 5, 
+              height: 85,
+              paddingBottom: 20,
+            },
           })}
         >
           <Tab.Screen name="Links" options={{ title: t.tabLinks || 'Links' }}>
