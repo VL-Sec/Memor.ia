@@ -1,43 +1,51 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 
 const WEEKLY_SUMMARY_KEY = 'memoria-weekly-summary';
 
-// Check if we're in Expo Go
+// Check if we're in Expo Go (notifications won't work there in SDK 53+)
 const isExpoGo = Constants.appOwnership === 'expo';
 
 // Days of the week - indices match JavaScript's getDay() where 0 = Sunday
 export const DAYS_OF_WEEK = [
-  { value: 0, en: 'Sunday', pt: 'Domingo', es: 'Domingo', fr: 'Dimanche' },
-  { value: 1, en: 'Monday', pt: 'Segunda-feira', es: 'Lunes', fr: 'Lundi' },
-  { value: 2, en: 'Tuesday', pt: 'Terça-feira', es: 'Martes', fr: 'Mardi' },
-  { value: 3, en: 'Wednesday', pt: 'Quarta-feira', es: 'Miércoles', fr: 'Mercredi' },
-  { value: 4, en: 'Thursday', pt: 'Quinta-feira', es: 'Jueves', fr: 'Jeudi' },
-  { value: 5, en: 'Friday', pt: 'Sexta-feira', es: 'Viernes', fr: 'Vendredi' },
-  { value: 6, en: 'Saturday', pt: 'Sábado', es: 'Sábado', fr: 'Samedi' },
+  { value: 0, en: 'Sunday', pt: 'Domingo', es: 'Domingo', fr: 'Dimanche', de: 'Sonntag', it: 'Domenica' },
+  { value: 1, en: 'Monday', pt: 'Segunda-feira', es: 'Lunes', fr: 'Lundi', de: 'Montag', it: 'Lunedì' },
+  { value: 2, en: 'Tuesday', pt: 'Terça-feira', es: 'Martes', fr: 'Mardi', de: 'Dienstag', it: 'Martedì' },
+  { value: 3, en: 'Wednesday', pt: 'Quarta-feira', es: 'Miércoles', fr: 'Mercredi', de: 'Mittwoch', it: 'Mercoledì' },
+  { value: 4, en: 'Thursday', pt: 'Quinta-feira', es: 'Jueves', fr: 'Jeudi', de: 'Donnerstag', it: 'Giovedì' },
+  { value: 5, en: 'Friday', pt: 'Sexta-feira', es: 'Viernes', fr: 'Vendredi', de: 'Freitag', it: 'Venerdì' },
+  { value: 6, en: 'Saturday', pt: 'Sábado', es: 'Sábado', fr: 'Samedi', de: 'Samstag', it: 'Sabato' },
 ];
 
-// Configure notification handler (only if not in Expo Go)
-if (!isExpoGo) {
-  try {
-    Notifications.setNotificationHandler({
-      handleNotification: async () => ({
-        shouldShowAlert: true,
-        shouldPlaySound: true,
-        shouldSetBadge: false,
-      }),
-    });
-  } catch (e) {
-    console.log('Notifications not available in this environment');
-  }
+// Configure notification handler for Development Build
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
+
+/**
+ * Check if notifications are available (not in Expo Go)
+ */
+export function areNotificationsAvailable() {
+  return !isExpoGo;
 }
 
 /**
  * Request notification permissions
  */
 export async function requestNotificationPermissions() {
+  // Check if we're on a physical device
+  if (!Device.isDevice) {
+    console.log('Notifications require a physical device');
+    return false;
+  }
+
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
   let finalStatus = existingStatus;
   
@@ -46,7 +54,50 @@ export async function requestNotificationPermissions() {
     finalStatus = status;
   }
   
+  // For Android, we need to set up a notification channel
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync('weekly-summary', {
+      name: 'Weekly Summary',
+      importance: Notifications.AndroidImportance.HIGH,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#007AFF',
+    });
+  }
+  
   return finalStatus === 'granted';
+}
+
+/**
+ * Get Expo Push Token (for remote notifications)
+ */
+export async function getExpoPushToken() {
+  if (isExpoGo) {
+    console.log('Push tokens not available in Expo Go');
+    return null;
+  }
+
+  if (!Device.isDevice) {
+    console.log('Push tokens require a physical device');
+    return null;
+  }
+
+  try {
+    const projectId = Constants.expoConfig?.extra?.eas?.projectId;
+    if (!projectId) {
+      console.log('No projectId found in app config');
+      return null;
+    }
+
+    const token = await Notifications.getExpoPushTokenAsync({
+      projectId: projectId,
+    });
+    
+    console.log('Expo Push Token:', token.data);
+    return token.data;
+  } catch (error) {
+    console.error('Error getting push token:', error);
+    return null;
+  }
 }
 
 /**
