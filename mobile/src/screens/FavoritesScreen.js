@@ -41,7 +41,7 @@ export default function FavoritesScreen({ language, userId, refreshKey }) {
       const { data: supabaseData } = await supabase
         .from('links')
         .select('*')
-        .eq('userId', DEMO_USER)
+        .eq('userId', userId)
         .eq('isFavorite', true)
         .order('createdAt', { ascending: false });
       
