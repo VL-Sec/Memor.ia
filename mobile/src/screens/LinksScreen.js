@@ -29,7 +29,19 @@ export default function LinksScreen({ language, refreshKey }) {
 
   const t = translations[language] || translations.en;
 
-  useEffect(() => { fetchData(); }, []);
+  // Reload when screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [])
+  );
+
+  // Also reload when refreshKey changes
+  useEffect(() => {
+    if (refreshKey > 0) {
+      fetchData();
+    }
+  }, [refreshKey]);
 
   const fetchData = async () => {
     try {
