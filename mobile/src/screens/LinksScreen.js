@@ -341,8 +341,26 @@ export default function LinksScreen({ language, refreshKey }) {
               </TouchableOpacity>
             </View>
             <ScrollView style={styles.modalBody} contentContainerStyle={styles.modalBodyContent}>
-              <Text style={styles.inputLabel}>{t.edit}</Text>
-              <TextInput style={styles.textInput} value={editTitle} onChangeText={setEditTitle} placeholder={editingItem?.url} placeholderTextColor="#8E8E93" />
+              {/* URL Section - View and Copy */}
+              <Text style={styles.inputLabel}>URL</Text>
+              <View style={styles.urlContainer}>
+                <Text style={styles.urlText} numberOfLines={2}>{editingItem?.url}</Text>
+                <TouchableOpacity 
+                  style={styles.copyUrlButton} 
+                  onPress={() => {
+                    Clipboard.setStringAsync(editingItem?.url || '');
+                    Toast.show({ type: 'success', text1: t.copied || 'Copiado!' });
+                  }}
+                >
+                  <Ionicons name="copy-outline" size={20} color="#007AFF" />
+                </TouchableOpacity>
+              </View>
+              
+              {/* Title */}
+              <Text style={styles.inputLabel}>{t.title || 'Título'}</Text>
+              <TextInput style={styles.textInput} value={editTitle} onChangeText={setEditTitle} placeholder={t.titlePlaceholder || 'Nome do link'} placeholderTextColor="#8E8E93" />
+              
+              {/* Move to folder */}
               <Text style={styles.inputLabel}>{t.moveToFolder}</Text>
               <TouchableOpacity style={styles.pickerButton} onPress={() => setShowFolderPicker(true)}>
                 <Ionicons name="folder-outline" size={20} color="#007AFF" />
@@ -353,6 +371,8 @@ export default function LinksScreen({ language, refreshKey }) {
                 </Text>
                 <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
               </TouchableOpacity>
+              
+              {/* Pin toggle */}
               <View style={styles.reminderSection}>
                 <View style={styles.reminderHeader}>
                   <View style={styles.reminderHeaderLeft}>
@@ -362,6 +382,8 @@ export default function LinksScreen({ language, refreshKey }) {
                   <Switch value={isPinnedEdit} onValueChange={setIsPinnedEdit} trackColor={{ false: '#3A3A3C', true: '#FFD60A' }} thumbColor="#FFFFFF" />
                 </View>
               </View>
+              
+              {/* Reminder toggle */}
               <View style={styles.reminderSection}>
                 <View style={styles.reminderHeader}>
                   <View style={styles.reminderHeaderLeft}>
@@ -376,6 +398,7 @@ export default function LinksScreen({ language, refreshKey }) {
                   </View>
                 )}
               </View>
+              
               <TouchableOpacity style={styles.saveButton} onPress={handleSaveEdit}>
                 <Text style={styles.saveButtonText}>{t.save}</Text>
               </TouchableOpacity>
