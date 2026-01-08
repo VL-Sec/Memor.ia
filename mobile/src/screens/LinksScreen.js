@@ -148,14 +148,14 @@ export default function LinksScreen({ language }) {
     const folder = folders.find(f => f.id === item.folderId);
     const hasReminder = item.reminder && item.reminder.location;
     return (
-      <TouchableOpacity style={styles.linkCard} onPress={() => handleOpenLink(item.url)}>
+      <TouchableOpacity style={styles.linkCard} onPress={() => handleOpenLink(item.url || '')}>
         {item.imageUrl && <Image source={{ uri: item.imageUrl }} style={styles.linkImage} />}
         <View style={styles.linkContent}>
           <View style={styles.linkTitleRow}>
-            <Text style={styles.linkTitle} numberOfLines={2}>{item.title || item.url}</Text>
+            <Text style={styles.linkTitle} numberOfLines={2}>{item.title || item.url || ''}</Text>
             {item.isPinned && <Ionicons name="pin" size={14} color="#FFD60A" style={{ marginLeft: 4 }} />}
           </View>
-          <Text style={styles.linkUrl} numberOfLines={1}>{item.url}</Text>
+          <Text style={styles.linkUrl} numberOfLines={1}>{item.url || ''}</Text>
           <View style={styles.linkMeta}>
             <View style={styles.folderBadge}>
               <Text style={styles.folderBadgeText}>{folder?.isDefault ? t.generalFolder : folder?.name || t.generalFolder}</Text>
