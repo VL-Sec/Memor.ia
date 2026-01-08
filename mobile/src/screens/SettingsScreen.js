@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
   cloudBackupHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   cloudBackupIconContainer: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#34C759', justifyContent: 'center', alignItems: 'center' },
   cloudBackupTitleContainer: { flex: 1, marginLeft: 12 },
-  cloudBackupTitle: { color: '#FFFFFF', fontSize: 18, fontWeight: 'bold' },
+  cloudBackupTitle: { color: '#FFFFFF', fontSize: 18, fontWeight: '700' },
   cloudBackupSubtitle: { color: '#34C759', fontSize: 14, marginTop: 2 },
   cloudBackupBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(52, 199, 89, 0.15)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 12, gap: 4 },
   cloudBackupBadgeText: { color: '#34C759', fontSize: 12, fontWeight: '600' },
