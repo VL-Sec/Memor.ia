@@ -275,6 +275,9 @@ export default function LinksScreen({ language, refreshKey }) {
           <TouchableOpacity style={styles.actionBtn} onPress={() => openEditModal(item)}>
             <Ionicons name="pencil-outline" size={18} color="#8E8E93" />
           </TouchableOpacity>
+          <TouchableOpacity style={styles.actionBtn} onPress={() => handleDeleteLink(item.id)}>
+            <Ionicons name="trash-outline" size={18} color="#FF3B30" />
+          </TouchableOpacity>
         </View>
       </TouchableOpacity>
     );
