@@ -10,9 +10,6 @@ export default function CustomHeader({ title }) {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    backgroundColor: '#000',
-  },
   container: {
     height: 60,
     backgroundColor: '#000',
