@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Modal, Switch, Platform, Linking, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Modal, Switch, Platform, Linking, Alert, Share } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
+import * as DocumentPicker from 'expo-document-picker';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import { translations, languages, setLanguage as saveLanguage } from '../lib/i18n';
 import { activatePremium, getPremiumStatus } from '../lib/premium';
+import { supabase } from '../lib/supabase';
 import CustomHeader from '../components/CustomHeader';
 
 const API_URL = 'https://linknote-hub.preview.emergentagent.com';
@@ -15,6 +20,9 @@ const PRIVACY_URL = 'https://linknote-hub.preview.emergentagent.com/privacy';
 
 // Check if we're in Expo Go
 const isExpoGo = Constants.appOwnership === 'expo';
+
+const DEMO_USER = 'demo_user';
+const LOCAL_NOTES_KEY = 'memoria-notes';
 
 const DAYS_OF_WEEK = [
   { value: 0, en: 'Sunday', pt: 'Domingo', es: 'Domingo', fr: 'Dimanche', de: 'Sonntag', it: 'Domenica' },
@@ -25,6 +33,8 @@ const DAYS_OF_WEEK = [
   { value: 5, en: 'Friday', pt: 'Sexta-feira', es: 'Viernes', fr: 'Vendredi', de: 'Freitag', it: 'Venerdì' },
   { value: 6, en: 'Saturday', pt: 'Sábado', es: 'Sábado', fr: 'Samedi', de: 'Samstag', it: 'Sabato' },
 ];
+
+const HOURS = Array.from({ length: 24 }, (_, i) => i);
 
 const getDayName = (dayValue, language) => {
   const day = DAYS_OF_WEEK.find(d => d.value === dayValue);
@@ -41,12 +51,15 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showActivationModal, setShowActivationModal] = useState(false);
   const [showDayModal, setShowDayModal] = useState(false);
+  const [showTimeModal, setShowTimeModal] = useState(false);
   const [activationCode, setActivationCode] = useState('');
   const [activating, setActivating] = useState(false);
   const [summaryEnabled, setSummaryEnabled] = useState(false);
   const [summaryDay, setSummaryDay] = useState(0);
   const [summaryHour, setSummaryHour] = useState(19);
   const [summaryMinute, setSummaryMinute] = useState(0);
+  const [isExporting, setIsExporting] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
 
   const t = translations[language] || translations.en;
 
@@ -176,13 +189,139 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
     }
   };
 
+  const handleTimeChange = async (hour) => {
+    setSummaryHour(hour);
+    setSummaryMinute(0);
+    setShowTimeModal(false);
+    if (summaryEnabled) {
+      try {
+        await AsyncStorage.setItem('memoria-weekly-summary', JSON.stringify({ 
+          enabled: summaryEnabled, 
+          dayOfWeek: summaryDay, 
+          hour: hour, 
+          minute: 0 
+        }));
+        Toast.show({ type: 'success', text1: t.timeSaved || 'Hora guardada' });
+      } catch (e) {
+        console.error('Error saving settings:', e);
+      }
+    }
+  };
+
+  // Export backup to JSON file
+  const handleExportBackup = async () => {
+    setIsExporting(true);
+    try {
+      // Collect all data
+      const localNotes = await AsyncStorage.getItem(LOCAL_NOTES_KEY);
+      const settings = await AsyncStorage.getItem('memoria-weekly-summary');
+      const premiumData = await AsyncStorage.getItem('memoria-premium');
+      
+      // Fetch Supabase data
+      const { data: linksData } = await supabase.from('links').select('*').eq('userId', DEMO_USER);
+      const { data: foldersData } = await supabase.from('folders').select('*').eq('userId', DEMO_USER);
+      
+      const backupData = {
+        version: '1.0.0',
+        exportDate: new Date().toISOString(),
+        data: {
+          localNotes: localNotes ? JSON.parse(localNotes) : [],
+          links: linksData || [],
+          folders: foldersData || [],
+          settings: settings ? JSON.parse(settings) : {},
+          premium: premiumData ? JSON.parse(premiumData) : {}
+        }
+      };
+      
+      const fileName = `memoria-backup-${new Date().toISOString().split('T')[0]}.json`;
+      const filePath = `${FileSystem.documentDirectory}${fileName}`;
+      
+      await FileSystem.writeAsStringAsync(filePath, JSON.stringify(backupData, null, 2));
+      
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(filePath, {
+          mimeType: 'application/json',
+          dialogTitle: t.exportBackup || 'Export Backup'
+        });
+        Toast.show({ type: 'success', text1: t.backupExported || 'Backup exportado com sucesso!' });
+      } else {
+        Toast.show({ type: 'error', text1: t.sharingNotAvailable || 'Partilha não disponível' });
+      }
+    } catch (error) {
+      console.error('Export error:', error);
+      Toast.show({ type: 'error', text1: t.exportError || 'Erro ao exportar backup' });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  // Import backup from JSON file
+  const handleImportBackup = async () => {
+    Alert.alert(
+      t.importBackup || 'Importar Backup',
+      t.importWarning || 'Isto irá substituir todos os seus dados atuais. Deseja continuar?',
+      [
+        { text: t.cancel || 'Cancelar', style: 'cancel' },
+        { 
+          text: t.continue || 'Continuar', 
+          style: 'destructive',
+          onPress: async () => {
+            setIsImporting(true);
+            try {
+              const result = await DocumentPicker.getDocumentAsync({
+                type: 'application/json',
+                copyToCacheDirectory: true
+              });
+              
+              if (result.canceled) {
+                setIsImporting(false);
+                return;
+              }
+              
+              const fileUri = result.assets[0].uri;
+              const fileContent = await FileSystem.readAsStringAsync(fileUri);
+              const backupData = JSON.parse(fileContent);
+              
+              if (!backupData.version || !backupData.data) {
+                Toast.show({ type: 'error', text1: t.invalidBackupFile || 'Ficheiro de backup inválido' });
+                setIsImporting(false);
+                return;
+              }
+              
+              // Restore local notes
+              if (backupData.data.localNotes) {
+                await AsyncStorage.setItem(LOCAL_NOTES_KEY, JSON.stringify(backupData.data.localNotes));
+              }
+              
+              // Restore settings
+              if (backupData.data.settings) {
+                await AsyncStorage.setItem('memoria-weekly-summary', JSON.stringify(backupData.data.settings));
+                setSummaryEnabled(backupData.data.settings.enabled || false);
+                setSummaryDay(backupData.data.settings.dayOfWeek || 0);
+                setSummaryHour(backupData.data.settings.hour || 19);
+              }
+              
+              Toast.show({ type: 'success', text1: t.backupImported || 'Backup importado com sucesso!' });
+              
+            } catch (error) {
+              console.error('Import error:', error);
+              Toast.show({ type: 'error', text1: t.importError || 'Erro ao importar backup' });
+            } finally {
+              setIsImporting(false);
+            }
+          }
+        }
+      ]
+    );
+  };
+
   const getCurrentLanguage = () => { 
     const lang = languages.find(l => l.code === language); 
     return lang ? `${lang.flag} ${lang.nativeName || lang.name}` : 'English'; 
   };
 
   return (
-    <>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
       <CustomHeader title={t.tabSettings || 'Settings'} />
       <ScrollView style={styles.container}>
         <View style={[styles.premiumCard, premiumStatus?.isPremiumActivated && styles.premiumCardActive, premiumStatus?.isTrialActive && !premiumStatus?.isPremiumActivated && styles.premiumCardTrial, !premiumStatus?.hasPremium && styles.premiumCardExpired]}>
@@ -226,17 +365,59 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
                 <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
               </View>
             </TouchableOpacity>
-            <View style={styles.settingItem}>
+            <TouchableOpacity style={styles.settingItem} onPress={() => setShowTimeModal(true)}>
               <View style={styles.settingLeft}>
                 <View style={styles.iconPlaceholder} />
                 <Text style={styles.settingLabel}>{t.time || 'Time'}</Text>
               </View>
               <View style={styles.settingRight}>
                 <Text style={styles.settingValue}>{formatTimeForLocale(summaryHour, summaryMinute)}</Text>
+                <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
               </View>
-            </View>
+            </TouchableOpacity>
           </>
         )}
+      </View>
+
+      {/* Local Backup Section */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{t.backup || 'Backup'}</Text>
+        <TouchableOpacity 
+          style={styles.settingItem} 
+          onPress={handleExportBackup}
+          disabled={isExporting}
+        >
+          <View style={styles.settingLeft}>
+            <Ionicons name="download-outline" size={24} color="#34C759" />
+            <View style={styles.settingTextContainer}>
+              <Text style={styles.settingLabel}>{t.exportBackup || 'Exportar Backup'}</Text>
+              <Text style={styles.settingDescription}>{t.exportBackupInfo || 'Guardar todos os dados num ficheiro JSON'}</Text>
+            </View>
+          </View>
+          {isExporting ? (
+            <Text style={styles.settingValue}>...</Text>
+          ) : (
+            <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
+          )}
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.settingItem} 
+          onPress={handleImportBackup}
+          disabled={isImporting}
+        >
+          <View style={styles.settingLeft}>
+            <Ionicons name="cloud-upload-outline" size={24} color="#007AFF" />
+            <View style={styles.settingTextContainer}>
+              <Text style={styles.settingLabel}>{t.importBackup || 'Importar Backup'}</Text>
+              <Text style={styles.settingDescription}>{t.importBackupInfo || 'Restaurar dados de um ficheiro de backup'}</Text>
+            </View>
+          </View>
+          {isImporting ? (
+            <Text style={styles.settingValue}>...</Text>
+          ) : (
+            <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
+          )}
+        </TouchableOpacity>
       </View>
 
       <View style={styles.cloudBackupCard}>
@@ -309,6 +490,8 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
         </TouchableOpacity>
       </View>
 
+      <View style={{ height: 40 }} />
+
       {/* Language Modal */}
       <Modal visible={showLanguageModal} animationType="slide" transparent={true} onRequestClose={() => setShowLanguageModal(false)}>
         <View style={styles.modalOverlay}>
@@ -352,6 +535,28 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
         </View>
       </Modal>
 
+      {/* Time Modal */}
+      <Modal visible={showTimeModal} animationType="slide" transparent={true} onRequestClose={() => setShowTimeModal(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{t.selectTime || 'Selecionar hora'}</Text>
+              <TouchableOpacity onPress={() => setShowTimeModal(false)}>
+                <Ionicons name="close" size={28} color="#FFFFFF" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.dayList}>
+              {HOURS.map((hour) => (
+                <TouchableOpacity key={hour} style={[styles.dayOption, summaryHour === hour && styles.dayOptionActive]} onPress={() => handleTimeChange(hour)}>
+                  <Text style={styles.dayName}>{formatTimeForLocale(hour, 0)}</Text>
+                  {summaryHour === hour && <Ionicons name="checkmark" size={24} color="#007AFF" />}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
       {/* Activation Modal */}
       <Modal visible={showActivationModal} animationType="slide" transparent={true} onRequestClose={() => setShowActivationModal(false)}>
         <View style={styles.modalOverlay}>
@@ -373,11 +578,12 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
         </View>
       </Modal>
       </ScrollView>
-    </>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: '#000000' },
   container: { flex: 1, backgroundColor: '#000000' },
   premiumCard: { flexDirection: 'row', alignItems: 'center', margin: 16, padding: 20, borderRadius: 20, borderWidth: 1 },
   premiumCardActive: { backgroundColor: 'rgba(255, 215, 0, 0.1)', borderColor: '#FFD700' },
