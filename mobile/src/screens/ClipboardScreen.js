@@ -9,6 +9,12 @@ import { supabase, generateId } from '../lib/supabase';
 import { translations } from '../lib/i18n';
 import CustomHeader from '../components/CustomHeader';
 
+// Helper function to format date according to user's system locale (with year)
+const formatDateLocale = (dateStr) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+};
+
 export default function ClipboardScreen({ language, userId, refreshKey, triggerRefresh }) {
   const [notes, setNotes] = useState([]);
   const [folders, setFolders] = useState([]);
@@ -56,7 +62,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
   useFocusEffect(
     useCallback(() => {
       fetchData();
-    }, [])
+    }, [userId])
   );
 
   // Also reload when refreshKey changes
@@ -88,12 +94,8 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
   // Smart Clipboard - Monitor clipboard when active
   useEffect(() => {
     if (smartClipboardActive) {
-      // Start monitoring clipboard
       startClipboardMonitoring();
-      
-      // Monitor app state changes
       const subscription = AppState.addEventListener('change', handleAppStateChange);
-      
       return () => {
         stopClipboardMonitoring();
         subscription?.remove();
@@ -105,7 +107,6 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
 
   const handleAppStateChange = async (nextAppState) => {
     if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
-      // App came to foreground - check clipboard immediately
       if (smartClipboardActive) {
         await checkAndSaveClipboard();
       }
@@ -114,10 +115,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
   };
 
   const startClipboardMonitoring = () => {
-    // Clear any existing interval
     stopClipboardMonitoring();
-    
-    // Check clipboard every 1 second (more responsive)
     clipboardCheckInterval.current = setInterval(async () => {
       await checkAndSaveClipboard();
     }, 1000);
@@ -131,23 +129,17 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
   };
 
   const checkAndSaveClipboard = async () => {
-    // Use ref to get current state value (avoids closure issue)
     if (!smartClipboardActiveRef.current) return;
     
     try {
       const content = await Clipboard.getStringAsync();
       
-      // Only save if content exists, is different from last, and has meaningful content
       if (content && 
           content.trim().length > 0 && 
           content.trim() !== lastClipboardContent.current?.trim()) {
         
         console.log('Smart Clipboard: New content detected!', content.substring(0, 50));
-        
-        // Update last content immediately to prevent duplicates
         lastClipboardContent.current = content;
-        
-        // Save to database
         await autoSaveClipboard(content);
       }
     } catch (error) {
@@ -157,7 +149,6 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
 
   const autoSaveClipboard = async (content) => {
     try {
-      // Use ref to get current folders value
       const currentFolders = foldersRef.current;
       const defaultFolder = currentFolders.find(f => f.isDefault);
       const newNote = {
@@ -176,7 +167,6 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
       const { error } = await supabase.from('links').insert([newNote]);
       
       if (!error) {
-        // Add to local state immediately
         setNotes(prev => [newNote, ...prev]);
         Toast.show({ 
           type: 'success', 
@@ -192,6 +182,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
   };
 
   const fetchData = async () => {
+    if (!userId) return;
     try {
       const { data: foldersData } = await supabase
         .from('folders')
@@ -237,7 +228,6 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
       if (error) throw error;
       setNotes([newNote, ...notes]);
       setNewContent('');
-      // Update last clipboard content to prevent auto-save of what we just added
       lastClipboardContent.current = newContent;
       Toast.show({ type: 'success', text1: t.saved });
       if (triggerRefresh) triggerRefresh();
@@ -247,14 +237,15 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
     }
   };
 
-  const handleCopyNote = async (content) => {
+  const handleCopyNote = async (content, e) => {
+    if (e) e.stopPropagation();
     await Clipboard.setStringAsync(content);
-    // Update last content to prevent re-saving what we just copied
     lastClipboardContent.current = content;
     Toast.show({ type: 'success', text1: t.copied });
   };
 
-  const handleDeleteNote = (id) => {
+  const handleDeleteNote = (id, e) => {
+    if (e) e.stopPropagation();
     Alert.alert(t.delete, '', [
       { text: t.cancel, style: 'cancel' },
       {
@@ -274,7 +265,8 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
     ]);
   };
 
-  const handleToggleFavorite = async (item) => {
+  const handleToggleFavorite = async (item, e) => {
+    if (e) e.stopPropagation();
     try {
       const newValue = !item.isFavorite;
       await supabase.from('links').update({ isFavorite: newValue }).eq('id', item.id);
@@ -289,7 +281,8 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
     }
   };
 
-  const handleTogglePin = async (item) => {
+  const handleTogglePin = async (item, e) => {
+    if (e) e.stopPropagation();
     try {
       const newValue = !item.isPinned;
       await supabase.from('links').update({ isPinned: newValue }).eq('id', item.id);
@@ -357,12 +350,10 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
     }
     try {
       if (editingFolder) {
-        // Update existing folder
         await supabase.from('folders').update({ name: folderName }).eq('id', editingFolder.id);
         setFolders(folders.map(f => f.id === editingFolder.id ? { ...f, name: folderName } : f));
         Toast.show({ type: 'success', text1: t.saved || 'Guardado' });
       } else {
-        // Create new folder
         const newFolder = {
           id: generateId(),
           userId: userId,
@@ -395,14 +386,12 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
           style: 'destructive',
           onPress: async () => {
             try {
-              // Set folderId to null for items in this folder
               await supabase.from('links').update({ folderId: null }).eq('folderId', folder.id);
-              // Delete folder
               await supabase.from('folders').delete().eq('id', folder.id);
               setFolders(folders.filter(f => f.id !== folder.id));
               if (selectedFolder === folder.id) setSelectedFolder('all');
               Toast.show({ type: 'success', text1: t.deleted || 'Eliminado' });
-              fetchData(); // Refresh to get updated items
+              fetchData();
             } catch (error) {
               console.error('Error deleting folder:', error);
             }
@@ -413,7 +402,6 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
   };
 
   const activateSmartClipboard = async () => {
-    // Get current clipboard content so we don't save it immediately
     try {
       const currentContent = await Clipboard.getStringAsync();
       lastClipboardContent.current = currentContent || '';
@@ -422,7 +410,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
     }
     
     setSmartClipboardActive(true);
-    setTimeLeft(120); // 2 minutes
+    setTimeLeft(120);
     Toast.show({ 
       type: 'success', 
       text1: t.smartClipboardActivated || 'Área Inteligente Ativada',
@@ -461,8 +449,13 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
   const renderNoteItem = ({ item }) => {
     const folder = folders.find(f => f.id === item.folderId);
     return (
-      <TouchableOpacity style={styles.noteCard} onPress={() => openEditModal(item)}>
-        <View style={styles.noteContent}>
+      <View style={styles.noteCard}>
+        {/* Main content area - opens edit modal */}
+        <TouchableOpacity 
+          style={styles.noteMainContent} 
+          onPress={() => openEditModal(item)}
+          activeOpacity={0.7}
+        >
           <Text style={styles.noteText} numberOfLines={3}>{item.content || ''}</Text>
           <View style={styles.noteMeta}>
             <View style={styles.folderBadge}>
@@ -470,31 +463,50 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
                 {folder?.isDefault ? t.generalFolder : folder?.name || t.generalFolder}
               </Text>
             </View>
+            <Text style={styles.dateText}>{formatDateLocale(item.createdAt)}</Text>
           </View>
-        </View>
+        </TouchableOpacity>
+        
+        {/* Action buttons - separate touch zone */}
         <View style={styles.actionButtons}>
-          <TouchableOpacity style={styles.actionBtn} onPress={() => handleTogglePin(item)}>
+          <TouchableOpacity 
+            style={styles.actionBtn} 
+            onPress={(e) => handleTogglePin(item, e)}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
             <Ionicons 
               name="pin" 
               size={20} 
               color={item.isPinned ? "#FFD60A" : "#8E8E93"} 
             />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionBtn} onPress={() => handleToggleFavorite(item)}>
+          <TouchableOpacity 
+            style={styles.actionBtn} 
+            onPress={(e) => handleToggleFavorite(item, e)}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
             <Ionicons 
               name={item.isFavorite ? "heart" : "heart-outline"} 
               size={20} 
               color={item.isFavorite ? "#FF3B30" : "#8E8E93"} 
             />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionBtn} onPress={() => handleCopyNote(item.content || '')}>
+          <TouchableOpacity 
+            style={styles.actionBtn} 
+            onPress={(e) => handleCopyNote(item.content || '', e)}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
             <Ionicons name="copy-outline" size={20} color="#8E8E93" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionBtn} onPress={() => handleDeleteNote(item.id)}>
+          <TouchableOpacity 
+            style={styles.actionBtn} 
+            onPress={(e) => handleDeleteNote(item.id, e)}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
             <Ionicons name="trash-outline" size={20} color="#FF3B30" />
           </TouchableOpacity>
         </View>
-      </TouchableOpacity>
+      </View>
     );
   };
 
@@ -564,14 +576,6 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
                 <Text style={[styles.folderChipText, selectedFolder === folder.id && styles.folderChipTextActive]}>
                   {folder.name}
                 </Text>
-                {selectedFolder === folder.id && (
-                  <TouchableOpacity 
-                    style={styles.folderDeleteBtn} 
-                    onPress={() => handleDeleteFolder(folder)}
-                  >
-                    <Ionicons name="close-circle" size={16} color="#FF3B30" />
-                  </TouchableOpacity>
-                )}
               </TouchableOpacity>
             ))}
             <TouchableOpacity style={styles.addFolderChip} onPress={() => openFolderModal()}>
@@ -670,7 +674,6 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
                 </TouchableOpacity>
               </View>
               <ScrollView>
-                {/* "Todos" option - means no specific folder */}
                 <TouchableOpacity 
                   style={[styles.folderOption, !editFolderId && styles.folderOptionActive]} 
                   onPress={() => { setEditFolderId(null); setShowFolderPicker(false); }}
@@ -679,7 +682,6 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
                   <Text style={styles.folderOptionName}>{t.allClipboards || 'Todos'}</Text>
                   {!editFolderId && <Ionicons name="checkmark" size={24} color="#007AFF" />}
                 </TouchableOpacity>
-                {/* Only user-created folders (not default) */}
                 {folders.filter(f => !f.isDefault).map((folder) => (
                   <TouchableOpacity 
                     key={folder.id} 
@@ -802,28 +804,14 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#000000' },
   container: { flex: 1, backgroundColor: '#000000' },
-  // Search - First
   searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1C1C1E', marginHorizontal: 16, marginTop: 16, marginBottom: 12, paddingHorizontal: 12, borderRadius: 12, height: 44 },
   searchInput: { flex: 1, marginLeft: 8, color: '#FFFFFF', fontSize: 16 },
-  // Smart Clipboard - Second
-  smartClipboard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1C1C1E', marginHorizontal: 16, marginBottom: 12, borderRadius: 16, padding: 12, borderWidth: 1, borderColor: '#2C2C2E' },
-  smartClipboardActive: { backgroundColor: 'rgba(0, 122, 255, 0.15)', borderColor: '#007AFF' },
-  smartClipboardIcon: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(0, 122, 255, 0.2)', justifyContent: 'center', alignItems: 'center' },
-  smartClipboardIconActive: { backgroundColor: '#007AFF' },
-  smartClipboardContent: { flex: 1, marginLeft: 12 },
-  smartClipboardTitle: { color: '#FFFFFF', fontWeight: '600', fontSize: 14 },
-  smartClipboardInfo: { color: '#8E8E93', fontSize: 12, marginTop: 2 },
-  smartClipboardButton: { backgroundColor: '#007AFF', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 14 },
-  smartClipboardButtonStop: { backgroundColor: '#FF3B30' },
-  smartClipboardButtonText: { color: '#FFFFFF', fontSize: 13, fontWeight: '600' },
-  // Add container - Third
   addContainer: { backgroundColor: '#1C1C1E', marginHorizontal: 16, marginBottom: 12, borderRadius: 16, padding: 12 },
   addInput: { color: '#FFFFFF', fontSize: 16, minHeight: 60, textAlignVertical: 'top' },
   addActions: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 },
   saveButton: { backgroundColor: '#007AFF', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, gap: 4 },
   saveButtonDisabled: { opacity: 0.5 },
   saveButtonText: { color: '#FFFFFF', fontWeight: '600' },
-  // Folder section with title
   folderSection: { marginHorizontal: 16, marginBottom: 12 },
   folderSectionTitle: { color: '#8E8E93', fontSize: 13, fontWeight: '600', textTransform: 'uppercase', marginBottom: 8 },
   folderList: { maxHeight: 50 },
@@ -833,19 +821,21 @@ const styles = StyleSheet.create({
   folderChipText: { color: '#FFFFFF', fontSize: 14, fontWeight: '500' },
   folderChipTextActive: { color: '#FFFFFF' },
   addFolderChip: { backgroundColor: '#2C2C2E', width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#3A3A3C' },
-  // List
   listContent: { padding: 16, paddingTop: 8, paddingBottom: 100 },
-  noteCard: { backgroundColor: '#1C1C1E', borderRadius: 16, marginBottom: 12, padding: 12, flexDirection: 'row' },
-  noteContent: { flex: 1 },
+  // Note card with separate touch zones
+  noteCard: { backgroundColor: '#1C1C1E', borderRadius: 16, marginBottom: 12, flexDirection: 'row', overflow: 'hidden' },
+  noteMainContent: { flex: 1, padding: 12 },
   noteText: { color: '#FFFFFF', fontSize: 15, lineHeight: 22, marginBottom: 8 },
-  noteMeta: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  noteMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
   folderBadge: { backgroundColor: 'rgba(0, 122, 255, 0.2)', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 },
   folderBadgeText: { color: '#007AFF', fontSize: 11 },
-  actionButtons: { justifyContent: 'center', alignItems: 'center', gap: 8, marginLeft: 8 },
+  dateText: { color: '#8E8E93', fontSize: 11 },
+  // Actions column - separate touch zone
+  actionButtons: { justifyContent: 'center', alignItems: 'center', gap: 8, paddingHorizontal: 8, backgroundColor: '#1C1C1E', borderLeftWidth: 1, borderLeftColor: '#2C2C2E' },
   actionBtn: { padding: 6 },
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
   emptyText: { color: '#8E8E93', fontSize: 16, marginTop: 16 },
-  // Modal styles with proper safe area
+  // Modal styles
   modalContainer: { flex: 1, backgroundColor: '#000000' },
   modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#2C2C2E', minHeight: 56 },
   modalHeaderButton: { padding: 4, minWidth: 60 },
