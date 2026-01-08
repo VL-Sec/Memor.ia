@@ -200,21 +200,17 @@ function TabNavigator({ language, userId, premiumStatus, refreshKey, triggerRefr
           height: 60 + Math.max(insets.bottom, 10),
           paddingBottom: Math.max(insets.bottom, 10),
           paddingTop: 8,
-          paddingLeft: 0,
-          paddingRight: 0,
-          marginLeft: 0,
-          marginRight: 0,
         },
         tabBarItemStyle: {
           flex: 1,
-          paddingTop: 4,
         },
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: 10,
           fontWeight: '600',
-          marginTop: 2,
         },
+        tabBarAllowFontScaling: false,
       })}
+      sceneContainerStyle={{ backgroundColor: '#000000' }}
     >
       <Tab.Screen name="Links" options={{ title: t.tabLinks || 'Links' }}>
         {(props) => <LinksScreen {...props} language={language} userId={userId} premiumStatus={premiumStatus} refreshKey={refreshKey} />}
