@@ -134,43 +134,45 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer theme={theme}>
-      <StatusBar style="light" />
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          headerShown: false,
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName;
-            if (route.name === 'Links') iconName = focused ? 'link' : 'link-outline';
-            else if (route.name === 'Notes') iconName = focused ? 'document-text' : 'document-text-outline';
-            else if (route.name === 'Clipboard') iconName = focused ? 'clipboard' : 'clipboard-outline';
-            else if (route.name === 'Favorites') iconName = focused ? 'heart' : 'heart-outline';
-            else if (route.name === 'Settings') iconName = focused ? 'settings' : 'settings-outline';
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
-          tabBarActiveTintColor: '#007AFF',
-          tabBarInactiveTintColor: '#8E8E93',
-          tabBarStyle: { backgroundColor: '#1C1C1E', borderTopColor: '#2C2C2E', paddingTop: 5, height: 85 },
-        })}
-      >
-        <Tab.Screen name="Links" options={{ title: t.tabLinks || 'Links' }}>
-          {(props) => <LinksScreen {...props} language={language} premiumStatus={premiumStatus} />}
-        </Tab.Screen>
-        <Tab.Screen name="Notes" options={{ title: t.tabNotes || 'Notes' }}>
-          {(props) => <NotesScreen {...props} language={language} />}
-        </Tab.Screen>
-        <Tab.Screen name="Clipboard" options={{ title: t.tabClipboard || 'Clipboard' }}>
-          {(props) => <ClipboardScreen {...props} language={language} premiumStatus={premiumStatus} />}
-        </Tab.Screen>
-        <Tab.Screen name="Favorites" options={{ title: t.tabFavorites || 'Favorites' }}>
-          {(props) => <FavoritesScreen {...props} language={language} />}
-        </Tab.Screen>
-        <Tab.Screen name="Settings" options={{ title: t.tabSettings || 'Settings' }}>
-          {(props) => <SettingsScreen {...props} language={language} setLanguage={setLanguage} premiumStatus={premiumStatus} setPremiumStatus={setPremiumStatus} />}
-        </Tab.Screen>
-      </Tab.Navigator>
-      <Toast config={toastConfig} visibilityTime={3000} autoHide={true} />
-    </NavigationContainer>
+    <SafeAreaProvider>
+      <NavigationContainer theme={theme}>
+        <StatusBar style="light" />
+        <Tab.Navigator
+          screenOptions={({ route }) => ({
+            headerShown: false,
+            tabBarIcon: ({ focused, color, size }) => {
+              let iconName;
+              if (route.name === 'Links') iconName = focused ? 'link' : 'link-outline';
+              else if (route.name === 'Notes') iconName = focused ? 'document-text' : 'document-text-outline';
+              else if (route.name === 'Clipboard') iconName = focused ? 'clipboard' : 'clipboard-outline';
+              else if (route.name === 'Favorites') iconName = focused ? 'heart' : 'heart-outline';
+              else if (route.name === 'Settings') iconName = focused ? 'settings' : 'settings-outline';
+              return <Ionicons name={iconName} size={size} color={color} />;
+            },
+            tabBarActiveTintColor: '#007AFF',
+            tabBarInactiveTintColor: '#8E8E93',
+            tabBarStyle: { backgroundColor: '#1C1C1E', borderTopColor: '#2C2C2E', paddingTop: 5, height: 85 },
+          })}
+        >
+          <Tab.Screen name="Links" options={{ title: t.tabLinks || 'Links' }}>
+            {(props) => <LinksScreen {...props} language={language} premiumStatus={premiumStatus} />}
+          </Tab.Screen>
+          <Tab.Screen name="Notes" options={{ title: t.tabNotes || 'Notes' }}>
+            {(props) => <NotesScreen {...props} language={language} />}
+          </Tab.Screen>
+          <Tab.Screen name="Clipboard" options={{ title: t.tabClipboard || 'Clipboard' }}>
+            {(props) => <ClipboardScreen {...props} language={language} premiumStatus={premiumStatus} />}
+          </Tab.Screen>
+          <Tab.Screen name="Favorites" options={{ title: t.tabFavorites || 'Favorites' }}>
+            {(props) => <FavoritesScreen {...props} language={language} />}
+          </Tab.Screen>
+          <Tab.Screen name="Settings" options={{ title: t.tabSettings || 'Settings' }}>
+            {(props) => <SettingsScreen {...props} language={language} setLanguage={setLanguage} premiumStatus={premiumStatus} setPremiumStatus={setPremiumStatus} />}
+          </Tab.Screen>
+        </Tab.Navigator>
+        <Toast config={toastConfig} visibilityTime={3000} autoHide={true} />
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 }
 
