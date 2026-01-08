@@ -455,8 +455,9 @@ const styles = StyleSheet.create({
   addContainer: { flexDirection: 'row', marginHorizontal: 16, marginBottom: 8, gap: 8 },
   addInput: { flex: 1, backgroundColor: '#1C1C1E', paddingHorizontal: 16, borderRadius: 12, height: 44, color: '#FFFFFF', fontSize: 16 },
   addButton: { backgroundColor: '#007AFF', width: 44, height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
-  // Folder section - Clean style without title
+  // Folder section with title
   folderSection: { marginHorizontal: 16, marginBottom: 12 },
+  folderSectionTitle: { color: '#8E8E93', fontSize: 13, fontWeight: '600', textTransform: 'uppercase', marginBottom: 8 },
   folderList: { maxHeight: 50 },
   folderListContent: { paddingRight: 16, alignItems: 'center' },
   folderChip: { backgroundColor: '#2C2C2E', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20, marginRight: 10, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#3A3A3C' },
