@@ -716,7 +716,6 @@ const styles = StyleSheet.create({
   folderChipActive: { backgroundColor: '#007AFF', borderColor: '#007AFF' },
   folderChipText: { color: '#FFFFFF', fontSize: 14, fontWeight: '500' },
   folderChipTextActive: { color: '#FFFFFF' },
-  folderDeleteBtn: { marginLeft: 6 },
   addFolderChip: { backgroundColor: '#2C2C2E', width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#3A3A3C' },
   // List
   listContent: { padding: 16, paddingTop: 8, paddingBottom: 100 },
