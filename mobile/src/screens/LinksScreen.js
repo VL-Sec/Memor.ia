@@ -390,10 +390,24 @@ export default function LinksScreen({ language, refreshKey }) {
               </TouchableOpacity>
             </View>
             <ScrollView>
-              {folders.map((folder) => (
-                <TouchableOpacity key={folder.id} style={[styles.folderOption, editFolderId === folder.id && styles.folderOptionActive]} onPress={() => { setEditFolderId(folder.id); setShowFolderPicker(false); }}>
+              {/* "Todos" option - means no specific folder */}
+              <TouchableOpacity 
+                style={[styles.folderOption, !editFolderId && styles.folderOptionActive]} 
+                onPress={() => { setEditFolderId(null); setShowFolderPicker(false); }}
+              >
+                <Text style={styles.folderOptionIcon}>📋</Text>
+                <Text style={styles.folderOptionName}>{t.allLinks || 'Todos'}</Text>
+                {!editFolderId && <Ionicons name="checkmark" size={24} color="#007AFF" />}
+              </TouchableOpacity>
+              {/* Only user-created folders (not default) */}
+              {folders.filter(f => !f.isDefault).map((folder) => (
+                <TouchableOpacity 
+                  key={folder.id} 
+                  style={[styles.folderOption, editFolderId === folder.id && styles.folderOptionActive]} 
+                  onPress={() => { setEditFolderId(folder.id); setShowFolderPicker(false); }}
+                >
                   <Text style={styles.folderOptionIcon}>{folder.icon || '📁'}</Text>
-                  <Text style={styles.folderOptionName}>{folder.isDefault ? t.generalFolder : folder.name}</Text>
+                  <Text style={styles.folderOptionName}>{folder.name}</Text>
                   {editFolderId === folder.id && <Ionicons name="checkmark" size={24} color="#007AFF" />}
                 </TouchableOpacity>
               ))}
