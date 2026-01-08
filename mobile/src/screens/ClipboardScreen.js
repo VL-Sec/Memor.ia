@@ -554,17 +554,17 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
                 {t.allClipboards || 'Todos'}
               </Text>
             </TouchableOpacity>
-            {folders.map(folder => (
+            {folders.filter(folder => !folder.isDefault).map(folder => (
               <TouchableOpacity 
                 key={folder.id} 
                 style={[styles.folderChip, selectedFolder === folder.id && styles.folderChipActive]} 
                 onPress={() => setSelectedFolder(folder.id)}
-                onLongPress={() => !folder.isDefault && openFolderModal(folder)}
+                onLongPress={() => openFolderModal(folder)}
               >
                 <Text style={[styles.folderChipText, selectedFolder === folder.id && styles.folderChipTextActive]}>
-                  {folder.isDefault ? (t.generalFolder || 'Geral') : folder.name}
+                  {folder.name}
                 </Text>
-                {!folder.isDefault && selectedFolder === folder.id && (
+                {selectedFolder === folder.id && (
                   <TouchableOpacity 
                     style={styles.folderDeleteBtn} 
                     onPress={() => handleDeleteFolder(folder)}
