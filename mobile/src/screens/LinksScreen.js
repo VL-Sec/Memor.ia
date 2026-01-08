@@ -437,18 +437,34 @@ export default function LinksScreen({ language, refreshKey }) {
                 </View>
               </View>
               
-              {/* Reminder toggle */}
+              {/* Reminder toggle with date/time picker */}
               <View style={styles.reminderSection}>
                 <View style={styles.reminderHeader}>
                   <View style={styles.reminderHeaderLeft}>
-                    <Ionicons name="location-outline" size={24} color="#FFD60A" />
-                    <Text style={styles.reminderTitle}>{t.setReminder}</Text>
+                    <Ionicons name="notifications-outline" size={24} color="#34C759" />
+                    <Text style={styles.reminderTitle}>{t.setReminder || 'Lembrete'}</Text>
                   </View>
                   <Switch value={reminderEnabled} onValueChange={setReminderEnabled} trackColor={{ false: '#3A3A3C', true: '#34C759' }} thumbColor="#FFFFFF" />
                 </View>
                 {reminderEnabled && (
                   <View style={styles.reminderOptions}>
-                    <TextInput style={styles.locationInput} value={reminderLocation} onChangeText={setReminderLocation} placeholder={t.reminderLocationPlaceholder} placeholderTextColor="#8E8E93" />
+                    <View style={styles.dateTimeRow}>
+                      <TouchableOpacity style={styles.dateTimeButton} onPress={() => setShowDatePicker(true)}>
+                        <Ionicons name="calendar-outline" size={20} color="#007AFF" />
+                        <Text style={styles.dateTimeText}>
+                          {reminderDate.toLocaleDateString(language === 'pt' ? 'pt-PT' : language)}
+                        </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={styles.dateTimeButton} onPress={() => setShowTimePicker(true)}>
+                        <Ionicons name="time-outline" size={20} color="#007AFF" />
+                        <Text style={styles.dateTimeText}>
+                          {reminderDate.toLocaleTimeString(language === 'pt' ? 'pt-PT' : language, { hour: '2-digit', minute: '2-digit' })}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                    <Text style={styles.reminderHint}>
+                      {t.reminderHint || 'Vais receber uma notificação nesta data e hora'}
+                    </Text>
                   </View>
                 )}
               </View>
@@ -460,6 +476,41 @@ export default function LinksScreen({ language, refreshKey }) {
           </View>
         </View>
       </Modal>
+
+      {/* Date Picker Modal */}
+      {showDatePicker && (
+        <DateTimePicker
+          value={reminderDate}
+          mode="date"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={(event, selectedDate) => {
+            setShowDatePicker(Platform.OS === 'ios');
+            if (selectedDate) {
+              const newDate = new Date(reminderDate);
+              newDate.setFullYear(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+              setReminderDate(newDate);
+            }
+          }}
+          minimumDate={new Date()}
+        />
+      )}
+
+      {/* Time Picker Modal */}
+      {showTimePicker && (
+        <DateTimePicker
+          value={reminderDate}
+          mode="time"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={(event, selectedTime) => {
+            setShowTimePicker(Platform.OS === 'ios');
+            if (selectedTime) {
+              const newDate = new Date(reminderDate);
+              newDate.setHours(selectedTime.getHours(), selectedTime.getMinutes());
+              setReminderDate(newDate);
+            }
+          }}
+        />
+      )}
 
       <Modal visible={showFolderPicker} animationType="slide" transparent={true} onRequestClose={() => setShowFolderPicker(false)}>
         <View style={styles.modalOverlay}>
