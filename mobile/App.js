@@ -153,23 +153,26 @@ export default function App() {
               else if (route.name === 'Notes') iconName = focused ? 'document-text' : 'document-text-outline';
               else if (route.name === 'Favorites') iconName = focused ? 'heart' : 'heart-outline';
               else if (route.name === 'Settings') iconName = focused ? 'settings' : 'settings-outline';
-              return <Ionicons name={iconName} size={size} color={color} />;
+              return <Ionicons name={iconName} size={24} color={color} />;
             },
             tabBarActiveTintColor: '#007AFF',
             tabBarInactiveTintColor: '#8E8E93',
             tabBarStyle: { 
               backgroundColor: '#1C1C1E', 
               borderTopColor: '#2C2C2E',
-              height: 90,
-              paddingBottom: 30,
-              paddingTop: 10,
+              borderTopWidth: 0.5,
+              height: 85,
+              paddingBottom: 25,
+              paddingTop: 8,
+              paddingHorizontal: 10,
             },
             tabBarLabelStyle: {
-              fontSize: 11,
+              fontSize: 10,
               fontWeight: '500',
+              marginTop: 2,
             },
-            tabBarItemStyle: {
-              flex: 1,
+            tabBarIconStyle: {
+              marginTop: 4,
             },
           })}
         >
