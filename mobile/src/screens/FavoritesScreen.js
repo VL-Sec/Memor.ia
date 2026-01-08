@@ -10,10 +10,9 @@ import { supabase } from '../lib/supabase';
 import { translations } from '../lib/i18n';
 import CustomHeader from '../components/CustomHeader';
 
-const DEMO_USER = 'demo_user';
 const LOCAL_NOTES_KEY = 'memoria-notes';
 
-export default function FavoritesScreen({ language, refreshKey }) {
+export default function FavoritesScreen({ language, userId, refreshKey }) {
   const [favorites, setFavorites] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
