@@ -86,6 +86,12 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
     setNoteTitle('');
     setNoteContent('');
     setNoteColor('default');
+    setReminderEnabled(false);
+    // Default reminder: tomorrow at 9:00
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(9, 0, 0, 0);
+    setReminderDate(tomorrow);
     setShowModal(true);
   };
 
@@ -94,7 +100,52 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
     setNoteTitle(note.title || '');
     setNoteContent(note.content || '');
     setNoteColor(note.color || 'default');
+    if (note.reminder && note.reminder.date) {
+      setReminderEnabled(true);
+      setReminderDate(new Date(note.reminder.date));
+    } else {
+      setReminderEnabled(false);
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(9, 0, 0, 0);
+      setReminderDate(tomorrow);
+    }
     setShowModal(true);
+  };
+
+  // Schedule notification for reminder
+  const scheduleNotification = async (title, body, date) => {
+    try {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Toast.show({ type: 'error', text1: t.notificationPermissionDenied || 'Permissão de notificações negada' });
+        return null;
+      }
+      
+      const notificationId = await Notifications.scheduleNotificationAsync({
+        content: {
+          title: title || t.reminder || 'Lembrete',
+          body: body || t.noteReminderBody || 'Tens uma nota para rever!',
+          sound: true,
+        },
+        trigger: date,
+      });
+      return notificationId;
+    } catch (error) {
+      console.error('Error scheduling notification:', error);
+      return null;
+    }
+  };
+
+  // Cancel scheduled notification
+  const cancelNotification = async (notificationId) => {
+    if (notificationId) {
+      try {
+        await Notifications.cancelScheduledNotificationAsync(notificationId);
+      } catch (error) {
+        console.error('Error canceling notification:', error);
+      }
+    }
   };
 
   const handleSaveNote = async () => {
@@ -104,15 +155,41 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
     }
 
     const now = new Date().toISOString();
+    let reminderData = null;
     
     if (editingNote) {
+      // Cancel existing notification if any
+      if (editingNote.reminder?.notificationId) {
+        await cancelNotification(editingNote.reminder.notificationId);
+      }
+      
+      // Schedule new notification if reminder is enabled
+      if (reminderEnabled && reminderDate > new Date()) {
+        const notificationId = await scheduleNotification(
+          noteTitle || t.reminder,
+          noteContent.substring(0, 100),
+          reminderDate
+        );
+        reminderData = { date: reminderDate.toISOString(), notificationId };
+      }
+      
       const updatedNotes = notes.map(n => 
         n.id === editingNote.id 
-          ? { ...n, title: noteTitle, content: noteContent, color: noteColor, updatedAt: now }
+          ? { ...n, title: noteTitle, content: noteContent, color: noteColor, reminder: reminderData, updatedAt: now }
           : n
       );
       await saveNotes(updatedNotes);
     } else {
+      // Schedule notification for new note
+      if (reminderEnabled && reminderDate > new Date()) {
+        const notificationId = await scheduleNotification(
+          noteTitle || t.reminder,
+          noteContent.substring(0, 100),
+          reminderDate
+        );
+        reminderData = { date: reminderDate.toISOString(), notificationId };
+      }
+      
       const newNote = {
         id: `note_${Date.now()}`,
         title: noteTitle,
@@ -120,6 +197,7 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
         color: noteColor,
         isPinned: false,
         isFavorite: false,
+        reminder: reminderData,
         order: 0,
         createdAt: now,
         updatedAt: now,
