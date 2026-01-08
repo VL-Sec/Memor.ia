@@ -1,8 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 
 const WEEKLY_SUMMARY_KEY = 'memoria-weekly-summary';
+
+// Check if we're in Expo Go
+const isExpoGo = Constants.appOwnership === 'expo';
 
 // Days of the week - indices match JavaScript's getDay() where 0 = Sunday
 export const DAYS_OF_WEEK = [
@@ -15,14 +19,20 @@ export const DAYS_OF_WEEK = [
   { value: 6, en: 'Saturday', pt: 'Sábado', es: 'Sábado', fr: 'Samedi' },
 ];
 
-// Configure notification handler
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
+// Configure notification handler (only if not in Expo Go)
+if (!isExpoGo) {
+  try {
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+      }),
+    });
+  } catch (e) {
+    console.log('Notifications not available in this environment');
+  }
+}
 
 /**
  * Request notification permissions
