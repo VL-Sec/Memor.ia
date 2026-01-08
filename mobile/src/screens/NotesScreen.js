@@ -335,7 +335,8 @@ export default function NotesScreen({ language }) {
           </View>
         </View>
       </Modal>
-    </View>
+      </View>
+    </>
   );
 }
 
