@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, RefreshControl, Modal, ScrollView, Alert, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, RefreshControl, Modal, ScrollView, Alert, FlatList, Switch, Platform } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Notifications from 'expo-notifications';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { translations } from '../lib/i18n';
 import CustomHeader from '../components/CustomHeader';
 
@@ -21,7 +23,7 @@ const NOTE_COLORS = [
 
 const STORAGE_KEY = 'memoria-notes';
 
-export default function NotesScreen({ language, refreshKey, triggerRefresh }) {
+export default function NotesScreen({ language, userId, refreshKey, triggerRefresh }) {
   const [notes, setNotes] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -30,6 +32,12 @@ export default function NotesScreen({ language, refreshKey, triggerRefresh }) {
   const [noteContent, setNoteContent] = useState('');
   const [noteColor, setNoteColor] = useState('default');
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Reminder state
+  const [reminderEnabled, setReminderEnabled] = useState(false);
+  const [reminderDate, setReminderDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
   
   const insets = useSafeAreaInsets();
   const t = translations[language] || translations.en;
