@@ -5,6 +5,7 @@ import * as Clipboard from 'expo-clipboard';
 import Toast from 'react-native-toast-message';
 import { supabase, generateId } from '../lib/supabase';
 import { translations } from '../lib/i18n';
+import CustomHeader from '../components/CustomHeader';
 
 const DEMO_USER = 'demo_user';
 
