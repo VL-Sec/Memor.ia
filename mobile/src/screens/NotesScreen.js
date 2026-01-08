@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { translations } from '../lib/i18n';
+import CustomHeader from '../components/CustomHeader';
 
 const NOTE_COLORS = [
   { id: 'default', color: '#1C1C1E', name: 'Default' },
