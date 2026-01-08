@@ -97,6 +97,29 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
   };
 
   const handleSummaryToggle = async (value) => {
+    if (value) {
+      // Request notification permission when enabling
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      
+      if (finalStatus !== 'granted') {
+        Alert.alert(
+          t.notifications || 'Notifications',
+          t.notificationPermissionRequired || 'Please enable notifications in your device settings to receive weekly summaries.',
+          [
+            { text: t.cancel || 'Cancel', style: 'cancel' },
+            { text: t.settings || 'Settings', onPress: () => Linking.openSettings() }
+          ]
+        );
+        return;
+      }
+    }
+    
     setSummaryEnabled(value);
     try {
       await AsyncStorage.setItem('memoria-weekly-summary', JSON.stringify({ 
