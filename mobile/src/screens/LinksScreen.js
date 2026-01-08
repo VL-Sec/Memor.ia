@@ -53,8 +53,8 @@ export default function LinksScreen({ language, userId, refreshKey }) {
 
   const fetchData = async () => {
     try {
-      const { data: foldersData } = await supabase.from('folders').select('*').eq('userId', DEMO_USER).eq('folderType', 'link').order('createdAt', { ascending: false });
-      const { data: linksData } = await supabase.from('links').select('*').eq('userId', DEMO_USER).eq('contentType', 'link').order('createdAt', { ascending: false });
+      const { data: foldersData } = await supabase.from('folders').select('*').eq('userId', userId).eq('folderType', 'link').order('createdAt', { ascending: false });
+      const { data: linksData } = await supabase.from('links').select('*').eq('userId', userId).eq('contentType', 'link').order('createdAt', { ascending: false });
       setFolders(foldersData || []);
       setLinks(linksData || []);
     } catch (error) {
@@ -71,7 +71,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
     if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
     try {
       const defaultFolder = folders.find(f => f.isDefault);
-      const newLink = { id: generateId(), userId: DEMO_USER, url, title: url, contentType: 'link', tags: [], isFavorite: false, folderId: selectedFolder !== 'all' ? selectedFolder : defaultFolder?.id, createdAt: new Date().toISOString() };
+      const newLink = { id: generateId(), userId: userId, url, title: url, contentType: 'link', tags: [], isFavorite: false, folderId: selectedFolder !== 'all' ? selectedFolder : defaultFolder?.id, createdAt: new Date().toISOString() };
       const { error } = await supabase.from('links').insert([newLink]);
       if (error) throw error;
       setLinks([newLink, ...links]);
@@ -229,7 +229,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
       } else {
         const newFolder = {
           id: generateId(),
-          userId: DEMO_USER,
+          userId: userId,
           name: folderName,
           icon: '📁',
           isDefault: false,
