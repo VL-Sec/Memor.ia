@@ -129,6 +129,12 @@ export const translations = {
     reminderBody: 'You have a link to check!',
     noteReminderBody: 'You have a note to review!',
     reminderSet: 'Reminder set',
+    reminderInPast: 'Date must be in the future',
+    errorSchedulingReminder: 'Error creating reminder',
+    
+    // Links
+    addLink: 'Add Link',
+    urlRequired: 'URL is required',
     
     // Settings
     settings: 'Settings',
