@@ -221,7 +221,7 @@ export default function NotesScreen({ language }) {
   );
 
   return (
-    <>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
       <CustomHeader title={t.tabNotes || 'Notes'} />
       <View style={styles.container}>
         {/* Search */}
