@@ -544,12 +544,6 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
 
         {/* 4. Folder filter - Improved visibility */}
         <View style={styles.folderSection}>
-          <View style={styles.folderHeader}>
-            <Text style={styles.folderSectionTitle}>{t.folders || 'Pastas'}</Text>
-            <TouchableOpacity style={styles.addFolderBtn} onPress={() => openFolderModal()}>
-              <Ionicons name="add-circle" size={24} color="#007AFF" />
-            </TouchableOpacity>
-          </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.folderList} contentContainerStyle={styles.folderListContent}>
             <TouchableOpacity 
               style={[styles.folderChip, selectedFolder === 'all' && styles.folderChipActive]} 
@@ -579,6 +573,9 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
                 )}
               </TouchableOpacity>
             ))}
+            <TouchableOpacity style={styles.addFolderChip} onPress={() => openFolderModal()}>
+              <Ionicons name="add" size={20} color="#007AFF" />
+            </TouchableOpacity>
           </ScrollView>
         </View>
 
