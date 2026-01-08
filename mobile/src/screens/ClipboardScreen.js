@@ -312,6 +312,88 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
     }
   };
 
+  // Folder management functions
+  const openFolderModal = (folder = null) => {
+    setEditingFolder(folder);
+    setFolderName(folder ? folder.name : '');
+    setShowFolderModal(true);
+  };
+
+  const closeFolderModal = () => {
+    setShowFolderModal(false);
+    setEditingFolder(null);
+    setFolderName('');
+  };
+
+  const handleSaveFolder = async () => {
+    if (!folderName.trim()) {
+      Toast.show({ type: 'error', text1: t.error || 'Nome obrigatório' });
+      return;
+    }
+    try {
+      if (editingFolder) {
+        // Update existing folder
+        await supabase.from('folders').update({ name: folderName }).eq('id', editingFolder.id);
+        setFolders(folders.map(f => f.id === editingFolder.id ? { ...f, name: folderName } : f));
+        Toast.show({ type: 'success', text1: t.saved || 'Guardado' });
+      } else {
+        // Create new folder
+        const newFolder = {
+          id: generateId(),
+          userId: DEMO_USER,
+          name: folderName,
+          icon: '📁',
+          isDefault: false,
+          folderType: 'text',
+          createdAt: new Date().toISOString(),
+        };
+        const { error } = await supabase.from('folders').insert([newFolder]);
+        if (error) throw error;
+        setFolders([...folders, newFolder]);
+        Toast.show({ type: 'success', text1: t.folderCreated || 'Pasta criada' });
+      }
+      closeFolderModal();
+    } catch (error) {
+      console.error('Error saving folder:', error);
+      Toast.show({ type: 'error', text1: t.error || 'Erro' });
+    }
+  };
+
+  const handleDeleteFolder = (folder) => {
+    if (folder.isDefault) {
+      Toast.show({ type: 'error', text1: t.cannotDeleteDefault || 'Não podes eliminar a pasta padrão' });
+      return;
+    }
+    Alert.alert(
+      t.deleteFolder || 'Eliminar pasta',
+      t.deleteFolderConfirm || 'Tens a certeza? Os itens serão movidos para a pasta Geral.',
+      [
+        { text: t.cancel || 'Cancelar', style: 'cancel' },
+        {
+          text: t.delete || 'Eliminar',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              // Move items to default folder
+              const defaultFolder = folders.find(f => f.isDefault);
+              if (defaultFolder) {
+                await supabase.from('links').update({ folderId: defaultFolder.id }).eq('folderId', folder.id);
+              }
+              // Delete folder
+              await supabase.from('folders').delete().eq('id', folder.id);
+              setFolders(folders.filter(f => f.id !== folder.id));
+              if (selectedFolder === folder.id) setSelectedFolder('all');
+              Toast.show({ type: 'success', text1: t.deleted || 'Eliminado' });
+              fetchData(); // Refresh to get updated items
+            } catch (error) {
+              console.error('Error deleting folder:', error);
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const activateSmartClipboard = async () => {
     // Get current clipboard content so we don't save it immediately
     try {
