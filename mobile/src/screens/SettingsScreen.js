@@ -14,9 +14,9 @@ import { translations, languages, setLanguage as saveLanguage } from '../lib/i18
 import { activatePremium, getPremiumStatus } from '../lib/premium';
 import { supabase } from '../lib/supabase';
 
-const API_URL = 'https://linknote-hub.preview.emergentagent.com';
-const TERMS_URL = 'https://linknote-hub.preview.emergentagent.com/terms';
-const PRIVACY_URL = 'https://linknote-hub.preview.emergentagent.com/privacy';
+const API_URL = 'https://link-fixer-6.preview.emergentagent.com';
+const TERMS_URL = 'https://link-fixer-6.preview.emergentagent.com/terms';
+const PRIVACY_URL = 'https://link-fixer-6.preview.emergentagent.com/privacy';
 
 // Check if we're in Expo Go
 const isExpoGo = Constants.appOwnership === 'expo';
