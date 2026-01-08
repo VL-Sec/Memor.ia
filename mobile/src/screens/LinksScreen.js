@@ -346,7 +346,11 @@ export default function LinksScreen({ language, refreshKey }) {
               <Text style={styles.inputLabel}>{t.moveToFolder}</Text>
               <TouchableOpacity style={styles.pickerButton} onPress={() => setShowFolderPicker(true)}>
                 <Ionicons name="folder-outline" size={20} color="#007AFF" />
-                <Text style={styles.pickerButtonText}>{folders.find(f => f.id === editFolderId)?.name || t.generalFolder}</Text>
+                <Text style={styles.pickerButtonText}>
+                  {editFolderId 
+                    ? (folders.find(f => f.id === editFolderId)?.name || t.allLinks || 'Todos')
+                    : (t.allLinks || 'Todos')}
+                </Text>
                 <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
               </TouchableOpacity>
               <View style={styles.reminderSection}>
