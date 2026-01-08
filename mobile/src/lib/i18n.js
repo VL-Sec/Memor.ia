@@ -458,6 +458,10 @@ export const translations = {
     emptyClipboardSubtitle: 'Cola texto ou ativa a área de transferência inteligente',
     emptyFavoritesTitle: 'Ainda não tens favoritos',
     emptyFavoritesSubtitle: 'Toca no coração em qualquer item para o adicionar aqui',
+    
+    // Premium & Subscription
+    subscribePremium: 'Subscrever Premium',
+    subscribeToUnlock: 'Subscreve para desbloquear todas as funcionalidades',
   },
 
   // ============================================
