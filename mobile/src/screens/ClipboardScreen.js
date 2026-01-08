@@ -162,7 +162,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
       const defaultFolder = currentFolders.find(f => f.isDefault);
       const newNote = {
         id: generateId(),
-        userId: DEMO_USER,
+        userId: userId,
         title: content.slice(0, 50) + (content.length > 50 ? '...' : ''),
         content: content,
         contentType: 'text',
@@ -196,14 +196,14 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
       const { data: foldersData } = await supabase
         .from('folders')
         .select('*')
-        .eq('userId', DEMO_USER)
+        .eq('userId', userId)
         .eq('folderType', 'text')
         .order('createdAt', { ascending: false });
       
       const { data: notesData } = await supabase
         .from('links')
         .select('*')
-        .eq('userId', DEMO_USER)
+        .eq('userId', userId)
         .eq('contentType', 'text')
         .order('createdAt', { ascending: false });
       
@@ -223,7 +223,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
       const defaultFolder = folders.find(f => f.isDefault);
       const newNote = {
         id: generateId(),
-        userId: DEMO_USER,
+        userId: userId,
         title: newContent.slice(0, 50) + (newContent.length > 50 ? '...' : ''),
         content: newContent,
         contentType: 'text',
@@ -365,7 +365,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
         // Create new folder
         const newFolder = {
           id: generateId(),
-          userId: DEMO_USER,
+          userId: userId,
           name: folderName,
           icon: '📁',
           isDefault: false,
