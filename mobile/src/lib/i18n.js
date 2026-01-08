@@ -993,6 +993,8 @@ export const translations = {
     weeklySummaryEnabled: 'Riepilogo settimanale attivato',
     weeklySummaryDisabled: 'Riepilogo settimanale disattivato',
     notificationPermissionRequired: 'Attiva le notifiche nelle impostazioni del dispositivo per ricevere i riepiloghi settimanali.',
+    expoGoNotSupported: 'Le notifiche non sono disponibili in Expo Go. Per favore, usa l\'app pubblicata per attivare questa funzionalità.',
+    notificationError: 'Impossibile attivare le notifiche. Riprova più tardi.',
     
     // Days of week
     sunday: 'Domenica',
