@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.8)', justifyContent: 'flex-end' },
   modalContent: { backgroundColor: '#1C1C1E', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingBottom: 40 },
   modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 20, borderBottomWidth: 1, borderBottomColor: '#2C2C2E' },
-  modalTitle: { color: '#FFFFFF', fontSize: 20, fontWeight: 'bold' },
+  modalTitle: { color: '#FFFFFF', fontSize: 20, fontWeight: '700' },
   languageOption: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: '#2C2C2E' },
   languageOptionActive: { backgroundColor: 'rgba(0, 122, 255, 0.1)' },
   languageFlag: { fontSize: 28, marginRight: 16 },
