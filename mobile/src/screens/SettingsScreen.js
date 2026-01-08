@@ -182,16 +182,18 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={[styles.premiumCard, premiumStatus?.isPremiumActivated && styles.premiumCardActive, premiumStatus?.isTrialActive && !premiumStatus?.isPremiumActivated && styles.premiumCardTrial, !premiumStatus?.hasPremium && styles.premiumCardExpired]}>
-        <View style={styles.premiumIcon}>
-          <Ionicons name={premiumStatus?.isPremiumActivated ? 'trophy' : 'sparkles'} size={32} color={premiumStatus?.isPremiumActivated ? '#FFD700' : '#007AFF'} />
+    <>
+      <CustomHeader title={t.tabSettings || 'Settings'} />
+      <ScrollView style={styles.container}>
+        <View style={[styles.premiumCard, premiumStatus?.isPremiumActivated && styles.premiumCardActive, premiumStatus?.isTrialActive && !premiumStatus?.isPremiumActivated && styles.premiumCardTrial, !premiumStatus?.hasPremium && styles.premiumCardExpired]}>
+          <View style={styles.premiumIcon}>
+            <Ionicons name={premiumStatus?.isPremiumActivated ? 'trophy' : 'sparkles'} size={32} color={premiumStatus?.isPremiumActivated ? '#FFD700' : '#007AFF'} />
+          </View>
+          <View style={styles.premiumContent}>
+            <Text style={styles.premiumTitle}>{premiumStatus?.isPremiumActivated ? (t.premiumActive || 'Premium Active') : premiumStatus?.isTrialActive ? (t.trialActive || 'Trial Active') : (t.trialExpired || 'Trial Expired')}</Text>
+            <Text style={styles.premiumSubtitle}>{premiumStatus?.isPremiumActivated ? `✅ ${premiumStatus.activatedCode}` : premiumStatus?.isTrialActive ? `${premiumStatus.trialDaysRemaining} ${t.trialDaysLeft || 'days left'}` : ''}</Text>
+          </View>
         </View>
-        <View style={styles.premiumContent}>
-          <Text style={styles.premiumTitle}>{premiumStatus?.isPremiumActivated ? (t.premiumActive || 'Premium Active') : premiumStatus?.isTrialActive ? (t.trialActive || 'Trial Active') : (t.trialExpired || 'Trial Expired')}</Text>
-          <Text style={styles.premiumSubtitle}>{premiumStatus?.isPremiumActivated ? `✅ ${premiumStatus.activatedCode}` : premiumStatus?.isTrialActive ? `${premiumStatus.trialDaysRemaining} ${t.trialDaysLeft || 'days left'}` : ''}</Text>
-        </View>
-      </View>
 
       {!premiumStatus?.isPremiumActivated && (
         <TouchableOpacity style={styles.activateButton} onPress={() => setShowActivationModal(true)}>
