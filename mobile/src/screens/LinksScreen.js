@@ -123,7 +123,9 @@ export default function LinksScreen({ language, userId, refreshKey }) {
 
   const openEditModal = (item, e) => {
     if (e) e.stopPropagation();
+    setIsAddingNew(false);
     setEditingItem(item);
+    setEditUrl(item.url || '');
     setEditTitle(item.title || '');
     setEditFolderId(item.folderId || '');
     setIsPinnedEdit(item.isPinned || false);
@@ -143,6 +145,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
   const closeEditModal = () => {
     setShowEditModal(false);
     setEditingItem(null);
+    setIsAddingNew(false);
   };
 
   const scheduleNotification = async (title, date) => {
