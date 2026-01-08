@@ -526,6 +526,10 @@ const styles = StyleSheet.create({
   modalBody: { flexGrow: 1 },
   modalBodyContent: { padding: 20, paddingBottom: 40 },
   inputLabel: { color: '#8E8E93', fontSize: 14, marginBottom: 8, textTransform: 'uppercase' },
+  // URL container with copy button
+  urlContainer: { backgroundColor: '#000000', borderRadius: 12, padding: 16, flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
+  urlText: { flex: 1, color: '#007AFF', fontSize: 14 },
+  copyUrlButton: { padding: 8, marginLeft: 8 },
   textInput: { backgroundColor: '#000000', borderRadius: 12, padding: 16, color: '#FFFFFF', fontSize: 16, marginBottom: 20 },
   pickerButton: { backgroundColor: '#000000', borderRadius: 12, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 20 },
   pickerButtonText: { flex: 1, color: '#FFFFFF', fontSize: 16 },
