@@ -127,31 +127,34 @@ export default function FavoritesScreen({ language }) {
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color="#8E8E93" />
-        <TextInput style={styles.searchInput} placeholder={t.search} placeholderTextColor="#8E8E93" value={searchQuery} onChangeText={setSearchQuery} />
-      </View>
+    <>
+      <CustomHeader title={t.tabFavorites || 'Favorites'} />
+      <View style={styles.container}>
+        <View style={styles.searchContainer}>
+          <Ionicons name="search" size={20} color="#8E8E93" />
+          <TextInput style={styles.searchInput} placeholder={t.search} placeholderTextColor="#8E8E93" value={searchQuery} onChangeText={setSearchQuery} />
+        </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterContainer}>
-        <FilterChip value="all" label={t.all || 'Todos'} />
-        <FilterChip value="links" label="Links" />
-        <FilterChip value="notes" label={t.tabNotes || 'Notas'} />
-        <FilterChip value="clipboard" label="Clipboard" />
-      </ScrollView>
-
-      {filteredFavorites.length === 0 ? (
-        <ScrollView style={{ flex: 1 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchFavorites(); }} tintColor="#007AFF" />}>
-          <View style={styles.emptyState}>
-            <Ionicons name="heart-outline" size={64} color="#8E8E93" />
-            <Text style={styles.emptyText}>{t.noFavorites || 'Sem favoritos'}</Text>
-            <Text style={styles.emptySubtext}>{t.addFavoritesHint || 'Toque no coração para adicionar favoritos'}</Text>
-          </View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterContainer}>
+          <FilterChip value="all" label={t.all || 'Todos'} />
+          <FilterChip value="links" label="Links" />
+          <FilterChip value="notes" label={t.tabNotes || 'Notas'} />
+          <FilterChip value="clipboard" label="Clipboard" />
         </ScrollView>
-      ) : (
-        <FlatList data={filteredFavorites} keyExtractor={(item) => item.id} renderItem={renderItem} contentContainerStyle={styles.listContent} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchFavorites(); }} tintColor="#007AFF" />} />
-      )}
-    </View>
+
+        {filteredFavorites.length === 0 ? (
+          <ScrollView style={{ flex: 1 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchFavorites(); }} tintColor="#007AFF" />}>
+            <View style={styles.emptyState}>
+              <Ionicons name="heart-outline" size={64} color="#8E8E93" />
+              <Text style={styles.emptyText}>{t.noFavorites || 'Sem favoritos'}</Text>
+              <Text style={styles.emptySubtext}>{t.addFavoritesHint || 'Toque no coração para adicionar favoritos'}</Text>
+            </View>
+          </ScrollView>
+        ) : (
+          <FlatList data={filteredFavorites} keyExtractor={(item) => item.id} renderItem={renderItem} contentContainerStyle={styles.listContent} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchFavorites(); }} tintColor="#007AFF" />} />
+        )}
+      </View>
+    </>
   );
 }
 
