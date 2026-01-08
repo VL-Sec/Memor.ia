@@ -137,6 +137,7 @@ export const translations = {
     selectTime: 'Select time',
     weeklySummaryEnabled: 'Weekly digest enabled',
     weeklySummaryDisabled: 'Weekly digest disabled',
+    notificationPermissionRequired: 'Please enable notifications in your device settings to receive weekly summaries.',
     
     // Days of week
     sunday: 'Sunday',
