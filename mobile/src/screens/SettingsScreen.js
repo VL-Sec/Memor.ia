@@ -331,7 +331,7 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
             setIsImporting(true);
             try {
               const result = await DocumentPicker.getDocumentAsync({
-                type: 'application/json',
+                type: ['application/json', '*/*'],
                 copyToCacheDirectory: true
               });
               
@@ -340,34 +340,62 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
                 return;
               }
               
+              Toast.show({ type: 'info', text1: t.importingBackup || 'A importar backup...' });
+              
               const fileUri = result.assets[0].uri;
               const fileContent = await FileSystem.readAsStringAsync(fileUri);
               const backupData = JSON.parse(fileContent);
               
-              if (!backupData.version || !backupData.data) {
+              // Support both old and new backup formats
+              if (!backupData.data && !backupData.version) {
                 Toast.show({ type: 'error', text1: t.invalidBackupFile || 'Ficheiro de backup inválido' });
                 setIsImporting(false);
                 return;
               }
               
-              // Restore local notes
-              if (backupData.data.localNotes) {
-                await AsyncStorage.setItem(LOCAL_NOTES_KEY, JSON.stringify(backupData.data.localNotes));
+              let importedCount = 0;
+              
+              // Restore local notes (support both old 'localNotes' and new 'notes' keys)
+              const notesToRestore = backupData.data?.notes || backupData.data?.localNotes;
+              if (notesToRestore && Array.isArray(notesToRestore)) {
+                await AsyncStorage.setItem(LOCAL_NOTES_KEY, JSON.stringify(notesToRestore));
+                importedCount += notesToRestore.length;
               }
               
               // Restore settings
-              if (backupData.data.settings) {
-                await AsyncStorage.setItem('memoria-weekly-summary', JSON.stringify(backupData.data.settings));
-                setSummaryEnabled(backupData.data.settings.enabled || false);
-                setSummaryDay(backupData.data.settings.dayOfWeek || 0);
-                setSummaryHour(backupData.data.settings.hour || 19);
+              const settingsToRestore = backupData.data?.settings;
+              if (settingsToRestore) {
+                if (settingsToRestore.weeklySummary) {
+                  await AsyncStorage.setItem('memoria-weekly-summary', JSON.stringify(settingsToRestore.weeklySummary));
+                  setSummaryEnabled(settingsToRestore.weeklySummary.enabled || false);
+                  setSummaryDay(settingsToRestore.weeklySummary.dayOfWeek || 0);
+                  setSummaryHour(settingsToRestore.weeklySummary.hour || 19);
+                } else {
+                  // Old format
+                  await AsyncStorage.setItem('memoria-weekly-summary', JSON.stringify(settingsToRestore));
+                  setSummaryEnabled(settingsToRestore.enabled || false);
+                  setSummaryDay(settingsToRestore.dayOfWeek || 0);
+                  setSummaryHour(settingsToRestore.hour || 19);
+                }
+                if (settingsToRestore.language) {
+                  await AsyncStorage.setItem('memoria-language', settingsToRestore.language);
+                }
               }
               
-              Toast.show({ type: 'success', text1: t.backupImported || 'Backup importado com sucesso!' });
+              // Restore premium
+              if (backupData.data?.premium) {
+                await AsyncStorage.setItem('memoria-premium', JSON.stringify(backupData.data.premium));
+              }
+              
+              Toast.show({ 
+                type: 'success', 
+                text1: t.backupImported || 'Backup importado!',
+                text2: `${importedCount} itens restaurados`
+              });
               
             } catch (error) {
               console.error('Import error:', error);
-              Toast.show({ type: 'error', text1: t.importError || 'Erro ao importar backup' });
+              Toast.show({ type: 'error', text1: t.importError || 'Erro ao importar', text2: error.message });
             } finally {
               setIsImporting(false);
             }
