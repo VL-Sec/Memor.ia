@@ -268,6 +268,7 @@ export const translations = {
     stop: 'Parar',
     autoSaved: 'Guardado automaticamente',
     smartClipboardDeactivated: 'Área Inteligente desativada',
+    deleteFolderConfirmSimple: 'Tens a certeza que queres eliminar esta pasta?',
     
     // Links
     addLink: 'Adicionar Link',
@@ -476,6 +477,7 @@ export const translations = {
     stop: 'Detener',
     autoSaved: 'Guardado automáticamente',
     smartClipboardDeactivated: 'Portapapeles inteligente desactivado',
+    deleteFolderConfirmSimple: '¿Estás seguro de que quieres eliminar esta carpeta?',
     
     // Links
     addLink: 'Añadir Enlace',
@@ -657,6 +659,7 @@ export const translations = {
     stop: 'Arrêter',
     autoSaved: 'Sauvegardé automatiquement',
     smartClipboardDeactivated: 'Presse-papiers intelligent désactivé',
+    deleteFolderConfirmSimple: 'Êtes-vous sûr de vouloir supprimer ce dossier ?',
     
     // Links
     addLink: 'Ajouter un Lien',
@@ -838,6 +841,7 @@ export const translations = {
     stop: 'Stoppen',
     autoSaved: 'Automatisch gespeichert',
     smartClipboardDeactivated: 'Intelligente Zwischenablage deaktiviert',
+    deleteFolderConfirmSimple: 'Bist du sicher, dass du diesen Ordner löschen möchtest?',
     
     // Links
     addLink: 'Link hinzufügen',
@@ -1019,6 +1023,7 @@ export const translations = {
     stop: 'Ferma',
     autoSaved: 'Salvato automaticamente',
     smartClipboardDeactivated: 'Appunti intelligenti disattivati',
+    deleteFolderConfirmSimple: 'Sei sicuro di voler eliminare questa cartella?',
     
     // Links
     addLink: 'Aggiungi Link',
