@@ -220,34 +220,36 @@ export default function NotesScreen({ language }) {
   );
 
   return (
-    <View style={styles.container}>
-      {/* Search */}
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color="#8E8E93" />
-        <TextInput
-          style={styles.searchInput}
-          placeholder={t.search}
-          placeholderTextColor="#8E8E93"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-      </View>
+    <>
+      <CustomHeader title={t.tabNotes || 'Notes'} />
+      <View style={styles.container}>
+        {/* Search */}
+        <View style={styles.searchContainer}>
+          <Ionicons name="search" size={20} color="#8E8E93" />
+          <TextInput
+            style={styles.searchInput}
+            placeholder={t.search}
+            placeholderTextColor="#8E8E93"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </View>
 
-      {/* Notes List */}
-      {sortedNotes.length === 0 ? (
-        <ScrollView 
-          style={styles.scrollView}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={() => { setRefreshing(true); loadNotes(); }}
-              tintColor="#007AFF"
-            />
-          }
-        >
-          <View style={styles.emptyState}>
-            <Ionicons name="document-text-outline" size={64} color="#8E8E93" />
-            <Text style={styles.emptyText}>{t.noNotes}</Text>
+        {/* Notes List */}
+        {sortedNotes.length === 0 ? (
+          <ScrollView 
+            style={styles.scrollView}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={() => { setRefreshing(true); loadNotes(); }}
+                tintColor="#007AFF"
+              />
+            }
+          >
+            <View style={styles.emptyState}>
+              <Ionicons name="document-text-outline" size={64} color="#8E8E93" />
+              <Text style={styles.emptyText}>{t.noNotes}</Text>
           </View>
         </ScrollView>
       ) : (
