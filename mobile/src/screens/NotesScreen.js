@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, RefreshControl, Modal, ScrollView, Alert, FlatList } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
@@ -30,7 +30,8 @@ export default function NotesScreen({ language, refreshKey, triggerRefresh }) {
   const [noteContent, setNoteContent] = useState('');
   const [noteColor, setNoteColor] = useState('default');
   const [searchQuery, setSearchQuery] = useState('');
-
+  
+  const insets = useSafeAreaInsets();
   const t = translations[language] || translations.en;
 
   // Load notes when screen is focused (for sync with Favorites)
@@ -88,7 +89,7 @@ export default function NotesScreen({ language, refreshKey, triggerRefresh }) {
     setShowModal(true);
   };
 
-  const handleSaveNote = () => {
+  const handleSaveNote = async () => {
     if (!noteContent.trim()) {
       Toast.show({ type: 'error', text1: t.error });
       return;
@@ -102,7 +103,7 @@ export default function NotesScreen({ language, refreshKey, triggerRefresh }) {
           ? { ...n, title: noteTitle, content: noteContent, color: noteColor, updatedAt: now }
           : n
       );
-      saveNotes(updatedNotes);
+      await saveNotes(updatedNotes);
     } else {
       const newNote = {
         id: `note_${Date.now()}`,
@@ -115,7 +116,7 @@ export default function NotesScreen({ language, refreshKey, triggerRefresh }) {
         createdAt: now,
         updatedAt: now,
       };
-      saveNotes([newNote, ...notes]);
+      await saveNotes([newNote, ...notes]);
     }
 
     setShowModal(false);
@@ -131,9 +132,9 @@ export default function NotesScreen({ language, refreshKey, triggerRefresh }) {
         {
           text: t.delete,
           style: 'destructive',
-          onPress: () => {
+          onPress: async () => {
             const filteredNotes = notes.filter(n => n.id !== noteId);
-            saveNotes(filteredNotes);
+            await saveNotes(filteredNotes);
             Toast.show({ type: 'success', text1: t.deleted });
           },
         },
@@ -141,26 +142,26 @@ export default function NotesScreen({ language, refreshKey, triggerRefresh }) {
     );
   };
 
-  const handleTogglePin = (noteId) => {
+  const handleTogglePin = async (noteId) => {
     const note = notes.find(n => n.id === noteId);
     const newPinState = !note.isPinned;
     const updatedNotes = notes.map(n =>
       n.id === noteId ? { ...n, isPinned: newPinState } : n
     );
-    saveNotes(updatedNotes);
+    await saveNotes(updatedNotes);
     Toast.show({ 
       type: 'success', 
       text1: newPinState ? (t.pinned || 'Fixado no topo') : (t.unpinned || 'Desafixado')
     });
   };
 
-  const handleToggleFavorite = (noteId) => {
+  const handleToggleFavorite = async (noteId) => {
     const note = notes.find(n => n.id === noteId);
     const newFavoriteState = !note.isFavorite;
     const updatedNotes = notes.map(n =>
       n.id === noteId ? { ...n, isFavorite: newFavoriteState } : n
     );
-    saveNotes(updatedNotes);
+    await saveNotes(updatedNotes);
     Toast.show({ 
       type: 'success', 
       text1: newFavoriteState ? (t.addedToFavorites || 'Adicionado aos favoritos') : (t.removedFromFavorites || 'Removido dos favoritos')
@@ -212,15 +213,6 @@ export default function NotesScreen({ language, refreshKey, triggerRefresh }) {
         {item.title ? (
           <Text style={styles.noteTitle} numberOfLines={1}>{item.title}</Text>
         ) : null}
-        {/* Status indicators - only show small icons in header */}
-        <View style={styles.noteIcons}>
-          {item.isPinned && (
-            <Ionicons name="pin" size={14} color="#FFD60A" />
-          )}
-          {item.isFavorite && (
-            <Ionicons name="heart" size={14} color="#FF3B30" style={{ marginLeft: 4 }} />
-          )}
-        </View>
       </View>
       <Text style={styles.noteContent} numberOfLines={4}>{item.content || ''}</Text>
       <View style={styles.noteFooter}>
@@ -233,7 +225,7 @@ export default function NotesScreen({ language, refreshKey, triggerRefresh }) {
             <Ionicons name={item.isFavorite ? "heart" : "heart-outline"} size={18} color={item.isFavorite ? "#FF3B30" : "#8E8E93"} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleTogglePin(item.id)} style={styles.actionButton}>
-            <Ionicons name={item.isPinned ? "pin" : "pin-outline"} size={18} color={item.isPinned ? "#FFD60A" : "#8E8E93"} />
+            <Ionicons name="pin" size={18} color={item.isPinned ? "#FFD60A" : "#8E8E93"} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleDeleteNote(item.id)} style={styles.actionButton}>
             <Ionicons name="trash-outline" size={18} color="#FF3B30" />
@@ -301,62 +293,60 @@ export default function NotesScreen({ language, refreshKey, triggerRefresh }) {
       <Modal
         visible={showModal}
         animationType="slide"
-        transparent={true}
+        transparent={false}
         onRequestClose={() => setShowModal(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <TouchableOpacity onPress={() => setShowModal(false)}>
-                <Ionicons name="close" size={28} color="#FFFFFF" />
-              </TouchableOpacity>
-              <Text style={styles.modalTitle}>
-                {editingNote ? t.editNote : t.newNote}
-              </Text>
-              <TouchableOpacity onPress={handleSaveNote}>
-                <Text style={styles.saveText}>{t.save}</Text>
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView style={styles.modalBody}>
-              <TextInput
-                style={styles.titleInput}
-                placeholder={t.noteTitlePlaceholder}
-                placeholderTextColor="#8E8E93"
-                value={noteTitle}
-                onChangeText={setNoteTitle}
-              />
-
-              <TextInput
-                style={styles.contentInput}
-                placeholder={t.notesPlaceholder}
-                placeholderTextColor="#8E8E93"
-                value={noteContent}
-                onChangeText={setNoteContent}
-                multiline
-                textAlignVertical="top"
-              />
-
-              <Text style={styles.colorLabel}>{t.noteColor}</Text>
-              <View style={styles.colorPicker}>
-                {NOTE_COLORS.map(c => (
-                  <TouchableOpacity
-                    key={c.id}
-                    style={[
-                      styles.colorOption,
-                      { backgroundColor: c.color },
-                      noteColor === c.id && styles.colorOptionSelected,
-                    ]}
-                    onPress={() => setNoteColor(c.id)}
-                  >
-                    {noteColor === c.id && (
-                      <Ionicons name="checkmark" size={16} color="#FFFFFF" />
-                    )}
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </ScrollView>
+        <View style={[styles.modalContainer, { paddingTop: insets.top }]}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setShowModal(false)} style={styles.modalHeaderButton}>
+              <Ionicons name="close" size={28} color="#FFFFFF" />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>
+              {editingNote ? t.editNote : t.newNote}
+            </Text>
+            <TouchableOpacity onPress={handleSaveNote} style={styles.modalHeaderButton}>
+              <Text style={styles.saveText}>{t.save}</Text>
+            </TouchableOpacity>
           </View>
+
+          <ScrollView style={styles.modalBody}>
+            <TextInput
+              style={styles.titleInput}
+              placeholder={t.noteTitlePlaceholder}
+              placeholderTextColor="#8E8E93"
+              value={noteTitle}
+              onChangeText={setNoteTitle}
+            />
+
+            <TextInput
+              style={styles.contentInput}
+              placeholder={t.notesPlaceholder}
+              placeholderTextColor="#8E8E93"
+              value={noteContent}
+              onChangeText={setNoteContent}
+              multiline
+              textAlignVertical="top"
+            />
+
+            <Text style={styles.colorLabel}>{t.noteColor}</Text>
+            <View style={styles.colorPicker}>
+              {NOTE_COLORS.map(c => (
+                <TouchableOpacity
+                  key={c.id}
+                  style={[
+                    styles.colorOption,
+                    { backgroundColor: c.color },
+                    noteColor === c.id && styles.colorOptionSelected,
+                  ]}
+                  onPress={() => setNoteColor(c.id)}
+                >
+                  {noteColor === c.id && (
+                    <Ionicons name="checkmark" size={16} color="#FFFFFF" />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ScrollView>
         </View>
       </Modal>
       </View>
@@ -373,7 +363,6 @@ const styles = StyleSheet.create({
   listContent: { paddingHorizontal: 16, paddingBottom: 100 },
   noteCard: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 16, marginBottom: 10 },
   noteHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  noteIcons: { flexDirection: 'row', alignItems: 'center' },
   noteTitle: { color: '#FFFFFF', fontSize: 18, fontWeight: '600', flex: 1 },
   noteContent: { color: '#CCCCCC', fontSize: 15, lineHeight: 22 },
   noteFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#2C2C2E' },
@@ -383,11 +372,12 @@ const styles = StyleSheet.create({
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 100 },
   emptyText: { color: '#8E8E93', fontSize: 16, marginTop: 16 },
   fab: { position: 'absolute', bottom: 24, right: 24, width: 56, height: 56, borderRadius: 28, backgroundColor: '#007AFF', justifyContent: 'center', alignItems: 'center', shadowColor: '#007AFF', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 8 },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.9)' },
-  modalContent: { flex: 1, backgroundColor: '#000000' },
-  modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, borderBottomWidth: 1, borderBottomColor: '#2C2C2E' },
+  // Modal styles with proper safe area
+  modalContainer: { flex: 1, backgroundColor: '#000000' },
+  modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#2C2C2E', minHeight: 56 },
+  modalHeaderButton: { padding: 4, minWidth: 60 },
   modalTitle: { color: '#FFFFFF', fontSize: 18, fontWeight: '600' },
-  saveText: { color: '#007AFF', fontSize: 17, fontWeight: '600' },
+  saveText: { color: '#007AFF', fontSize: 17, fontWeight: '600', textAlign: 'right' },
   modalBody: { flex: 1, padding: 16 },
   titleInput: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 16, color: '#FFFFFF', fontSize: 18, fontWeight: '600', marginBottom: 12 },
   contentInput: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 16, color: '#FFFFFF', fontSize: 16, minHeight: 200, marginBottom: 20 },
