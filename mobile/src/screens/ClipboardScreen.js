@@ -131,7 +131,8 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
   };
 
   const checkAndSaveClipboard = async () => {
-    if (!smartClipboardActive) return;
+    // Use ref to get current state value (avoids closure issue)
+    if (!smartClipboardActiveRef.current) return;
     
     try {
       const content = await Clipboard.getStringAsync();
@@ -156,7 +157,9 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
 
   const autoSaveClipboard = async (content) => {
     try {
-      const defaultFolder = folders.find(f => f.isDefault);
+      // Use ref to get current folders value
+      const currentFolders = foldersRef.current;
+      const defaultFolder = currentFolders.find(f => f.isDefault);
       const newNote = {
         id: generateId(),
         userId: DEMO_USER,
