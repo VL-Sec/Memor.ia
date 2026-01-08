@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { NavigationContainer, DarkTheme, useFocusEffect } from '@react-navigation/native';
+import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
@@ -149,8 +149,8 @@ export default function App() {
             tabBarIcon: ({ focused, color, size }) => {
               let iconName;
               if (route.name === 'Links') iconName = focused ? 'link' : 'link-outline';
-              else if (route.name === 'Notes') iconName = focused ? 'document-text' : 'document-text-outline';
               else if (route.name === 'Clipboard') iconName = focused ? 'clipboard' : 'clipboard-outline';
+              else if (route.name === 'Notes') iconName = focused ? 'document-text' : 'document-text-outline';
               else if (route.name === 'Favorites') iconName = focused ? 'heart' : 'heart-outline';
               else if (route.name === 'Settings') iconName = focused ? 'settings' : 'settings-outline';
               return <Ionicons name={iconName} size={size} color={color} />;
@@ -166,19 +166,27 @@ export default function App() {
             },
           })}
         >
+          {/* Order: Links → Clipboard → Notes → Favorites */}
           <Tab.Screen name="Links" options={{ title: t.tabLinks || 'Links' }}>
             {(props) => <LinksScreen {...props} language={language} premiumStatus={premiumStatus} refreshKey={refreshKey} />}
-          </Tab.Screen>
-          <Tab.Screen name="Notes" options={{ title: t.tabNotes || 'Notas' }}>
-            {(props) => <NotesScreen {...props} language={language} refreshKey={refreshKey} triggerRefresh={triggerRefresh} />}
           </Tab.Screen>
           <Tab.Screen name="Clipboard" options={{ title: t.tabClipboard || 'Área' }}>
             {(props) => <ClipboardScreen {...props} language={language} premiumStatus={premiumStatus} refreshKey={refreshKey} triggerRefresh={triggerRefresh} />}
           </Tab.Screen>
+          <Tab.Screen name="Notes" options={{ title: t.tabNotes || 'Notas' }}>
+            {(props) => <NotesScreen {...props} language={language} refreshKey={refreshKey} triggerRefresh={triggerRefresh} />}
+          </Tab.Screen>
           <Tab.Screen name="Favorites" options={{ title: t.tabFavorites || 'Favoritos' }}>
             {(props) => <FavoritesScreen {...props} language={language} refreshKey={refreshKey} />}
           </Tab.Screen>
-          <Tab.Screen name="Settings" options={{ title: t.tabSettings || 'Definições' }}>
+          {/* Settings - Hidden from tab bar, accessed via header icon */}
+          <Tab.Screen 
+            name="Settings" 
+            options={{ 
+              tabBarButton: () => null, // Hide from tab bar
+              tabBarStyle: { display: 'none' }, // Hide tab bar when on Settings
+            }}
+          >
             {(props) => <SettingsScreen {...props} language={language} setLanguage={setLanguage} premiumStatus={premiumStatus} setPremiumStatus={setPremiumStatus} />}
           </Tab.Screen>
         </Tab.Navigator>
