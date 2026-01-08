@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, Image, Linking, Alert, RefreshControl, Modal, ScrollView, Switch, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import { supabase, generateId } from '../lib/supabase';
@@ -9,7 +10,7 @@ import CustomHeader from '../components/CustomHeader';
 
 const DEMO_USER = 'demo_user';
 
-export default function LinksScreen({ language }) {
+export default function LinksScreen({ language, refreshKey }) {
   const [links, setLinks] = useState([]);
   const [folders, setFolders] = useState([]);
   const [selectedFolder, setSelectedFolder] = useState('all');
