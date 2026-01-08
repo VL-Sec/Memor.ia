@@ -155,11 +155,12 @@ export default function FavoritesScreen({ language }) {
           <FlatList data={filteredFavorites} keyExtractor={(item) => item.id} renderItem={renderItem} contentContainerStyle={styles.listContent} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchFavorites(); }} tintColor="#007AFF" />} />
         )}
       </View>
-    </>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: '#000000' },
   container: { flex: 1, backgroundColor: '#000000' },
   searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1C1C1E', margin: 16, marginBottom: 8, paddingHorizontal: 12, borderRadius: 12, height: 44 },
   searchInput: { flex: 1, marginLeft: 8, color: '#FFFFFF', fontSize: 16 },
