@@ -398,21 +398,21 @@ export default function LinksScreen({ language, userId, refreshKey }) {
           </View>
         </TouchableOpacity>
         
-        {/* Action buttons - separate touch zone */}
+        {/* Action buttons - Order: Heart, Pin, Edit, Trash */}
         <View style={styles.linkActions}>
-          <TouchableOpacity 
-            style={styles.actionBtn} 
-            onPress={(e) => handleTogglePin(item, e)}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Ionicons name="pin" size={20} color={item.isPinned ? "#FFD60A" : "#8E8E93"} />
-          </TouchableOpacity>
           <TouchableOpacity 
             style={styles.actionBtn} 
             onPress={(e) => handleToggleFavorite(item, e)}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             <Ionicons name={item.isFavorite ? 'heart' : 'heart-outline'} size={20} color={item.isFavorite ? '#FF3B30' : '#8E8E93'} />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.actionBtn} 
+            onPress={(e) => handleTogglePin(item, e)}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Ionicons name="pin" size={20} color={item.isPinned ? "#FFD60A" : "#8E8E93"} />
           </TouchableOpacity>
           <TouchableOpacity 
             style={styles.actionBtn} 
