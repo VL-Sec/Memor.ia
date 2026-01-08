@@ -467,18 +467,14 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
           </View>
         </TouchableOpacity>
         
-        {/* Action buttons - separate touch zone */}
+        {/* Action buttons - Order: Copy, Heart, Pin, Trash */}
         <View style={styles.actionButtons}>
           <TouchableOpacity 
             style={styles.actionBtn} 
-            onPress={(e) => handleTogglePin(item, e)}
+            onPress={(e) => handleCopyNote(item.content || '', e)}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <Ionicons 
-              name="pin" 
-              size={20} 
-              color={item.isPinned ? "#FFD60A" : "#8E8E93"} 
-            />
+            <Ionicons name="copy-outline" size={20} color="#8E8E93" />
           </TouchableOpacity>
           <TouchableOpacity 
             style={styles.actionBtn} 
@@ -493,10 +489,14 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
           </TouchableOpacity>
           <TouchableOpacity 
             style={styles.actionBtn} 
-            onPress={(e) => handleCopyNote(item.content || '', e)}
+            onPress={(e) => handleTogglePin(item, e)}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <Ionicons name="copy-outline" size={20} color="#8E8E93" />
+            <Ionicons 
+              name="pin" 
+              size={20} 
+              color={item.isPinned ? "#FFD60A" : "#8E8E93"} 
+            />
           </TouchableOpacity>
           <TouchableOpacity 
             style={styles.actionBtn} 
