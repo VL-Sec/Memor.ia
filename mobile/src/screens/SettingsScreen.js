@@ -7,6 +7,7 @@ import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import { translations, languages, setLanguage as saveLanguage } from '../lib/i18n';
 import { activatePremium, getPremiumStatus } from '../lib/premium';
+import CustomHeader from '../components/CustomHeader';
 
 const API_URL = 'https://memor-clip.preview.emergentagent.com';
 const TERMS_URL = 'https://memor-clip.preview.emergentagent.com/terms';
