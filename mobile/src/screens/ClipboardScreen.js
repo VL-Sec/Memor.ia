@@ -157,7 +157,7 @@ export default function ClipboardScreen({ language }) {
       <View style={styles.noteCard}>
         <View style={styles.noteContent}>
           <View style={styles.noteHeader}>
-            <Text style={styles.noteText} numberOfLines={3}>{item.content}</Text>
+            <Text style={styles.noteText} numberOfLines={3}>{item.content || ''}</Text>
             {item.isPinned && <Ionicons name="pin" size={14} color="#FFD60A" style={{ marginLeft: 4 }} />}
           </View>
           <View style={styles.noteMeta}>
@@ -175,7 +175,7 @@ export default function ClipboardScreen({ language }) {
           <TouchableOpacity style={styles.actionBtn} onPress={() => handleToggleFavorite(item)}>
             <Ionicons name={item.isFavorite ? "heart" : "heart-outline"} size={20} color={item.isFavorite ? "#FF3B30" : "#8E8E93"} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.copyButton} onPress={() => handleCopyNote(item.content)}>
+          <TouchableOpacity style={styles.copyButton} onPress={() => handleCopyNote(item.content || '')}>
             <Ionicons name="copy" size={18} color="#FFFFFF" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionBtn} onPress={() => handleDeleteNote(item.id)}>
