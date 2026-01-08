@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 
@@ -29,7 +29,35 @@ const theme = {
   },
 };
 
-// Custom Toast component to avoid fontWeight: 'bold' issues with SDK 54
+// Custom Header component to avoid fontWeight: 'bold' issues
+const CustomHeader = ({ title }) => (
+  <SafeAreaView style={headerStyles.safeArea}>
+    <View style={headerStyles.container}>
+      <Text style={headerStyles.title}>{title}</Text>
+    </View>
+  </SafeAreaView>
+);
+
+const headerStyles = StyleSheet.create({
+  safeArea: {
+    backgroundColor: '#000000',
+  },
+  container: {
+    height: 44,
+    backgroundColor: '#000000',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#2C2C2E',
+  },
+  title: {
+    color: '#FFFFFF',
+    fontSize: 17,
+    fontWeight: '600',
+  },
+});
+
+// Custom Toast component to avoid fontWeight: 'bold' issues
 const CustomToast = ({ text1, text2, type, hide }) => {
   const borderColor = type === 'success' ? '#34C759' : type === 'error' ? '#FF3B30' : '#007AFF';
   return (
@@ -86,6 +114,14 @@ const toastStyles = StyleSheet.create({
     marginLeft: 10,
   },
 });
+
+// Screen wrapper with custom header
+const ScreenWrapper = ({ title, children }) => (
+  <View style={{ flex: 1, backgroundColor: '#000000' }}>
+    <CustomHeader title={title} />
+    {children}
+  </View>
+);
 
 export default function App() {
   const [language, setLanguage] = useState('en');
@@ -146,25 +182,43 @@ export default function App() {
           tabBarActiveTintColor: '#007AFF',
           tabBarInactiveTintColor: '#8E8E93',
           tabBarStyle: { backgroundColor: '#1C1C1E', borderTopColor: '#2C2C2E', paddingTop: 5, height: 85 },
-          headerStyle: { backgroundColor: '#000000' },
-          headerTintColor: '#FFFFFF',
-          headerTitleStyle: { fontWeight: '600' },
+          headerShown: false,
         })}
       >
-        <Tab.Screen name="Links" options={{ title: t.tabLinks || 'Links', headerTitle: 'Memor.ia' }}>
-          {(props) => <LinksScreen {...props} language={language} premiumStatus={premiumStatus} />}
+        <Tab.Screen name="Links" options={{ title: t.tabLinks || 'Links' }}>
+          {(props) => (
+            <ScreenWrapper title="Memor.ia">
+              <LinksScreen {...props} language={language} premiumStatus={premiumStatus} />
+            </ScreenWrapper>
+          )}
         </Tab.Screen>
-        <Tab.Screen name="Notes" options={{ title: t.tabNotes || 'Notes', headerTitle: t.tabNotes || 'Notes' }}>
-          {(props) => <NotesScreen {...props} language={language} />}
+        <Tab.Screen name="Notes" options={{ title: t.tabNotes || 'Notes' }}>
+          {(props) => (
+            <ScreenWrapper title={t.tabNotes || 'Notes'}>
+              <NotesScreen {...props} language={language} />
+            </ScreenWrapper>
+          )}
         </Tab.Screen>
-        <Tab.Screen name="Clipboard" options={{ title: t.tabClipboard || 'Clipboard', headerTitle: t.tabClipboard || 'Clipboard' }}>
-          {(props) => <ClipboardScreen {...props} language={language} premiumStatus={premiumStatus} />}
+        <Tab.Screen name="Clipboard" options={{ title: t.tabClipboard || 'Clipboard' }}>
+          {(props) => (
+            <ScreenWrapper title={t.tabClipboard || 'Clipboard'}>
+              <ClipboardScreen {...props} language={language} premiumStatus={premiumStatus} />
+            </ScreenWrapper>
+          )}
         </Tab.Screen>
-        <Tab.Screen name="Favorites" options={{ title: t.tabFavorites || 'Favorites', headerTitle: t.tabFavorites || 'Favorites' }}>
-          {(props) => <FavoritesScreen {...props} language={language} />}
+        <Tab.Screen name="Favorites" options={{ title: t.tabFavorites || 'Favorites' }}>
+          {(props) => (
+            <ScreenWrapper title={t.tabFavorites || 'Favorites'}>
+              <FavoritesScreen {...props} language={language} />
+            </ScreenWrapper>
+          )}
         </Tab.Screen>
-        <Tab.Screen name="Settings" options={{ title: t.tabSettings || 'Settings', headerTitle: t.tabSettings || 'Settings' }}>
-          {(props) => <SettingsScreen {...props} language={language} setLanguage={setLanguage} premiumStatus={premiumStatus} setPremiumStatus={setPremiumStatus} />}
+        <Tab.Screen name="Settings" options={{ title: t.tabSettings || 'Settings' }}>
+          {(props) => (
+            <ScreenWrapper title={t.tabSettings || 'Settings'}>
+              <SettingsScreen {...props} language={language} setLanguage={setLanguage} premiumStatus={premiumStatus} setPremiumStatus={setPremiumStatus} />
+            </ScreenWrapper>
+          )}
         </Tab.Screen>
       </Tab.Navigator>
       <Toast config={toastConfig} visibilityTime={3000} autoHide={true} />
