@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Modal, Switch, Platform, Linking, Alert, Share } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Modal, Switch, Platform, Linking, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
@@ -47,6 +47,22 @@ const formatTimeForLocale = (hour, minute) => {
   return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 };
 
+// Get platform-specific backup info
+const getBackupInfo = () => {
+  if (Platform.OS === 'ios') {
+    return {
+      icon: 'logo-apple',
+      name: 'iCloud',
+      description: 'iCloud Backup',
+    };
+  }
+  return {
+    icon: 'logo-google',
+    name: 'Google',
+    description: 'Google Backup',
+  };
+};
+
 export default function SettingsScreen({ language, setLanguage, premiumStatus, setPremiumStatus }) {
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showActivationModal, setShowActivationModal] = useState(false);
@@ -62,6 +78,7 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
   const [isImporting, setIsImporting] = useState(false);
 
   const t = translations[language] || translations.en;
+  const backupInfo = getBackupInfo();
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -315,6 +332,17 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
     );
   };
 
+  // Open device backup settings
+  const handleOpenBackupSettings = () => {
+    if (Platform.OS === 'ios') {
+      // iOS - open Settings app (will open general settings, user navigates to iCloud)
+      Linking.openURL('app-settings:');
+    } else {
+      // Android - open backup settings
+      Linking.openSettings();
+    }
+  };
+
   const getCurrentLanguage = () => { 
     const lang = languages.find(l => l.code === language); 
     return lang ? `${lang.flag} ${lang.nativeName || lang.name}` : 'English'; 
@@ -324,6 +352,7 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <CustomHeader title={t.tabSettings || 'Settings'} />
       <ScrollView style={styles.container}>
+        {/* Premium Card */}
         <View style={[styles.premiumCard, premiumStatus?.isPremiumActivated && styles.premiumCardActive, premiumStatus?.isTrialActive && !premiumStatus?.isPremiumActivated && styles.premiumCardTrial, !premiumStatus?.hasPremium && styles.premiumCardExpired]}>
           <View style={styles.premiumIcon}>
             <Ionicons name={premiumStatus?.isPremiumActivated ? 'trophy' : 'sparkles'} size={32} color={premiumStatus?.isPremiumActivated ? '#FFD700' : '#007AFF'} />
@@ -334,249 +363,257 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
           </View>
         </View>
 
-      {!premiumStatus?.isPremiumActivated && (
-        <TouchableOpacity style={styles.activateButton} onPress={() => setShowActivationModal(true)}>
-          <Ionicons name="ticket" size={24} color="#FFFFFF" />
-          <Text style={styles.activateButtonText}>{t.enterActivationCode || 'Enter activation code'}</Text>
-        </TouchableOpacity>
-      )}
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t.notifications || 'Notifications'}</Text>
-        <View style={styles.settingItem}>
-          <View style={styles.settingLeft}>
-            <Ionicons name="calendar-outline" size={24} color="#007AFF" />
-            <View style={styles.settingTextContainer}>
-              <Text style={styles.settingLabel}>{t.weeklySummary || 'Weekly Summary'}</Text>
-              <Text style={styles.settingDescription}>{t.weeklySummaryInfo || 'Receive a reminder to review your saved content'}</Text>
-            </View>
-          </View>
-          <Switch value={summaryEnabled} onValueChange={handleSummaryToggle} trackColor={{ false: '#3A3A3C', true: '#34C759' }} thumbColor="#FFFFFF" />
-        </View>
-        {summaryEnabled && (
-          <>
-            <TouchableOpacity style={styles.settingItem} onPress={() => setShowDayModal(true)}>
-              <View style={styles.settingLeft}>
-                <View style={styles.iconPlaceholder} />
-                <Text style={styles.settingLabel}>{t.dayOfWeek || 'Day'}</Text>
-              </View>
-              <View style={styles.settingRight}>
-                <Text style={styles.settingValue}>{getDayName(summaryDay, language)}</Text>
-                <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.settingItem} onPress={() => setShowTimeModal(true)}>
-              <View style={styles.settingLeft}>
-                <View style={styles.iconPlaceholder} />
-                <Text style={styles.settingLabel}>{t.time || 'Time'}</Text>
-              </View>
-              <View style={styles.settingRight}>
-                <Text style={styles.settingValue}>{formatTimeForLocale(summaryHour, summaryMinute)}</Text>
-                <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
-              </View>
-            </TouchableOpacity>
-          </>
+        {!premiumStatus?.isPremiumActivated && (
+          <TouchableOpacity style={styles.activateButton} onPress={() => setShowActivationModal(true)}>
+            <Ionicons name="ticket" size={24} color="#FFFFFF" />
+            <Text style={styles.activateButtonText}>{t.enterActivationCode || 'Enter activation code'}</Text>
+          </TouchableOpacity>
         )}
-      </View>
 
-      {/* Local Backup Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t.backup || 'Backup'}</Text>
-        <TouchableOpacity 
-          style={styles.settingItem} 
-          onPress={handleExportBackup}
-          disabled={isExporting}
-        >
-          <View style={styles.settingLeft}>
-            <Ionicons name="download-outline" size={24} color="#34C759" />
-            <View style={styles.settingTextContainer}>
-              <Text style={styles.settingLabel}>{t.exportBackup || 'Exportar Backup'}</Text>
-              <Text style={styles.settingDescription}>{t.exportBackupInfo || 'Guardar todos os dados num ficheiro JSON'}</Text>
+        {/* Notifications Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t.notifications || 'Notifications'}</Text>
+          <View style={styles.settingItem}>
+            <View style={styles.settingLeft}>
+              <Ionicons name="calendar-outline" size={24} color="#007AFF" />
+              <View style={styles.settingTextContainer}>
+                <Text style={styles.settingLabel}>{t.weeklySummary || 'Weekly Summary'}</Text>
+                <Text style={styles.settingDescription}>{t.weeklySummaryInfo || 'Receive a reminder to review your saved content'}</Text>
+              </View>
             </View>
+            <Switch value={summaryEnabled} onValueChange={handleSummaryToggle} trackColor={{ false: '#3A3A3C', true: '#34C759' }} thumbColor="#FFFFFF" />
           </View>
-          {isExporting ? (
-            <Text style={styles.settingValue}>...</Text>
-          ) : (
-            <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
+          {summaryEnabled && (
+            <>
+              <TouchableOpacity style={styles.settingItem} onPress={() => setShowDayModal(true)}>
+                <View style={styles.settingLeft}>
+                  <View style={styles.iconPlaceholder} />
+                  <Text style={styles.settingLabel}>{t.dayOfWeek || 'Day'}</Text>
+                </View>
+                <View style={styles.settingRight}>
+                  <Text style={styles.settingValue}>{getDayName(summaryDay, language)}</Text>
+                  <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.settingItem} onPress={() => setShowTimeModal(true)}>
+                <View style={styles.settingLeft}>
+                  <View style={styles.iconPlaceholder} />
+                  <Text style={styles.settingLabel}>{t.time || 'Time'}</Text>
+                </View>
+                <View style={styles.settingRight}>
+                  <Text style={styles.settingValue}>{formatTimeForLocale(summaryHour, summaryMinute)}</Text>
+                  <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
+                </View>
+              </TouchableOpacity>
+            </>
           )}
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.settingItem} 
-          onPress={handleImportBackup}
-          disabled={isImporting}
-        >
-          <View style={styles.settingLeft}>
-            <Ionicons name="cloud-upload-outline" size={24} color="#007AFF" />
-            <View style={styles.settingTextContainer}>
-              <Text style={styles.settingLabel}>{t.importBackup || 'Importar Backup'}</Text>
-              <Text style={styles.settingDescription}>{t.importBackupInfo || 'Restaurar dados de um ficheiro de backup'}</Text>
+        </View>
+
+        {/* Native System Backup Card - Platform specific */}
+        <View style={styles.cloudBackupCard}>
+          <View style={styles.cloudBackupHeader}>
+            <View style={styles.cloudBackupIconContainer}>
+              <Ionicons name={backupInfo.icon} size={28} color="#FFFFFF" />
+            </View>
+            <View style={styles.cloudBackupTitleContainer}>
+              <Text style={styles.cloudBackupTitle}>
+                {Platform.OS === 'ios' 
+                  ? (t.iCloudBackup || 'iCloud Backup') 
+                  : (t.googleBackup || 'Google Backup')}
+              </Text>
+              <Text style={styles.cloudBackupSubtitle}>{t.systemBackupSubtitle || 'Backup automático do sistema'}</Text>
             </View>
           </View>
-          {isImporting ? (
-            <Text style={styles.settingValue}>...</Text>
-          ) : (
-            <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
-          )}
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.cloudBackupCard}>
-        <View style={styles.cloudBackupHeader}>
-          <View style={styles.cloudBackupIconContainer}>
-            <Ionicons name="cloud-done" size={28} color="#FFFFFF" />
+          <Text style={styles.cloudBackupDescription}>
+            {Platform.OS === 'ios'
+              ? (t.iCloudBackupDescription || 'Os dados da app são automaticamente incluídos no backup do iCloud. Ao reinstalar a app ou trocar de iPhone, os seus dados serão restaurados.')
+              : (t.googleBackupDescription || 'Os dados da app são automaticamente incluídos no backup do Google. Ao reinstalar a app ou trocar de telemóvel, os seus dados serão restaurados.')}
+          </Text>
+          <View style={styles.cloudBackupTipContainer}>
+            <Ionicons name="information-circle" size={16} color="#FFD60A" />
+            <Text style={styles.cloudBackupTip}>
+              {Platform.OS === 'ios'
+                ? (t.iCloudBackupTip || 'Certifique-se que o backup do iCloud está ativado em Definições > [Seu Nome] > iCloud > Backup')
+                : (t.googleBackupTip || 'Certifique-se que o backup está ativado em Definições > Google > Backup')}
+            </Text>
           </View>
-          <View style={styles.cloudBackupTitleContainer}>
-            <Text style={styles.cloudBackupTitle}>{t.cloudBackupTitle || 'Automatic Backup'}</Text>
-            <Text style={styles.cloudBackupSubtitle}>{t.cloudBackupSubtitle || 'Your data is safe'}</Text>
-          </View>
-          <View style={styles.cloudBackupBadge}>
-            <Ionicons name="checkmark-circle" size={16} color="#34C759" />
-            <Text style={styles.cloudBackupBadgeText}>{t.cloudBackupEnabled || 'Enabled'}</Text>
-          </View>
+          <TouchableOpacity style={styles.openSettingsButton} onPress={handleOpenBackupSettings}>
+            <Text style={styles.openSettingsButtonText}>{t.openSettings || 'Abrir Definições'}</Text>
+            <Ionicons name="open-outline" size={18} color="#007AFF" />
+          </TouchableOpacity>
         </View>
-        <Text style={styles.cloudBackupDescription}>{t.cloudBackupDescription || 'All your links, notes and settings are automatically synced.'}</Text>
-        <View style={styles.cloudBackupProviders}>
-          <View style={styles.cloudProvider}>
-            <Ionicons name={Platform.OS === 'ios' ? 'logo-apple' : 'logo-google'} size={20} color="#8E8E93" />
-            <Text style={styles.cloudProviderText}>{Platform.OS === 'ios' ? (t.cloudBackupIOS || 'iCloud Backup') : (t.cloudBackupAndroid || 'Google Backup')}</Text>
-          </View>
-        </View>
-        <View style={styles.cloudBackupTipContainer}>
-          <Ionicons name="information-circle" size={16} color="#FFD60A" />
-          <Text style={styles.cloudBackupTip}>{t.cloudBackupTip || 'Make sure cloud backup is enabled in your device settings.'}</Text>
-        </View>
-      </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t.settings || 'Settings'}</Text>
-        <TouchableOpacity style={styles.settingItem} onPress={() => setShowLanguageModal(true)}>
-          <View style={styles.settingLeft}>
-            <Ionicons name="globe-outline" size={24} color="#007AFF" />
-            <Text style={styles.settingLabel}>{t.language || 'Language'}</Text>
-          </View>
-          <View style={styles.settingRight}>
-            <Text style={styles.settingValue}>{getCurrentLanguage()}</Text>
-            <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
-          </View>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.section}>
-        <View style={styles.settingItem}>
-          <View style={styles.settingLeft}>
-            <Ionicons name="information-circle-outline" size={24} color="#8E8E93" />
-            <Text style={styles.settingLabel}>{t.version || 'Version'}</Text>
-          </View>
-          <Text style={styles.settingValue}>1.0.0</Text>
-        </View>
-      </View>
-
-      {/* Legal Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Legal</Text>
-        <TouchableOpacity style={styles.settingItem} onPress={() => Linking.openURL(TERMS_URL)}>
-          <View style={styles.settingLeft}>
-            <Ionicons name="document-text-outline" size={24} color="#8E8E93" />
-            <Text style={styles.settingLabel}>{t.termsOfService || 'Terms of Service'}</Text>
-          </View>
-          <Ionicons name="open-outline" size={20} color="#8E8E93" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.settingItem} onPress={() => Linking.openURL(PRIVACY_URL)}>
-          <View style={styles.settingLeft}>
-            <Ionicons name="shield-checkmark-outline" size={24} color="#8E8E93" />
-            <Text style={styles.settingLabel}>{t.privacyPolicy || 'Privacy Policy'}</Text>
-          </View>
-          <Ionicons name="open-outline" size={20} color="#8E8E93" />
-        </TouchableOpacity>
-      </View>
-
-      <View style={{ height: 40 }} />
-
-      {/* Language Modal */}
-      <Modal visible={showLanguageModal} animationType="slide" transparent={true} onRequestClose={() => setShowLanguageModal(false)}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{t.language || 'Language'}</Text>
-              <TouchableOpacity onPress={() => setShowLanguageModal(false)}>
-                <Ionicons name="close" size={28} color="#FFFFFF" />
-              </TouchableOpacity>
+        {/* Manual Backup Section (Additional) */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t.manualBackup || 'Backup Manual'}</Text>
+          <TouchableOpacity 
+            style={styles.settingItem} 
+            onPress={handleExportBackup}
+            disabled={isExporting}
+          >
+            <View style={styles.settingLeft}>
+              <Ionicons name="download-outline" size={24} color="#34C759" />
+              <View style={styles.settingTextContainer}>
+                <Text style={styles.settingLabel}>{t.exportBackup || 'Exportar Backup'}</Text>
+                <Text style={styles.settingDescription}>{t.exportBackupInfo || 'Guardar dados num ficheiro JSON'}</Text>
+              </View>
             </View>
-            {languages.map((lang) => (
-              <TouchableOpacity key={lang.code} style={[styles.languageOption, language === lang.code && styles.languageOptionActive]} onPress={() => handleLanguageChange(lang.code)}>
-                <Text style={styles.languageFlag}>{lang.flag}</Text>
-                <Text style={styles.languageName}>{lang.nativeName || lang.name}</Text>
-                {language === lang.code && <Ionicons name="checkmark" size={24} color="#007AFF" />}
-              </TouchableOpacity>
-            ))}
+            {isExporting ? (
+              <Text style={styles.settingValue}>...</Text>
+            ) : (
+              <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.settingItem, { borderBottomWidth: 0 }]} 
+            onPress={handleImportBackup}
+            disabled={isImporting}
+          >
+            <View style={styles.settingLeft}>
+              <Ionicons name="push-outline" size={24} color="#007AFF" />
+              <View style={styles.settingTextContainer}>
+                <Text style={styles.settingLabel}>{t.importBackup || 'Importar Backup'}</Text>
+                <Text style={styles.settingDescription}>{t.importBackupInfo || 'Restaurar de um ficheiro'}</Text>
+              </View>
+            </View>
+            {isImporting ? (
+              <Text style={styles.settingValue}>...</Text>
+            ) : (
+              <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
+            )}
+          </TouchableOpacity>
+        </View>
+
+        {/* General Settings Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t.general || 'Geral'}</Text>
+          <TouchableOpacity style={styles.settingItem} onPress={() => setShowLanguageModal(true)}>
+            <View style={styles.settingLeft}>
+              <Ionicons name="globe-outline" size={24} color="#007AFF" />
+              <Text style={styles.settingLabel}>{t.language || 'Language'}</Text>
+            </View>
+            <View style={styles.settingRight}>
+              <Text style={styles.settingValue}>{getCurrentLanguage()}</Text>
+              <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
+            </View>
+          </TouchableOpacity>
+          <View style={[styles.settingItem, { borderBottomWidth: 0 }]}>
+            <View style={styles.settingLeft}>
+              <Ionicons name="information-circle-outline" size={24} color="#8E8E93" />
+              <Text style={styles.settingLabel}>{t.version || 'Version'}</Text>
+            </View>
+            <Text style={styles.settingValue}>1.0.0</Text>
           </View>
         </View>
-      </Modal>
 
-      {/* Day Modal */}
-      <Modal visible={showDayModal} animationType="slide" transparent={true} onRequestClose={() => setShowDayModal(false)}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{t.selectDay || 'Select day'}</Text>
-              <TouchableOpacity onPress={() => setShowDayModal(false)}>
-                <Ionicons name="close" size={28} color="#FFFFFF" />
-              </TouchableOpacity>
+        {/* Legal Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Legal</Text>
+          <TouchableOpacity style={styles.settingItem} onPress={() => Linking.openURL(TERMS_URL)}>
+            <View style={styles.settingLeft}>
+              <Ionicons name="document-text-outline" size={24} color="#8E8E93" />
+              <Text style={styles.settingLabel}>{t.termsOfService || 'Terms of Service'}</Text>
             </View>
-            <ScrollView style={styles.dayList}>
-              {DAYS_OF_WEEK.map((day) => (
-                <TouchableOpacity key={day.value} style={[styles.dayOption, summaryDay === day.value && styles.dayOptionActive]} onPress={() => handleDayChange(day.value)}>
-                  <Text style={styles.dayName}>{day[language] || day.en}</Text>
-                  {summaryDay === day.value && <Ionicons name="checkmark" size={24} color="#007AFF" />}
+            <Ionicons name="open-outline" size={20} color="#8E8E93" />
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.settingItem, { borderBottomWidth: 0 }]} onPress={() => Linking.openURL(PRIVACY_URL)}>
+            <View style={styles.settingLeft}>
+              <Ionicons name="shield-checkmark-outline" size={24} color="#8E8E93" />
+              <Text style={styles.settingLabel}>{t.privacyPolicy || 'Privacy Policy'}</Text>
+            </View>
+            <Ionicons name="open-outline" size={20} color="#8E8E93" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={{ height: 40 }} />
+
+        {/* Language Modal */}
+        <Modal visible={showLanguageModal} animationType="slide" transparent={true} onRequestClose={() => setShowLanguageModal(false)}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>{t.language || 'Language'}</Text>
+                <TouchableOpacity onPress={() => setShowLanguageModal(false)}>
+                  <Ionicons name="close" size={28} color="#FFFFFF" />
                 </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
-
-      {/* Time Modal */}
-      <Modal visible={showTimeModal} animationType="slide" transparent={true} onRequestClose={() => setShowTimeModal(false)}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{t.selectTime || 'Selecionar hora'}</Text>
-              <TouchableOpacity onPress={() => setShowTimeModal(false)}>
-                <Ionicons name="close" size={28} color="#FFFFFF" />
-              </TouchableOpacity>
+              </View>
+              <ScrollView>
+                {languages.map((lang) => (
+                  <TouchableOpacity key={lang.code} style={[styles.languageOption, language === lang.code && styles.languageOptionActive]} onPress={() => handleLanguageChange(lang.code)}>
+                    <Text style={styles.languageFlag}>{lang.flag}</Text>
+                    <Text style={styles.languageName}>{lang.nativeName || lang.name}</Text>
+                    {language === lang.code && <Ionicons name="checkmark" size={24} color="#007AFF" />}
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
             </View>
-            <ScrollView style={styles.dayList}>
-              {HOURS.map((hour) => (
-                <TouchableOpacity key={hour} style={[styles.dayOption, summaryHour === hour && styles.dayOptionActive]} onPress={() => handleTimeChange(hour)}>
-                  <Text style={styles.dayName}>{formatTimeForLocale(hour, 0)}</Text>
-                  {summaryHour === hour && <Ionicons name="checkmark" size={24} color="#007AFF" />}
+          </View>
+        </Modal>
+
+        {/* Day Modal */}
+        <Modal visible={showDayModal} animationType="slide" transparent={true} onRequestClose={() => setShowDayModal(false)}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>{t.selectDay || 'Select day'}</Text>
+                <TouchableOpacity onPress={() => setShowDayModal(false)}>
+                  <Ionicons name="close" size={28} color="#FFFFFF" />
                 </TouchableOpacity>
-              ))}
-            </ScrollView>
+              </View>
+              <ScrollView style={styles.dayList}>
+                {DAYS_OF_WEEK.map((day) => (
+                  <TouchableOpacity key={day.value} style={[styles.dayOption, summaryDay === day.value && styles.dayOptionActive]} onPress={() => handleDayChange(day.value)}>
+                    <Text style={styles.dayName}>{day[language] || day.en}</Text>
+                    {summaryDay === day.value && <Ionicons name="checkmark" size={24} color="#007AFF" />}
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
 
-      {/* Activation Modal */}
-      <Modal visible={showActivationModal} animationType="slide" transparent={true} onRequestClose={() => setShowActivationModal(false)}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{t.activationCode || 'Activation Code'}</Text>
-              <TouchableOpacity onPress={() => setShowActivationModal(false)}>
-                <Ionicons name="close" size={28} color="#FFFFFF" />
+        {/* Time Modal */}
+        <Modal visible={showTimeModal} animationType="slide" transparent={true} onRequestClose={() => setShowTimeModal(false)}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>{t.selectTime || 'Selecionar hora'}</Text>
+                <TouchableOpacity onPress={() => setShowTimeModal(false)}>
+                  <Ionicons name="close" size={28} color="#FFFFFF" />
+                </TouchableOpacity>
+              </View>
+              <ScrollView style={styles.dayList}>
+                {HOURS.map((hour) => (
+                  <TouchableOpacity key={hour} style={[styles.dayOption, summaryHour === hour && styles.dayOptionActive]} onPress={() => handleTimeChange(hour)}>
+                    <Text style={styles.dayName}>{formatTimeForLocale(hour, 0)}</Text>
+                    {summaryHour === hour && <Ionicons name="checkmark" size={24} color="#007AFF" />}
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
+
+        {/* Activation Modal */}
+        <Modal visible={showActivationModal} animationType="slide" transparent={true} onRequestClose={() => setShowActivationModal(false)}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>{t.activationCode || 'Activation Code'}</Text>
+                <TouchableOpacity onPress={() => setShowActivationModal(false)}>
+                  <Ionicons name="close" size={28} color="#FFFFFF" />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.activationIconContainer}>
+                <Ionicons name="ticket" size={48} color="#007AFF" />
+              </View>
+              <TextInput style={styles.activationInput} placeholder="XXXX-XXXX-XXXX" placeholderTextColor="#8E8E93" value={activationCode} onChangeText={(text) => setActivationCode(text.toUpperCase())} autoCapitalize="characters" maxLength={14} />
+              <TouchableOpacity style={[styles.activationSubmitButton, (!activationCode.trim() || activating) && styles.activationSubmitButtonDisabled]} onPress={handleActivateCode} disabled={!activationCode.trim() || activating}>
+                <Text style={styles.activationSubmitText}>{activating ? '...' : (t.activate || 'Activate')}</Text>
               </TouchableOpacity>
             </View>
-            <View style={styles.activationIconContainer}>
-              <Ionicons name="ticket" size={48} color="#007AFF" />
-            </View>
-            <TextInput style={styles.activationInput} placeholder="XXXX-XXXX-XXXX" placeholderTextColor="#8E8E93" value={activationCode} onChangeText={(text) => setActivationCode(text.toUpperCase())} autoCapitalize="characters" maxLength={14} />
-            <TouchableOpacity style={[styles.activationSubmitButton, (!activationCode.trim() || activating) && styles.activationSubmitButtonDisabled]} onPress={handleActivateCode} disabled={!activationCode.trim() || activating}>
-              <Text style={styles.activationSubmitText}>{activating ? '...' : (t.activate || 'Activate')}</Text>
-            </TouchableOpacity>
           </View>
-        </View>
-      </Modal>
+        </Modal>
       </ScrollView>
     </SafeAreaView>
   );
@@ -597,20 +634,17 @@ const styles = StyleSheet.create({
   activateButtonText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
   section: { backgroundColor: '#1C1C1E', marginHorizontal: 16, marginBottom: 16, borderRadius: 16, overflow: 'hidden' },
   sectionTitle: { color: '#8E8E93', fontSize: 13, fontWeight: '600', textTransform: 'uppercase', paddingHorizontal: 16, paddingTop: 16, paddingBottom: 8 },
-  cloudBackupCard: { backgroundColor: '#1C1C1E', marginHorizontal: 16, marginBottom: 16, borderRadius: 20, padding: 16, borderWidth: 1, borderColor: '#34C759' },
+  cloudBackupCard: { backgroundColor: '#1C1C1E', marginHorizontal: 16, marginBottom: 16, borderRadius: 20, padding: 16 },
   cloudBackupHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
-  cloudBackupIconContainer: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#34C759', justifyContent: 'center', alignItems: 'center' },
+  cloudBackupIconContainer: { width: 48, height: 48, borderRadius: 24, backgroundColor: Platform.OS === 'ios' ? '#007AFF' : '#34A853', justifyContent: 'center', alignItems: 'center' },
   cloudBackupTitleContainer: { flex: 1, marginLeft: 12 },
   cloudBackupTitle: { color: '#FFFFFF', fontSize: 18, fontWeight: '700' },
-  cloudBackupSubtitle: { color: '#34C759', fontSize: 14, marginTop: 2 },
-  cloudBackupBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(52, 199, 89, 0.15)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 12, gap: 4 },
-  cloudBackupBadgeText: { color: '#34C759', fontSize: 12, fontWeight: '600' },
-  cloudBackupDescription: { color: '#8E8E93', fontSize: 14, lineHeight: 20, marginBottom: 12 },
-  cloudBackupProviders: { flexDirection: 'row', marginBottom: 12 },
-  cloudProvider: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#2C2C2E', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, gap: 8 },
-  cloudProviderText: { color: '#FFFFFF', fontSize: 14 },
-  cloudBackupTipContainer: { flexDirection: 'row', alignItems: 'flex-start', backgroundColor: 'rgba(255, 214, 10, 0.1)', padding: 12, borderRadius: 10, gap: 8 },
+  cloudBackupSubtitle: { color: '#8E8E93', fontSize: 14, marginTop: 2 },
+  cloudBackupDescription: { color: '#CCCCCC', fontSize: 14, lineHeight: 20, marginBottom: 12 },
+  cloudBackupTipContainer: { flexDirection: 'row', alignItems: 'flex-start', backgroundColor: 'rgba(255, 214, 10, 0.1)', padding: 12, borderRadius: 10, gap: 8, marginBottom: 12 },
   cloudBackupTip: { color: '#FFD60A', fontSize: 12, flex: 1, lineHeight: 16 },
+  openSettingsButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0, 122, 255, 0.15)', paddingVertical: 12, borderRadius: 12, gap: 8 },
+  openSettingsButtonText: { color: '#007AFF', fontSize: 16, fontWeight: '600' },
   settingItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: '#2C2C2E' },
   settingLeft: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
   settingTextContainer: { flex: 1 },
@@ -620,7 +654,7 @@ const styles = StyleSheet.create({
   settingValue: { color: '#8E8E93', fontSize: 16 },
   iconPlaceholder: { width: 24 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.8)', justifyContent: 'flex-end' },
-  modalContent: { backgroundColor: '#1C1C1E', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingBottom: 40 },
+  modalContent: { backgroundColor: '#1C1C1E', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingBottom: 40, maxHeight: '80%' },
   modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 20, borderBottomWidth: 1, borderBottomColor: '#2C2C2E' },
   modalTitle: { color: '#FFFFFF', fontSize: 20, fontWeight: '700' },
   languageOption: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: '#2C2C2E' },
