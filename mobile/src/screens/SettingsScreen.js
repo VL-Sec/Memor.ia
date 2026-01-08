@@ -350,7 +350,7 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <CustomHeader title={t.tabSettings || 'Settings'} />
+      <CustomHeader title={t.tabSettings || 'Definições'} showSettings={false} />
       <ScrollView style={styles.container}>
         {/* Premium Card */}
         <View style={[styles.premiumCard, premiumStatus?.isPremiumActivated && styles.premiumCardActive, premiumStatus?.isTrialActive && !premiumStatus?.isPremiumActivated && styles.premiumCardTrial, !premiumStatus?.hasPremium && styles.premiumCardExpired]}>
