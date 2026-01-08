@@ -207,23 +207,38 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
     }
   };
 
-  const handleTimeChange = async (hour) => {
-    setSummaryHour(hour);
-    setSummaryMinute(0);
-    setShowTimeModal(false);
-    if (summaryEnabled) {
-      try {
-        await AsyncStorage.setItem('memoria-weekly-summary', JSON.stringify({ 
-          enabled: summaryEnabled, 
-          dayOfWeek: summaryDay, 
-          hour: hour, 
-          minute: 0 
-        }));
-        Toast.show({ type: 'success', text1: t.timeSaved || 'Hora guardada' });
-      } catch (e) {
-        console.error('Error saving settings:', e);
+  const handleTimeChange = async (event, selectedTime) => {
+    if (Platform.OS !== 'ios') {
+      setShowTimeModal(false);
+    }
+    
+    if (selectedTime) {
+      const hour = selectedTime.getHours();
+      const minute = selectedTime.getMinutes();
+      setSummaryHour(hour);
+      setSummaryMinute(minute);
+      
+      if (summaryEnabled) {
+        try {
+          await AsyncStorage.setItem('memoria-weekly-summary', JSON.stringify({ 
+            enabled: summaryEnabled, 
+            dayOfWeek: summaryDay, 
+            hour: hour, 
+            minute: minute 
+          }));
+          Toast.show({ type: 'success', text1: t.timeSaved || 'Hora guardada' });
+        } catch (e) {
+          console.error('Error saving settings:', e);
+        }
       }
     }
+  };
+  
+  // Get time as Date object for DateTimePicker
+  const getTimeAsDate = () => {
+    const date = new Date();
+    date.setHours(summaryHour, summaryMinute, 0, 0);
+    return date;
   };
 
   // Export backup to JSON file
