@@ -59,6 +59,7 @@ export const translations = {
     stop: 'Stop',
     autoSaved: 'Auto-saved',
     smartClipboardDeactivated: 'Smart Clipboard deactivated',
+    deleteFolderConfirmSimple: 'Are you sure you want to delete this folder?',
     
     // Links
     addLink: 'Add Link',
