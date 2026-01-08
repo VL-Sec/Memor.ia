@@ -296,14 +296,8 @@ export default function LinksScreen({ language, refreshKey }) {
           </TouchableOpacity>
         </View>
 
-        {/* Folder section - Improved visibility */}
+        {/* Folder section - Clean style without title */}
         <View style={styles.folderSection}>
-          <View style={styles.folderHeader}>
-            <Text style={styles.folderSectionTitle}>{t.folders || 'Pastas'}</Text>
-            <TouchableOpacity style={styles.addFolderBtn} onPress={() => openFolderModal()}>
-              <Ionicons name="add-circle" size={24} color="#007AFF" />
-            </TouchableOpacity>
-          </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.folderList} contentContainerStyle={styles.folderListContent}>
             <TouchableOpacity style={[styles.folderChip, selectedFolder === 'all' && styles.folderChipActive]} onPress={() => setSelectedFolder('all')}>
               <Text style={[styles.folderChipText, selectedFolder === 'all' && styles.folderChipTextActive]}>{t.allLinks || 'Todos'}</Text>
@@ -325,6 +319,9 @@ export default function LinksScreen({ language, refreshKey }) {
                 )}
               </TouchableOpacity>
             ))}
+            <TouchableOpacity style={styles.addFolderChip} onPress={() => openFolderModal()}>
+              <Ionicons name="add" size={20} color="#007AFF" />
+            </TouchableOpacity>
           </ScrollView>
         </View>
 
