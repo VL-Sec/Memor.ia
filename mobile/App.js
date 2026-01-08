@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Toast, { BaseToast } from 'react-native-toast-message';
+import Toast from 'react-native-toast-message';
 
 import LinksScreen from './src/screens/LinksScreen';
 import NotesScreen from './src/screens/NotesScreen';
@@ -29,50 +29,63 @@ const theme = {
   },
 };
 
-const toastConfig = {
-  success: (props) => (
-    <BaseToast
-      {...props}
-      style={{ borderLeftColor: '#34C759', backgroundColor: '#1C1C1E', borderRadius: 12, marginHorizontal: 16 }}
-      contentContainerStyle={{ paddingHorizontal: 15 }}
-      text1Style={{ fontSize: 15, fontWeight: '600', color: '#FFFFFF' }}
-      text2Style={{ fontSize: 13, color: '#8E8E93' }}
-      renderTrailingIcon={() => (
-        <TouchableOpacity style={{ padding: 10, justifyContent: 'center' }} onPress={() => Toast.hide()}>
-          <Ionicons name="close" size={20} color="#8E8E93" />
-        </TouchableOpacity>
-      )}
-    />
-  ),
-  error: (props) => (
-    <BaseToast
-      {...props}
-      style={{ borderLeftColor: '#FF3B30', backgroundColor: '#1C1C1E', borderRadius: 12, marginHorizontal: 16 }}
-      contentContainerStyle={{ paddingHorizontal: 15 }}
-      text1Style={{ fontSize: 15, fontWeight: '600', color: '#FFFFFF' }}
-      text2Style={{ fontSize: 13, color: '#8E8E93' }}
-      renderTrailingIcon={() => (
-        <TouchableOpacity style={{ padding: 10, justifyContent: 'center' }} onPress={() => Toast.hide()}>
-          <Ionicons name="close" size={20} color="#8E8E93" />
-        </TouchableOpacity>
-      )}
-    />
-  ),
-  info: (props) => (
-    <BaseToast
-      {...props}
-      style={{ borderLeftColor: '#007AFF', backgroundColor: '#1C1C1E', borderRadius: 12, marginHorizontal: 16 }}
-      contentContainerStyle={{ paddingHorizontal: 15 }}
-      text1Style={{ fontSize: 15, fontWeight: '600', color: '#FFFFFF' }}
-      text2Style={{ fontSize: 13, color: '#8E8E93' }}
-      renderTrailingIcon={() => (
-        <TouchableOpacity style={{ padding: 10, justifyContent: 'center' }} onPress={() => Toast.hide()}>
-          <Ionicons name="close" size={20} color="#8E8E93" />
-        </TouchableOpacity>
-      )}
-    />
-  ),
+// Custom Toast component to avoid fontWeight: 'bold' issues with SDK 54
+const CustomToast = ({ text1, text2, type, hide }) => {
+  const borderColor = type === 'success' ? '#34C759' : type === 'error' ? '#FF3B30' : '#007AFF';
+  return (
+    <View style={[toastStyles.container, { borderLeftColor: borderColor }]}>
+      <View style={toastStyles.content}>
+        {text1 && <Text style={toastStyles.text1}>{text1}</Text>}
+        {text2 && <Text style={toastStyles.text2}>{text2}</Text>}
+      </View>
+      <TouchableOpacity style={toastStyles.closeBtn} onPress={hide}>
+        <Ionicons name="close" size={20} color="#8E8E93" />
+      </TouchableOpacity>
+    </View>
+  );
 };
+
+const toastConfig = {
+  success: (props) => <CustomToast {...props} type="success" />,
+  error: (props) => <CustomToast {...props} type="error" />,
+  info: (props) => <CustomToast {...props} type="info" />,
+};
+
+const toastStyles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1C1C1E',
+    borderRadius: 12,
+    borderLeftWidth: 4,
+    marginHorizontal: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    minHeight: 50,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  content: {
+    flex: 1,
+  },
+  text1: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  text2: {
+    fontSize: 13,
+    color: '#8E8E93',
+    marginTop: 2,
+  },
+  closeBtn: {
+    padding: 5,
+    marginLeft: 10,
+  },
+});
 
 export default function App() {
   const [language, setLanguage] = useState('en');
