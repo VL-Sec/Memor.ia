@@ -372,7 +372,8 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
           </View>
         </View>
       </Modal>
-    </ScrollView>
+      </ScrollView>
+    </>
   );
 }
 
