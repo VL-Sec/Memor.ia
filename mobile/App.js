@@ -222,16 +222,41 @@ const toastStyles = StyleSheet.create({
 });
 
 // ============================================
-// TAB NAVIGATOR - Only 4 tabs
+// TAB NAVIGATOR - Only 4 tabs (DEFAULT STYLE - NO CUSTOM)
 // ============================================
 function TabNavigator({ language, userId, premiumStatus, refreshKey, triggerRefresh, t, insets }) {
   return (
     <Tab.Navigator
-      tabBar={(props) => <CustomTabBar {...props} insets={insets} />}
-      screenOptions={{
+      screenOptions={({ route }) => ({
         headerShown: false,
-      }}
-      sceneContainerStyle={{ backgroundColor: '#000000' }}
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+          switch (route.name) {
+            case 'Links':
+              iconName = focused ? 'link' : 'link-outline';
+              break;
+            case 'Clipboard':
+              iconName = focused ? 'clipboard' : 'clipboard-outline';
+              break;
+            case 'Notes':
+              iconName = focused ? 'document-text' : 'document-text-outline';
+              break;
+            case 'Favorites':
+              iconName = focused ? 'heart' : 'heart-outline';
+              break;
+            default:
+              iconName = 'help-outline';
+          }
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: '#007AFF',
+        tabBarInactiveTintColor: '#8E8E93',
+        // MINIMAL STYLE - just colors, no layout changes
+        tabBarStyle: { 
+          backgroundColor: '#1C1C1E', 
+          borderTopColor: '#2C2C2E',
+        },
+      })}
     >
       <Tab.Screen name="Links" options={{ title: 'Links' }}>
         {(props) => (
