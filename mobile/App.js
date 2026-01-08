@@ -161,6 +161,6 @@ export default function App() {
 
 const styles = StyleSheet.create({
   loadingContainer: { flex: 1, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' },
-  loadingText: { color: '#FFFFFF', fontSize: 24, fontWeight: 'bold', marginTop: 20 },
+  loadingText: { color: '#FFFFFF', fontSize: 24, fontWeight: '700', marginTop: 20 },
   errorText: { color: '#FF3B30', fontSize: 16 },
 });
