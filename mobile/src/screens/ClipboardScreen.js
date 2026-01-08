@@ -29,6 +29,11 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [editContent, setEditContent] = useState('');
+  
+  // Folder management modal state
+  const [showFolderModal, setShowFolderModal] = useState(false);
+  const [editingFolder, setEditingFolder] = useState(null);
+  const [folderName, setFolderName] = useState('');
 
   const insets = useSafeAreaInsets();
   const t = translations[language] || translations.en;
