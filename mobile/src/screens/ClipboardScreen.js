@@ -106,10 +106,10 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
     // Clear any existing interval
     stopClipboardMonitoring();
     
-    // Check clipboard every 1.5 seconds
+    // Check clipboard every 1 second (more responsive)
     clipboardCheckInterval.current = setInterval(async () => {
       await checkAndSaveClipboard();
-    }, 1500);
+    }, 1000);
   };
 
   const stopClipboardMonitoring = () => {
@@ -125,10 +125,12 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
     try {
       const content = await Clipboard.getStringAsync();
       
-      // Only save if content is different and not empty
+      // Only save if content exists, is different from last, and has meaningful content
       if (content && 
           content.trim().length > 0 && 
-          content !== lastClipboardContent.current) {
+          content.trim() !== lastClipboardContent.current?.trim()) {
+        
+        console.log('Smart Clipboard: New content detected!', content.substring(0, 50));
         
         // Update last content immediately to prevent duplicates
         lastClipboardContent.current = content;
@@ -150,10 +152,10 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
         title: content.slice(0, 50) + (content.length > 50 ? '...' : ''),
         content: content,
         contentType: 'text',
-        tags: ['auto-saved'],
+        tags: ['auto-saved', 'smart-clipboard'],
         isFavorite: false,
         isPinned: false,
-        folderId: defaultFolder?.id,
+        folderId: defaultFolder?.id || null,
         createdAt: new Date().toISOString(),
       };
       
@@ -165,7 +167,10 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
         Toast.show({ 
           type: 'success', 
           text1: t.autoSaved || 'Guardado automaticamente',
+          text2: content.slice(0, 40) + (content.length > 40 ? '...' : ''),
         });
+      } else {
+        console.error('Supabase insert error:', error);
       }
     } catch (error) {
       console.error('Error auto-saving:', error);
