@@ -310,11 +310,6 @@ export default function LinksScreen({ language, refreshKey }) {
                 <Text style={[styles.folderChipText, selectedFolder === folder.id && styles.folderChipTextActive]}>
                   {folder.name}
                 </Text>
-                {selectedFolder === folder.id && (
-                  <TouchableOpacity style={styles.folderDeleteBtn} onPress={() => handleDeleteFolder(folder)}>
-                    <Ionicons name="close-circle" size={16} color="#FF3B30" />
-                  </TouchableOpacity>
-                )}
               </TouchableOpacity>
             ))}
             <TouchableOpacity style={styles.addFolderChip} onPress={() => openFolderModal()}>
