@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { NavigationContainer, DarkTheme } from '@react-navigation/native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { NavigationContainer, DarkTheme, useFocusEffect } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
@@ -96,6 +96,7 @@ export default function App() {
   const [premiumStatus, setPremiumStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     const init = async () => {
@@ -112,6 +113,11 @@ export default function App() {
       }
     };
     init();
+  }, []);
+
+  // Function to trigger refresh across all screens
+  const triggerRefresh = useCallback(() => {
+    setRefreshKey(prev => prev + 1);
   }, []);
 
   const t = translations[language] || translations.en;
@@ -155,18 +161,18 @@ export default function App() {
           })}
         >
           <Tab.Screen name="Links" options={{ title: t.tabLinks || 'Links' }}>
-            {(props) => <LinksScreen {...props} language={language} premiumStatus={premiumStatus} />}
+            {(props) => <LinksScreen {...props} language={language} premiumStatus={premiumStatus} refreshKey={refreshKey} />}
           </Tab.Screen>
-          <Tab.Screen name="Notes" options={{ title: t.tabNotes || 'Notes' }}>
-            {(props) => <NotesScreen {...props} language={language} />}
+          <Tab.Screen name="Notes" options={{ title: t.tabNotes || 'Notas' }}>
+            {(props) => <NotesScreen {...props} language={language} refreshKey={refreshKey} triggerRefresh={triggerRefresh} />}
           </Tab.Screen>
-          <Tab.Screen name="Clipboard" options={{ title: t.tabClipboard || 'Clipboard' }}>
-            {(props) => <ClipboardScreen {...props} language={language} premiumStatus={premiumStatus} />}
+          <Tab.Screen name="Clipboard" options={{ title: t.tabClipboard || 'Área' }}>
+            {(props) => <ClipboardScreen {...props} language={language} premiumStatus={premiumStatus} refreshKey={refreshKey} triggerRefresh={triggerRefresh} />}
           </Tab.Screen>
-          <Tab.Screen name="Favorites" options={{ title: t.tabFavorites || 'Favorites' }}>
-            {(props) => <FavoritesScreen {...props} language={language} />}
+          <Tab.Screen name="Favorites" options={{ title: t.tabFavorites || 'Favoritos' }}>
+            {(props) => <FavoritesScreen {...props} language={language} refreshKey={refreshKey} />}
           </Tab.Screen>
-          <Tab.Screen name="Settings" options={{ title: t.tabSettings || 'Settings' }}>
+          <Tab.Screen name="Settings" options={{ title: t.tabSettings || 'Definições' }}>
             {(props) => <SettingsScreen {...props} language={language} setLanguage={setLanguage} premiumStatus={premiumStatus} setPremiumStatus={setPremiumStatus} />}
           </Tab.Screen>
         </Tab.Navigator>
