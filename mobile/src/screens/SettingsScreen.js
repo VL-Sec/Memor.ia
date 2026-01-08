@@ -348,9 +348,17 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
     return lang ? `${lang.flag} ${lang.nativeName || lang.name}` : 'English'; 
   };
 
+  const navigation = useNavigation();
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <CustomHeader title={t.tabSettings || 'Definições'} showSettings={false} />
+      <View style={styles.headerContainer}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={24} color="#007AFF" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>{t.tabSettings || 'Definições'}</Text>
+        <View style={styles.headerSpacer} />
+      </View>
       <ScrollView style={styles.container}>
         {/* Premium Card */}
         <View style={[styles.premiumCard, premiumStatus?.isPremiumActivated && styles.premiumCardActive, premiumStatus?.isTrialActive && !premiumStatus?.isPremiumActivated && styles.premiumCardTrial, !premiumStatus?.hasPremium && styles.premiumCardExpired]}>
