@@ -193,7 +193,7 @@ function TabNavigator({ language, userId, premiumStatus, refreshKey, triggerRefr
           else if (route.name === 'Clipboard') iconName = focused ? 'clipboard' : 'clipboard-outline';
           else if (route.name === 'Notes') iconName = focused ? 'document-text' : 'document-text-outline';
           else if (route.name === 'Favorites') iconName = focused ? 'heart' : 'heart-outline';
-          return <Ionicons name={iconName} size={22} color={color} />;
+          return <Ionicons name={iconName} size={24} color={color} />;
         },
         tabBarActiveTintColor: '#007AFF',
         tabBarInactiveTintColor: '#8E8E93',
@@ -201,19 +201,22 @@ function TabNavigator({ language, userId, premiumStatus, refreshKey, triggerRefr
           backgroundColor: '#1C1C1E', 
           borderTopColor: '#2C2C2E',
           borderTopWidth: 0.5,
-          height: 55 + Math.max(insets.bottom, 10),
+          height: 60 + Math.max(insets.bottom, 10),
           paddingBottom: Math.max(insets.bottom, 10),
-          paddingTop: 6,
-          paddingHorizontal: 0,
+          paddingTop: 8,
+          paddingLeft: 0,
+          paddingRight: 0,
+          marginLeft: 0,
+          marginRight: 0,
         },
         tabBarItemStyle: {
-          width: TAB_WIDTH,
-          minWidth: TAB_WIDTH,
-          maxWidth: TAB_WIDTH,
+          flex: 1,
+          paddingTop: 4,
         },
         tabBarLabelStyle: {
-          fontSize: 10,
-          fontWeight: '500',
+          fontSize: 11,
+          fontWeight: '600',
+          marginTop: 2,
         },
       })}
     >
