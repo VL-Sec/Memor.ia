@@ -124,6 +124,7 @@ export const translations = {
     reminderHint: 'You will receive a notification at this date and time',
     notificationPermissionDenied: 'Notification permission denied',
     reminderBody: 'You have a link to check!',
+    noteReminderBody: 'You have a note to review!',
     reminderSet: 'Reminder set',
     
     // Settings
