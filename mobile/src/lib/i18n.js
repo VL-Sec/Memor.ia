@@ -363,6 +363,12 @@ export const translations = {
     reminderBody: 'Tens um link para ver!',
     noteReminderBody: 'Tens uma nota para rever!',
     reminderSet: 'Lembrete definido',
+    reminderInPast: 'A data deve ser no futuro',
+    errorSchedulingReminder: 'Erro ao criar lembrete',
+    
+    // Links
+    addLink: 'Adicionar Link',
+    urlRequired: 'URL é obrigatório',
     
     // Settings
     settings: 'Definições',
