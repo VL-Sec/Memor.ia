@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
@@ -17,9 +17,12 @@ import { getPremiumStatus } from './src/lib/premium';
 
 const Tab = createBottomTabNavigator();
 
+// Extend DarkTheme to ensure all required properties exist
 const theme = {
+  ...DarkTheme,
   dark: true,
   colors: {
+    ...DarkTheme.colors,
     primary: '#007AFF',
     background: '#000000',
     card: '#1C1C1E',
