@@ -105,6 +105,9 @@ export const translations = {
     // Drag & Drop
     dragToReorder: 'Hold and drag to reorder',
     
+    // Folders
+    createNewFolder: 'Create new folder',
+    
     // Premium
     premium: 'Premium',
     premiumActive: 'Premium Active',
