@@ -38,6 +38,9 @@
       "expo-secure-store",
       "expo-localization",
       "expo-font",
+      "expo-file-system",
+      "expo-sharing",
+      "expo-document-picker",
       [
         "expo-notifications",
         {
