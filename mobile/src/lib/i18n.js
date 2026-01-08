@@ -127,6 +127,18 @@ export const translations = {
     cloudBackupEnabled: 'Enabled',
     cloudBackupTip: 'Make sure cloud backup is turned on in your device settings.',
     
+    // Platform-specific backup
+    iCloudBackup: 'iCloud Backup',
+    googleBackup: 'Google Backup',
+    systemBackupSubtitle: 'Automatic system backup',
+    iCloudBackupDescription: 'App data is automatically included in iCloud backup. When you reinstall the app or switch iPhones, your data will be restored.',
+    googleBackupDescription: 'App data is automatically included in Google backup. When you reinstall the app or switch phones, your data will be restored.',
+    iCloudBackupTip: 'Make sure iCloud backup is enabled in Settings > [Your Name] > iCloud > Backup',
+    googleBackupTip: 'Make sure backup is enabled in Settings > Google > Backup',
+    openSettings: 'Open Settings',
+    manualBackup: 'Manual Backup',
+    general: 'General',
+    
     // Notifications
     notifications: 'Notifications',
     weeklySummary: 'Weekly Digest',
