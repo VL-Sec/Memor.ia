@@ -151,6 +151,84 @@ export default function LinksScreen({ language, refreshKey }) {
     }
   };
 
+  // Folder management functions
+  const openFolderModal = (folder = null) => {
+    setEditingFolder(folder);
+    setFolderName(folder ? folder.name : '');
+    setShowFolderModal(true);
+  };
+
+  const closeFolderModal = () => {
+    setShowFolderModal(false);
+    setEditingFolder(null);
+    setFolderName('');
+  };
+
+  const handleSaveFolder = async () => {
+    if (!folderName.trim()) {
+      Toast.show({ type: 'error', text1: t.error || 'Nome obrigatório' });
+      return;
+    }
+    try {
+      if (editingFolder) {
+        await supabase.from('folders').update({ name: folderName }).eq('id', editingFolder.id);
+        setFolders(folders.map(f => f.id === editingFolder.id ? { ...f, name: folderName } : f));
+        Toast.show({ type: 'success', text1: t.saved || 'Guardado' });
+      } else {
+        const newFolder = {
+          id: generateId(),
+          userId: DEMO_USER,
+          name: folderName,
+          icon: '📁',
+          isDefault: false,
+          folderType: 'link',
+          createdAt: new Date().toISOString(),
+        };
+        const { error } = await supabase.from('folders').insert([newFolder]);
+        if (error) throw error;
+        setFolders([...folders, newFolder]);
+        Toast.show({ type: 'success', text1: t.folderCreated || 'Pasta criada' });
+      }
+      closeFolderModal();
+    } catch (error) {
+      console.error('Error saving folder:', error);
+      Toast.show({ type: 'error', text1: t.error || 'Erro' });
+    }
+  };
+
+  const handleDeleteFolder = (folder) => {
+    if (folder.isDefault) {
+      Toast.show({ type: 'error', text1: t.cannotDeleteDefault || 'Não podes eliminar a pasta padrão' });
+      return;
+    }
+    Alert.alert(
+      t.deleteFolder || 'Eliminar pasta',
+      t.deleteFolderConfirm || 'Tens a certeza? Os itens serão movidos para a pasta Geral.',
+      [
+        { text: t.cancel || 'Cancelar', style: 'cancel' },
+        {
+          text: t.delete || 'Eliminar',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const defaultFolder = folders.find(f => f.isDefault);
+              if (defaultFolder) {
+                await supabase.from('links').update({ folderId: defaultFolder.id }).eq('folderId', folder.id);
+              }
+              await supabase.from('folders').delete().eq('id', folder.id);
+              setFolders(folders.filter(f => f.id !== folder.id));
+              if (selectedFolder === folder.id) setSelectedFolder('all');
+              Toast.show({ type: 'success', text1: t.deleted || 'Eliminado' });
+              fetchData();
+            } catch (error) {
+              console.error('Error deleting folder:', error);
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const filteredLinks = links.filter(link => {
     const matchesFolder = selectedFolder === 'all' || link.folderId === selectedFolder;
     const matchesSearch = !searchQuery || link.title?.toLowerCase().includes(searchQuery.toLowerCase()) || link.url?.toLowerCase().includes(searchQuery.toLowerCase());
