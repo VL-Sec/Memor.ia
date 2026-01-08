@@ -789,4 +789,9 @@ const styles = StyleSheet.create({
   activationSubmitButton: { backgroundColor: '#007AFF', marginHorizontal: 20, marginTop: 16, padding: 16, borderRadius: 12, alignItems: 'center' },
   activationSubmitButtonDisabled: { opacity: 0.5 },
   activationSubmitText: { color: '#FFFFFF', fontSize: 18, fontWeight: '600' },
+  // Time picker modal styles
+  timePickerModalContent: { backgroundColor: '#1C1C1E', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingBottom: 40 },
+  timePickerContainer: { alignItems: 'center', paddingVertical: 20 },
+  timePickerDoneButton: { backgroundColor: '#007AFF', marginHorizontal: 20, padding: 16, borderRadius: 12, alignItems: 'center' },
+  timePickerDoneText: { color: '#FFFFFF', fontSize: 18, fontWeight: '600' },
 });
