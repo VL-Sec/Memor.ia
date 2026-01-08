@@ -27,6 +27,8 @@ export default function LinksScreen({ language, userId, refreshKey }) {
   const [refreshing, setRefreshing] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  const [isAddingNew, setIsAddingNew] = useState(false);
+  const [editUrl, setEditUrl] = useState('');
   const [editTitle, setEditTitle] = useState('');
   const [editFolderId, setEditFolderId] = useState('');
   const [reminderEnabled, setReminderEnabled] = useState(false);
