@@ -306,6 +306,7 @@ export const translations = {
     selectTime: 'Selecionar hora',
     weeklySummaryEnabled: 'Resumo semanal ativado',
     weeklySummaryDisabled: 'Resumo semanal desativado',
+    notificationPermissionRequired: 'Ativa as notificações nas definições do dispositivo para receberes resumos semanais.',
     
     // Days of week
     sunday: 'Domingo',
