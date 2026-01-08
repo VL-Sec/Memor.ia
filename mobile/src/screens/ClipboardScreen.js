@@ -309,6 +309,7 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
   const openEditModal = (item) => {
     setEditingItem(item);
     setEditContent(item.content || '');
+    setEditFolderId(item.folderId || null);
     setShowEditModal(true);
   };
 
@@ -316,6 +317,7 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
     setShowEditModal(false);
     setEditingItem(null);
     setEditContent('');
+    setEditFolderId(null);
   };
 
   const handleSaveEdit = async () => {
@@ -324,6 +326,7 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
       const updateData = { 
         content: editContent,
         title: editContent.slice(0, 50) + (editContent.length > 50 ? '...' : ''),
+        folderId: editFolderId,
       };
       await supabase.from('links').update(updateData).eq('id', editingItem.id);
       setNotes(notes.map(n => n.id === editingItem.id ? { ...n, ...updateData } : n));
