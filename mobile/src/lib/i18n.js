@@ -255,7 +255,7 @@ export const translations = {
     // Tabs
     tabLinks: 'Links',
     tabNotes: 'Notas',
-    tabClipboard: 'Área de Transferência',
+    tabClipboard: 'Clipboard',
     tabFavorites: 'Favoritos',
     tabSettings: 'Definições',
     
