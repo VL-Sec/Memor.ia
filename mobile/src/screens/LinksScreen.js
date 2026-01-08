@@ -173,7 +173,9 @@ export default function LinksScreen({ language, userId, refreshKey }) {
           sound: true,
         },
         trigger: {
+          type: 'timeInterval',
           seconds: seconds,
+          repeats: false,
         },
       });
       
