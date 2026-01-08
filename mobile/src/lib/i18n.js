@@ -159,6 +159,21 @@ export const translations = {
     pinned: 'Pinned to top',
     unpinned: 'Unpinned',
     pinToTop: 'Pin to top',
+    timeSaved: 'Time saved',
+    
+    // Local Backup
+    exportBackup: 'Export Backup',
+    exportBackupInfo: 'Save all your data to a JSON file',
+    importBackup: 'Import Backup',
+    importBackupInfo: 'Restore data from a backup file',
+    backupExported: 'Backup exported successfully!',
+    backupImported: 'Backup imported successfully!',
+    exportError: 'Error exporting backup',
+    importError: 'Error importing backup',
+    importWarning: 'This will replace all your current data. Do you want to continue?',
+    invalidBackupFile: 'Invalid backup file',
+    continue: 'Continue',
+    sharingNotAvailable: 'Sharing not available',
     
     // Reminders
     reminder: 'Reminder',
