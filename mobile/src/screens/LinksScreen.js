@@ -26,6 +26,11 @@ export default function LinksScreen({ language, refreshKey }) {
   const [reminderLocation, setReminderLocation] = useState('');
   const [showFolderPicker, setShowFolderPicker] = useState(false);
   const [isPinnedEdit, setIsPinnedEdit] = useState(false);
+  
+  // Folder management
+  const [showFolderModal, setShowFolderModal] = useState(false);
+  const [editingFolder, setEditingFolder] = useState(null);
+  const [folderName, setFolderName] = useState('');
 
   const t = translations[language] || translations.en;
 
