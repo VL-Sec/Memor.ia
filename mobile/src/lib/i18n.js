@@ -1063,6 +1063,10 @@ export const translations = {
     deactivate: 'Ferma',
     timeRemaining: 'rimanente',
     
+    // Links
+    linkTitle: 'Titolo',
+    linkTitlePlaceholder: 'Nome del link',
+    
     // Notes
     notesPlaceholder: 'Inizia a scrivere...',
     noteTitle: 'Titolo',
