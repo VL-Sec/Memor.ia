@@ -11,9 +11,7 @@ import { supabase, generateId } from '../lib/supabase';
 import { translations } from '../lib/i18n';
 import CustomHeader from '../components/CustomHeader';
 
-const DEMO_USER = 'demo_user';
-
-export default function LinksScreen({ language, refreshKey }) {
+export default function LinksScreen({ language, userId, refreshKey }) {
   const [links, setLinks] = useState([]);
   const [folders, setFolders] = useState([]);
   const [selectedFolder, setSelectedFolder] = useState('all');
