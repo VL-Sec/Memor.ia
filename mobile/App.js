@@ -217,16 +217,16 @@ function AppContent({ language, setLanguage, premiumStatus, setPremiumStatus, re
       >
         {/* Order: Links → Clipboard → Notes → Favorites */}
         <Tab.Screen name="Links" options={{ title: t.tabLinks || 'Links' }}>
-          {(props) => <LinksScreen {...props} language={language} premiumStatus={premiumStatus} refreshKey={refreshKey} />}
+          {(props) => <LinksScreen {...props} language={language} userId={userId} premiumStatus={premiumStatus} refreshKey={refreshKey} />}
         </Tab.Screen>
         <Tab.Screen name="Clipboard" options={{ title: t.tabClipboard || 'Área' }}>
-          {(props) => <ClipboardScreen {...props} language={language} premiumStatus={premiumStatus} refreshKey={refreshKey} triggerRefresh={triggerRefresh} />}
+          {(props) => <ClipboardScreen {...props} language={language} userId={userId} premiumStatus={premiumStatus} refreshKey={refreshKey} triggerRefresh={triggerRefresh} />}
         </Tab.Screen>
         <Tab.Screen name="Notes" options={{ title: t.tabNotes || 'Notas' }}>
-          {(props) => <NotesScreen {...props} language={language} refreshKey={refreshKey} triggerRefresh={triggerRefresh} />}
+          {(props) => <NotesScreen {...props} language={language} userId={userId} refreshKey={refreshKey} triggerRefresh={triggerRefresh} />}
         </Tab.Screen>
         <Tab.Screen name="Favorites" options={{ title: t.tabFavorites || 'Favoritos' }}>
-          {(props) => <FavoritesScreen {...props} language={language} refreshKey={refreshKey} />}
+          {(props) => <FavoritesScreen {...props} language={language} userId={userId} refreshKey={refreshKey} />}
         </Tab.Screen>
         {/* Settings - Hidden from tab bar, accessed via header icon */}
         <Tab.Screen 
@@ -236,7 +236,7 @@ function AppContent({ language, setLanguage, premiumStatus, setPremiumStatus, re
             tabBarStyle: { display: 'none' },
           }}
         >
-          {(props) => <SettingsScreen {...props} language={language} setLanguage={setLanguage} premiumStatus={premiumStatus} setPremiumStatus={setPremiumStatus} />}
+          {(props) => <SettingsScreen {...props} language={language} userId={userId} setLanguage={setLanguage} premiumStatus={premiumStatus} setPremiumStatus={setPremiumStatus} />}
         </Tab.Screen>
       </Tab.Navigator>
       <Toast config={toastConfig} visibilityTime={3000} autoHide={true} />
