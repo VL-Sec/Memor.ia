@@ -456,18 +456,32 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
         {/* Premium Card */}
         <View style={[styles.premiumCard, premiumStatus?.isPremiumActivated && styles.premiumCardActive, premiumStatus?.isTrialActive && !premiumStatus?.isPremiumActivated && styles.premiumCardTrial, !premiumStatus?.hasPremium && styles.premiumCardExpired]}>
           <View style={styles.premiumIcon}>
-            <Ionicons name={premiumStatus?.isPremiumActivated ? 'trophy' : 'sparkles'} size={32} color={premiumStatus?.isPremiumActivated ? '#FFD700' : '#007AFF'} />
+            <Ionicons name={premiumStatus?.isPremiumActivated ? 'trophy' : premiumStatus?.isTrialActive ? 'sparkles' : 'lock-closed'} size={32} color={premiumStatus?.isPremiumActivated ? '#FFD700' : premiumStatus?.isTrialActive ? '#007AFF' : '#FF3B30'} />
           </View>
           <View style={styles.premiumContent}>
-            <Text style={styles.premiumTitle}>{premiumStatus?.isPremiumActivated ? (t.premiumActive || 'Premium Active') : premiumStatus?.isTrialActive ? (t.trialActive || 'Trial Active') : (t.trialExpired || 'Trial Expired')}</Text>
-            <Text style={styles.premiumSubtitle}>{premiumStatus?.isPremiumActivated ? `✅ ${premiumStatus.activatedCode}` : premiumStatus?.isTrialActive ? `${premiumStatus.trialDaysRemaining} ${t.trialDaysLeft || 'days left'}` : ''}</Text>
+            <Text style={styles.premiumTitle}>{premiumStatus?.isPremiumActivated ? (t.premiumActive || 'Premium Ativo') : premiumStatus?.isTrialActive ? (t.trialActive || 'Período de Teste') : (t.trialExpired || 'Período Expirado')}</Text>
+            <Text style={styles.premiumSubtitle}>{premiumStatus?.isPremiumActivated ? `✅ ${premiumStatus.activatedCode}` : premiumStatus?.isTrialActive ? `${premiumStatus.trialDaysRemaining} ${t.trialDaysLeft || 'dias restantes'}` : (t.subscribeToUnlock || 'Subscreva para desbloquear')}</Text>
           </View>
         </View>
+
+        {/* Subscribe Button - Show when trial expired */}
+        {!premiumStatus?.hasPremium && (
+          <TouchableOpacity 
+            style={styles.subscribeButton} 
+            onPress={() => {
+              const storeUrl = Platform.OS === 'ios' ? APP_STORE_URL : PLAY_STORE_URL;
+              Linking.openURL(storeUrl);
+            }}
+          >
+            <Ionicons name="card-outline" size={24} color="#FFFFFF" />
+            <Text style={styles.subscribeButtonText}>{t.subscribePremium || 'Subscrever Premium'}</Text>
+          </TouchableOpacity>
+        )}
 
         {!premiumStatus?.isPremiumActivated && (
           <TouchableOpacity style={styles.activateButton} onPress={() => setShowActivationModal(true)}>
             <Ionicons name="ticket" size={24} color="#FFFFFF" />
-            <Text style={styles.activateButtonText}>{t.enterActivationCode || 'Enter activation code'}</Text>
+            <Text style={styles.activateButtonText}>{t.enterActivationCode || 'Inserir código de ativação'}</Text>
           </TouchableOpacity>
         )}
 
