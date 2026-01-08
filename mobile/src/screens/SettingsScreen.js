@@ -239,6 +239,25 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
         </View>
       </View>
 
+      {/* Legal Section */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Legal</Text>
+        <TouchableOpacity style={styles.settingItem} onPress={() => Linking.openURL(TERMS_URL)}>
+          <View style={styles.settingLeft}>
+            <Ionicons name="document-text-outline" size={24} color="#8E8E93" />
+            <Text style={styles.settingLabel}>{t.termsOfService || 'Terms of Service'}</Text>
+          </View>
+          <Ionicons name="open-outline" size={20} color="#8E8E93" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.settingItem} onPress={() => Linking.openURL(PRIVACY_URL)}>
+          <View style={styles.settingLeft}>
+            <Ionicons name="shield-checkmark-outline" size={24} color="#8E8E93" />
+            <Text style={styles.settingLabel}>{t.privacyPolicy || 'Privacy Policy'}</Text>
+          </View>
+          <Ionicons name="open-outline" size={20} color="#8E8E93" />
+        </TouchableOpacity>
+      </View>
+
       {/* Language Modal */}
       <Modal visible={showLanguageModal} animationType="slide" transparent={true} onRequestClose={() => setShowLanguageModal(false)}>
         <View style={styles.modalOverlay}>
