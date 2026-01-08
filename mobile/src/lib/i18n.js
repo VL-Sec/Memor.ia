@@ -79,6 +79,10 @@ export const translations = {
     deactivate: 'Stop',
     timeRemaining: 'left',
     
+    // Links
+    linkTitle: 'Title',
+    linkTitlePlaceholder: 'Link name',
+    
     // Notes
     notesPlaceholder: 'Start writing...',
     noteTitle: 'Title',
