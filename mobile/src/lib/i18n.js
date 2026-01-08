@@ -339,6 +339,13 @@ export const translations = {
     getPremium: 'Obter Premium',
     restorePurchase: 'Restaurar Compra',
     
+    // Reminders
+    setReminder: 'Lembrete',
+    reminderHint: 'Vais receber uma notificação nesta data e hora',
+    notificationPermissionDenied: 'Permissão de notificações negada',
+    reminderBody: 'Tens um link para ver!',
+    reminderSet: 'Lembrete definido',
+    
     // Settings
     settings: 'Definições',
     language: 'Idioma',
