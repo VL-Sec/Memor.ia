@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function CustomHeader({ title, showSettings = true }) {
+export default function CustomHeader({ title, showSettings = true, rightIcon, onRightIconPress, rightIconColor }) {
   const navigation = useNavigation();
 
   const goToSettings = () => {
@@ -13,11 +13,18 @@ export default function CustomHeader({ title, showSettings = true }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{title}</Text>
-      {showSettings && (
-        <TouchableOpacity style={styles.settingsButton} onPress={goToSettings}>
-          <Ionicons name="settings-outline" size={24} color="#8E8E93" />
-        </TouchableOpacity>
-      )}
+      <View style={styles.rightButtons}>
+        {rightIcon && (
+          <TouchableOpacity style={styles.iconButton} onPress={onRightIconPress}>
+            <Ionicons name={rightIcon} size={24} color={rightIconColor || "#8E8E93"} />
+          </TouchableOpacity>
+        )}
+        {showSettings && (
+          <TouchableOpacity style={styles.iconButton} onPress={goToSettings}>
+            <Ionicons name="settings-outline" size={24} color="#8E8E93" />
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 }
@@ -38,7 +45,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
   },
-  settingsButton: {
+  rightButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  iconButton: {
     padding: 8,
   },
 });
