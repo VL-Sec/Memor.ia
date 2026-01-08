@@ -320,18 +320,12 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
                 {folder?.isDefault ? t.generalFolder : folder?.name || t.generalFolder}
               </Text>
             </View>
-            {item.isPinned && (
-              <Ionicons name="pin" size={14} color="#FFD60A" style={{ marginLeft: 4 }} />
-            )}
-            {item.isFavorite && (
-              <Ionicons name="heart" size={14} color="#FF3B30" style={{ marginLeft: 4 }} />
-            )}
           </View>
         </View>
         <View style={styles.actionButtons}>
           <TouchableOpacity style={styles.actionBtn} onPress={() => handleTogglePin(item)}>
             <Ionicons 
-              name={item.isPinned ? "pin" : "pin-outline"} 
+              name="pin" 
               size={20} 
               color={item.isPinned ? "#FFD60A" : "#8E8E93"} 
             />
