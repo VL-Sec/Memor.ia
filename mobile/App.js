@@ -215,7 +215,7 @@ function TabNavigator({ language, userId, premiumStatus, refreshKey, triggerRefr
       <Tab.Screen name="Links" options={{ title: t.tabLinks || 'Links' }}>
         {(props) => <LinksScreen {...props} language={language} userId={userId} premiumStatus={premiumStatus} refreshKey={refreshKey} />}
       </Tab.Screen>
-      <Tab.Screen name="Clipboard" options={{ title: t.tabClipboard || 'Área' }}>
+      <Tab.Screen name="Clipboard" options={{ title: 'Clipboard' }}>
         {(props) => <ClipboardScreen {...props} language={language} userId={userId} premiumStatus={premiumStatus} refreshKey={refreshKey} triggerRefresh={triggerRefresh} />}
       </Tab.Screen>
       <Tab.Screen name="Notes" options={{ title: t.tabNotes || 'Notas' }}>
