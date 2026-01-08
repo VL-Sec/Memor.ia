@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, Image, Linking, RefreshControl, ScrollView, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -12,7 +13,7 @@ import CustomHeader from '../components/CustomHeader';
 const DEMO_USER = 'demo_user';
 const LOCAL_NOTES_KEY = 'memoria-notes';
 
-export default function FavoritesScreen({ language }) {
+export default function FavoritesScreen({ language, refreshKey }) {
   const [favorites, setFavorites] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
@@ -21,15 +22,43 @@ export default function FavoritesScreen({ language }) {
 
   const t = translations[language] || translations.en;
 
-  useEffect(() => { fetchFavorites(); }, []);
+  // Reload when screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      fetchFavorites();
+    }, [])
+  );
+
+  // Also reload when refreshKey changes
+  useEffect(() => {
+    if (refreshKey > 0) {
+      fetchFavorites();
+    }
+  }, [refreshKey]);
 
   const fetchFavorites = async () => {
     try {
-      const { data: supabaseData } = await supabase.from('links').select('*').eq('userId', DEMO_USER).eq('isFavorite', true).order('createdAt', { ascending: false });
+      // Fetch from Supabase (links and clipboard items)
+      const { data: supabaseData } = await supabase
+        .from('links')
+        .select('*')
+        .eq('userId', DEMO_USER)
+        .eq('isFavorite', true)
+        .order('createdAt', { ascending: false });
+      
+      // Fetch local notes
       const localNotesStr = await AsyncStorage.getItem(LOCAL_NOTES_KEY);
       const localNotes = localNotesStr ? JSON.parse(localNotesStr) : [];
-      const favoriteNotes = localNotes.filter(n => n.isFavorite).map(n => ({ ...n, contentType: 'note', source: 'local' }));
-      const allFavorites = [...(supabaseData || []).map(item => ({ ...item, source: 'supabase' })), ...favoriteNotes].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      const favoriteNotes = localNotes
+        .filter(n => n.isFavorite === true)
+        .map(n => ({ ...n, contentType: 'note', source: 'local' }));
+      
+      // Combine all favorites
+      const allFavorites = [
+        ...(supabaseData || []).map(item => ({ ...item, source: 'supabase' })),
+        ...favoriteNotes
+      ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      
       setFavorites(allFavorites);
     } catch (error) {
       console.error('Error fetching favorites:', error);
@@ -39,7 +68,9 @@ export default function FavoritesScreen({ language }) {
     }
   };
 
-  const handleOpenLink = (url) => { Linking.openURL(url); };
+  const handleOpenLink = (url) => { 
+    Linking.openURL(url); 
+  };
 
   const handleCopyContent = async (content) => {
     await Clipboard.setStringAsync(content);
@@ -49,13 +80,19 @@ export default function FavoritesScreen({ language }) {
   const handleRemoveFavorite = async (item) => {
     try {
       if (item.source === 'local') {
+        // Update local notes
         const localNotesStr = await AsyncStorage.getItem(LOCAL_NOTES_KEY);
         const localNotes = localNotesStr ? JSON.parse(localNotesStr) : [];
-        const updatedNotes = localNotes.map(n => n.id === item.id ? { ...n, isFavorite: false } : n);
+        const updatedNotes = localNotes.map(n => 
+          n.id === item.id ? { ...n, isFavorite: false } : n
+        );
         await AsyncStorage.setItem(LOCAL_NOTES_KEY, JSON.stringify(updatedNotes));
       } else {
+        // Update Supabase
         await supabase.from('links').update({ isFavorite: false }).eq('id', item.id);
       }
+      
+      // Remove from local state immediately
       setFavorites(favorites.filter(f => f.id !== item.id));
       Toast.show({ type: 'success', text1: t.removedFromFavorites || 'Removido dos favoritos' });
     } catch (error) {
@@ -81,8 +118,8 @@ export default function FavoritesScreen({ language }) {
   const getItemLabel = (type) => {
     switch (type) {
       case 'link': return 'Link';
-      case 'note': return t.tabNotes || 'Note';
-      case 'clipboard': return 'Clipboard';
+      case 'note': return t.tabNotes || 'Nota';
+      case 'clipboard': return t.tabClipboard || 'Área de Transferência';
       default: return 'Item';
     }
   };
@@ -96,21 +133,31 @@ export default function FavoritesScreen({ language }) {
     }
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
-    return item.title?.toLowerCase().includes(query) || item.url?.toLowerCase().includes(query) || item.content?.toLowerCase().includes(query);
+    return item.title?.toLowerCase().includes(query) || 
+           item.url?.toLowerCase().includes(query) || 
+           item.content?.toLowerCase().includes(query);
   });
 
   const renderItem = ({ item }) => {
     const itemType = getItemType(item);
     const isLink = itemType === 'link';
+    
     return (
-      <TouchableOpacity style={styles.card} onPress={() => isLink ? handleOpenLink(item.url) : handleCopyContent(item.content || '')}>
-        {isLink && item.imageUrl && <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />}
+      <TouchableOpacity 
+        style={styles.card} 
+        onPress={() => isLink ? handleOpenLink(item.url) : handleCopyContent(item.content || '')}
+      >
+        {isLink && item.imageUrl && (
+          <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
+        )}
         <View style={styles.cardContent}>
           <View style={styles.cardHeader}>
             <Ionicons name={getItemIcon(itemType)} size={16} color="#8E8E93" />
             <Text style={styles.cardType}>{getItemLabel(itemType)}</Text>
           </View>
-          <Text style={styles.cardTitle} numberOfLines={2}>{item.title || item.content?.slice(0, 50) || ''}</Text>
+          <Text style={styles.cardTitle} numberOfLines={2}>
+            {item.title || item.content?.slice(0, 50) || ''}
+          </Text>
           {isLink && <Text style={styles.cardUrl} numberOfLines={1}>{item.url || ''}</Text>}
           {!isLink && <Text style={styles.cardPreview} numberOfLines={2}>{item.content || ''}</Text>}
         </View>
@@ -122,37 +169,71 @@ export default function FavoritesScreen({ language }) {
   };
 
   const FilterChip = ({ value, label }) => (
-    <TouchableOpacity style={[styles.filterChip, filter === value && styles.filterChipActive]} onPress={() => setFilter(value)}>
-      <Text style={[styles.filterChipText, filter === value && styles.filterChipTextActive]}>{label}</Text>
+    <TouchableOpacity 
+      style={[styles.filterChip, filter === value && styles.filterChipActive]} 
+      onPress={() => setFilter(value)}
+    >
+      <Text style={[styles.filterChipText, filter === value && styles.filterChipTextActive]}>
+        {label}
+      </Text>
     </TouchableOpacity>
   );
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <CustomHeader title={t.tabFavorites || 'Favorites'} />
+      <CustomHeader title={t.tabFavorites || 'Favoritos'} />
       <View style={styles.container}>
         <View style={styles.searchContainer}>
           <Ionicons name="search" size={20} color="#8E8E93" />
-          <TextInput style={styles.searchInput} placeholder={t.search} placeholderTextColor="#8E8E93" value={searchQuery} onChangeText={setSearchQuery} />
+          <TextInput 
+            style={styles.searchInput} 
+            placeholder={t.search} 
+            placeholderTextColor="#8E8E93" 
+            value={searchQuery} 
+            onChangeText={setSearchQuery} 
+          />
         </View>
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterContainer}>
           <FilterChip value="all" label={t.all || 'Todos'} />
           <FilterChip value="links" label="Links" />
           <FilterChip value="notes" label={t.tabNotes || 'Notas'} />
-          <FilterChip value="clipboard" label="Clipboard" />
+          <FilterChip value="clipboard" label={t.tabClipboard || 'Área'} />
         </ScrollView>
 
         {filteredFavorites.length === 0 ? (
-          <ScrollView style={{ flex: 1 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchFavorites(); }} tintColor="#007AFF" />}>
+          <ScrollView 
+            style={{ flex: 1 }} 
+            refreshControl={
+              <RefreshControl 
+                refreshing={refreshing} 
+                onRefresh={() => { setRefreshing(true); fetchFavorites(); }} 
+                tintColor="#007AFF" 
+              />
+            }
+          >
             <View style={styles.emptyState}>
               <Ionicons name="heart-outline" size={64} color="#8E8E93" />
               <Text style={styles.emptyText}>{t.noFavorites || 'Sem favoritos'}</Text>
-              <Text style={styles.emptySubtext}>{t.addFavoritesHint || 'Toque no coração para adicionar favoritos'}</Text>
+              <Text style={styles.emptySubtext}>
+                {t.addFavoritesHint || 'Toque no coração para adicionar favoritos'}
+              </Text>
             </View>
           </ScrollView>
         ) : (
-          <FlatList data={filteredFavorites} keyExtractor={(item) => item.id} renderItem={renderItem} contentContainerStyle={styles.listContent} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchFavorites(); }} tintColor="#007AFF" />} />
+          <FlatList 
+            data={filteredFavorites} 
+            keyExtractor={(item) => item.id} 
+            renderItem={renderItem} 
+            contentContainerStyle={styles.listContent} 
+            refreshControl={
+              <RefreshControl 
+                refreshing={refreshing} 
+                onRefresh={() => { setRefreshing(true); fetchFavorites(); }} 
+                tintColor="#007AFF" 
+              />
+            } 
+          />
         )}
       </View>
     </SafeAreaView>
