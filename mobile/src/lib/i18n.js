@@ -138,6 +138,8 @@ export const translations = {
     weeklySummaryEnabled: 'Weekly digest enabled',
     weeklySummaryDisabled: 'Weekly digest disabled',
     notificationPermissionRequired: 'Please enable notifications in your device settings to receive weekly summaries.',
+    expoGoNotSupported: 'Notifications are not supported in Expo Go. Please use the published app to enable this feature.',
+    notificationError: 'Could not enable notifications. Please try again later.',
     
     // Days of week
     sunday: 'Sunday',
