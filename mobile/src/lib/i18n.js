@@ -233,6 +233,10 @@ export const translations = {
     emptyClipboardSubtitle: 'Paste text or activate Smart Clipboard',
     emptyFavoritesTitle: 'No favorites yet',
     emptyFavoritesSubtitle: 'Tap the heart on any item to add it here',
+    
+    // Premium & Subscription
+    subscribePremium: 'Subscribe Premium',
+    subscribeToUnlock: 'Subscribe to unlock all features',
   },
 
   // ============================================
