@@ -462,6 +462,7 @@ const styles = StyleSheet.create({
   addFolderChip: { backgroundColor: '#2C2C2E', width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#3A3A3C' },
   listContent: { padding: 16, paddingTop: 8, paddingBottom: 100 },
   linkCard: { backgroundColor: '#1C1C1E', borderRadius: 16, marginBottom: 12, flexDirection: 'row', overflow: 'hidden' },
+  linkTouchable: { flex: 1, flexDirection: 'row' },
   linkImage: { width: 80, height: 80 },
   linkContent: { flex: 1, padding: 12 },
   linkTitleRow: { flexDirection: 'row', alignItems: 'center' },
