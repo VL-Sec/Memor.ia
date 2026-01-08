@@ -54,12 +54,14 @@ const theme = {
 // CUSTOM TAB BAR - Perfect 4-way distribution
 // ============================================
 function CustomTabBar({ state, descriptors, navigation, insets }) {
+  // Calculate exact width for each tab
+  const tabWidth = SCREEN_WIDTH / state.routes.length;
+  
   return (
     <View style={[
       tabBarStyles.container, 
       { 
         paddingBottom: Math.max(insets.bottom, 10),
-        width: '100%',
       }
     ]}>
       {state.routes.map((route, index) => {
@@ -113,7 +115,7 @@ function CustomTabBar({ state, descriptors, navigation, insets }) {
             testID={options.tabBarTestID}
             onPress={onPress}
             onLongPress={onLongPress}
-            style={tabBarStyles.tab}
+            style={[tabBarStyles.tab, { width: tabWidth }]}
             activeOpacity={0.7}
           >
             <Ionicons 
@@ -144,9 +146,9 @@ const tabBarStyles = StyleSheet.create({
     borderTopWidth: 0.5,
     borderTopColor: '#2C2C2E',
     paddingTop: 8,
+    width: SCREEN_WIDTH,
   },
   tab: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 6,
