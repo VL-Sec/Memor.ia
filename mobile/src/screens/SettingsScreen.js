@@ -229,44 +229,89 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
   const handleExportBackup = async () => {
     setIsExporting(true);
     try {
-      // Collect all data
+      // Show loading message
+      Toast.show({ type: 'info', text1: t.exportingBackup || 'A exportar backup...' });
+      
+      // Collect all local data from AsyncStorage
       const localNotes = await AsyncStorage.getItem(LOCAL_NOTES_KEY);
       const settings = await AsyncStorage.getItem('memoria-weekly-summary');
       const premiumData = await AsyncStorage.getItem('memoria-premium');
+      const languageData = await AsyncStorage.getItem('memoria-language');
       
-      // Fetch Supabase data
-      const { data: linksData } = await supabase.from('links').select('*').eq('userId', DEMO_USER);
-      const { data: foldersData } = await supabase.from('folders').select('*').eq('userId', DEMO_USER);
+      // Fetch all Supabase data (links and clipboard items)
+      const { data: linksData, error: linksError } = await supabase
+        .from('links')
+        .select('*')
+        .eq('userId', DEMO_USER);
+      
+      const { data: foldersData, error: foldersError } = await supabase
+        .from('folders')
+        .select('*')
+        .eq('userId', DEMO_USER);
+      
+      if (linksError) console.error('Links fetch error:', linksError);
+      if (foldersError) console.error('Folders fetch error:', foldersError);
+      
+      // Separate links and clipboard items
+      const links = (linksData || []).filter(item => item.contentType === 'link');
+      const clipboardItems = (linksData || []).filter(item => item.contentType === 'text');
       
       const backupData = {
+        appName: 'Memor.ia',
         version: '1.0.0',
         exportDate: new Date().toISOString(),
+        deviceInfo: {
+          platform: Platform.OS,
+        },
         data: {
-          localNotes: localNotes ? JSON.parse(localNotes) : [],
-          links: linksData || [],
+          notes: localNotes ? JSON.parse(localNotes) : [],
+          links: links,
+          clipboardItems: clipboardItems,
           folders: foldersData || [],
-          settings: settings ? JSON.parse(settings) : {},
+          settings: {
+            weeklySummary: settings ? JSON.parse(settings) : {},
+            language: languageData || 'en',
+          },
           premium: premiumData ? JSON.parse(premiumData) : {}
+        },
+        stats: {
+          totalNotes: localNotes ? JSON.parse(localNotes).length : 0,
+          totalLinks: links.length,
+          totalClipboardItems: clipboardItems.length,
+          totalFolders: (foldersData || []).length,
         }
       };
       
       const fileName = `memoria-backup-${new Date().toISOString().split('T')[0]}.json`;
       const filePath = `${FileSystem.documentDirectory}${fileName}`;
       
+      // Write file
       await FileSystem.writeAsStringAsync(filePath, JSON.stringify(backupData, null, 2));
       
+      // Verify file was created
+      const fileInfo = await FileSystem.getInfoAsync(filePath);
+      if (!fileInfo.exists) {
+        throw new Error('Failed to create backup file');
+      }
+      
+      // Share the file
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(filePath, {
           mimeType: 'application/json',
-          dialogTitle: t.exportBackup || 'Export Backup'
+          dialogTitle: t.exportBackup || 'Exportar Backup',
+          UTI: 'public.json',
         });
-        Toast.show({ type: 'success', text1: t.backupExported || 'Backup exportado com sucesso!' });
+        Toast.show({ 
+          type: 'success', 
+          text1: t.backupExported || 'Backup exportado!',
+          text2: `${backupData.stats.totalNotes} notas, ${backupData.stats.totalLinks} links, ${backupData.stats.totalClipboardItems} itens`
+        });
       } else {
-        Toast.show({ type: 'error', text1: t.sharingNotAvailable || 'Partilha não disponível' });
+        Toast.show({ type: 'error', text1: t.sharingNotAvailable || 'Partilha não disponível neste dispositivo' });
       }
     } catch (error) {
       console.error('Export error:', error);
-      Toast.show({ type: 'error', text1: t.exportError || 'Erro ao exportar backup' });
+      Toast.show({ type: 'error', text1: t.exportError || 'Erro ao exportar', text2: error.message });
     } finally {
       setIsExporting(false);
     }
