@@ -9,9 +9,7 @@ import { supabase, generateId } from '../lib/supabase';
 import { translations } from '../lib/i18n';
 import CustomHeader from '../components/CustomHeader';
 
-const DEMO_USER = 'demo_user';
-
-export default function ClipboardScreen({ language, refreshKey, triggerRefresh }) {
+export default function ClipboardScreen({ language, userId, refreshKey, triggerRefresh }) {
   const [notes, setNotes] = useState([]);
   const [folders, setFolders] = useState([]);
   const [selectedFolder, setSelectedFolder] = useState('all');
