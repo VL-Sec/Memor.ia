@@ -292,7 +292,10 @@ export default function LinksScreen({ language, refreshKey }) {
 
   const renderLinkItem = ({ item }) => {
     const folder = folders.find(f => f.id === item.folderId);
-    const hasReminder = item.reminder && item.reminder.location;
+    const hasReminder = item.reminder && item.reminder.date;
+    const reminderDate = hasReminder ? new Date(item.reminder.date) : null;
+    const isReminderPast = reminderDate && reminderDate < new Date();
+    
     return (
       <View style={styles.linkCard}>
         <TouchableOpacity style={styles.linkTouchable} onPress={() => handleOpenLink(item.url || '')}>
@@ -306,10 +309,12 @@ export default function LinksScreen({ language, refreshKey }) {
               <View style={styles.folderBadge}>
                 <Text style={styles.folderBadgeText}>{folder?.isDefault ? t.generalFolder : folder?.name || t.generalFolder}</Text>
               </View>
-              {hasReminder && (
+              {hasReminder && !isReminderPast && (
                 <View style={styles.reminderBadge}>
-                  <Ionicons name="location" size={12} color="#FFD60A" />
-                  <Text style={styles.reminderBadgeText}>{t.reminder}</Text>
+                  <Ionicons name="notifications" size={12} color="#34C759" />
+                  <Text style={styles.reminderBadgeText}>
+                    {reminderDate.toLocaleDateString(language === 'pt' ? 'pt-PT' : language, { day: '2-digit', month: '2-digit' })}
+                  </Text>
                 </View>
               )}
             </View>
