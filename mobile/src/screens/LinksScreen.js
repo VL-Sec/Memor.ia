@@ -168,7 +168,6 @@ export default function LinksScreen({ language, refreshKey }) {
         <View style={styles.linkContent}>
           <View style={styles.linkTitleRow}>
             <Text style={styles.linkTitle} numberOfLines={2}>{item.title || item.url || ''}</Text>
-            {item.isPinned && <Ionicons name="pin" size={14} color="#FFD60A" style={{ marginLeft: 4 }} />}
           </View>
           <Text style={styles.linkUrl} numberOfLines={1}>{item.url || ''}</Text>
           <View style={styles.linkMeta}>
@@ -181,18 +180,17 @@ export default function LinksScreen({ language, refreshKey }) {
                 <Text style={styles.reminderBadgeText}>{t.reminder}</Text>
               </View>
             )}
-            {item.isFavorite && <Ionicons name="heart" size={14} color="#FF3B30" />}
           </View>
         </View>
         <View style={styles.linkActions}>
           <TouchableOpacity style={styles.actionBtn} onPress={() => handleTogglePin(item)}>
-            <Ionicons name={item.isPinned ? "pin" : "pin-outline"} size={20} color={item.isPinned ? "#FFD60A" : "#8E8E93"} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionBtn} onPress={() => openEditModal(item)}>
-            <Ionicons name="pencil" size={18} color="#8E8E93" />
+            <Ionicons name="pin" size={20} color={item.isPinned ? "#FFD60A" : "#8E8E93"} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionBtn} onPress={() => handleToggleFavorite(item)}>
             <Ionicons name={item.isFavorite ? 'heart' : 'heart-outline'} size={20} color={item.isFavorite ? '#FF3B30' : '#8E8E93'} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.actionBtn} onPress={() => openEditModal(item)}>
+            <Ionicons name="pencil-outline" size={18} color="#8E8E93" />
           </TouchableOpacity>
         </View>
       </TouchableOpacity>
