@@ -188,46 +188,48 @@ export default function ClipboardScreen({ language }) {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.addContainer}>
-        <TextInput style={styles.addInput} placeholder={t.clipboardPlaceholder} placeholderTextColor="#8E8E93" value={newContent} onChangeText={setNewContent} multiline />
-        <View style={styles.addActions}>
-          <Text style={styles.charCount}>{newContent.length} {t.chars}</Text>
-          <TouchableOpacity style={[styles.saveButton, !newContent.trim() && styles.saveButtonDisabled]} onPress={handleAddNote} disabled={!newContent.trim()}>
-            <Ionicons name="add" size={20} color="#FFFFFF" />
-            <Text style={styles.saveButtonText}>{t.save}</Text>
-          </TouchableOpacity>
+    <>
+      <CustomHeader title={t.tabClipboard || 'Clipboard'} />
+      <View style={styles.container}>
+        <View style={styles.addContainer}>
+          <TextInput style={styles.addInput} placeholder={t.clipboardPlaceholder} placeholderTextColor="#8E8E93" value={newContent} onChangeText={setNewContent} multiline />
+          <View style={styles.addActions}>
+            <Text style={styles.charCount}>{newContent.length} {t.chars}</Text>
+            <TouchableOpacity style={[styles.saveButton, !newContent.trim() && styles.saveButtonDisabled]} onPress={handleAddNote} disabled={!newContent.trim()}>
+              <Ionicons name="add" size={20} color="#FFFFFF" />
+              <Text style={styles.saveButtonText}>{t.save}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
 
-      <TouchableOpacity style={[styles.smartClipboard, smartClipboardActive && styles.smartClipboardActive]} onPress={smartClipboardActive ? () => setSmartClipboardActive(false) : activateSmartClipboard}>
-        <View style={styles.smartClipboardIcon}>
-          <Ionicons name="clipboard" size={24} color={smartClipboardActive ? '#FFFFFF' : '#007AFF'} />
-        </View>
-        <View style={styles.smartClipboardContent}>
-          <Text style={styles.smartClipboardTitle}>{t.smartClipboard}</Text>
-          <Text style={styles.smartClipboardInfo}>{smartClipboardActive ? `${formatTime(timeLeft)} ${t.timeRemaining}` : t.smartClipboardInfo}</Text>
-        </View>
-        <View style={[styles.smartClipboardButton, smartClipboardActive && styles.smartClipboardButtonStop]}>
-          <Text style={styles.smartClipboardButtonText}>{smartClipboardActive ? t.deactivate : t.activate}</Text>
-        </View>
-      </TouchableOpacity>
-
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color="#8E8E93" />
-        <TextInput style={styles.searchInput} placeholder={t.search} placeholderTextColor="#8E8E93" value={searchQuery} onChangeText={setSearchQuery} />
-      </View>
-
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.folderList}>
-        <TouchableOpacity style={[styles.folderChip, selectedFolder === 'all' && styles.folderChipActive]} onPress={() => setSelectedFolder('all')}>
-          <Text style={[styles.folderChipText, selectedFolder === 'all' && styles.folderChipTextActive]}>{t.allClipboards}</Text>
+        <TouchableOpacity style={[styles.smartClipboard, smartClipboardActive && styles.smartClipboardActive]} onPress={smartClipboardActive ? () => setSmartClipboardActive(false) : activateSmartClipboard}>
+          <View style={styles.smartClipboardIcon}>
+            <Ionicons name="clipboard" size={24} color={smartClipboardActive ? '#FFFFFF' : '#007AFF'} />
+          </View>
+          <View style={styles.smartClipboardContent}>
+            <Text style={styles.smartClipboardTitle}>{t.smartClipboard}</Text>
+            <Text style={styles.smartClipboardInfo}>{smartClipboardActive ? `${formatTime(timeLeft)} ${t.timeRemaining}` : t.smartClipboardInfo}</Text>
+          </View>
+          <View style={[styles.smartClipboardButton, smartClipboardActive && styles.smartClipboardButtonStop]}>
+            <Text style={styles.smartClipboardButtonText}>{smartClipboardActive ? t.deactivate : t.activate}</Text>
+          </View>
         </TouchableOpacity>
-        {folders.map(folder => (
-          <TouchableOpacity key={folder.id} style={[styles.folderChip, selectedFolder === folder.id && styles.folderChipActive]} onPress={() => setSelectedFolder(folder.id)}>
-            <Text style={[styles.folderChipText, selectedFolder === folder.id && styles.folderChipTextActive]}>{folder.isDefault ? t.generalFolder : folder.name}</Text>
+
+        <View style={styles.searchContainer}>
+          <Ionicons name="search" size={20} color="#8E8E93" />
+          <TextInput style={styles.searchInput} placeholder={t.search} placeholderTextColor="#8E8E93" value={searchQuery} onChangeText={setSearchQuery} />
+        </View>
+
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.folderList}>
+          <TouchableOpacity style={[styles.folderChip, selectedFolder === 'all' && styles.folderChipActive]} onPress={() => setSelectedFolder('all')}>
+            <Text style={[styles.folderChipText, selectedFolder === 'all' && styles.folderChipTextActive]}>{t.allClipboards}</Text>
           </TouchableOpacity>
-        ))}
-      </ScrollView>
+          {folders.map(folder => (
+            <TouchableOpacity key={folder.id} style={[styles.folderChip, selectedFolder === folder.id && styles.folderChipActive]} onPress={() => setSelectedFolder(folder.id)}>
+              <Text style={[styles.folderChipText, selectedFolder === folder.id && styles.folderChipTextActive]}>{folder.isDefault ? t.generalFolder : folder.name}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
 
       {filteredNotes.length === 0 ? (
         <ScrollView style={{ flex: 1 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchData(); }} tintColor="#007AFF" />}>
