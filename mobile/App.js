@@ -171,6 +171,7 @@ export default function App() {
         setPremiumStatus={setPremiumStatus}
         refreshKey={refreshKey}
         triggerRefresh={triggerRefresh}
+        userId={userId}
         t={t}
       />
     </SafeAreaProvider>
@@ -178,7 +179,7 @@ export default function App() {
 }
 
 // Separate component to use safe area insets
-function AppContent({ language, setLanguage, premiumStatus, setPremiumStatus, refreshKey, triggerRefresh, t }) {
+function AppContent({ language, setLanguage, premiumStatus, setPremiumStatus, refreshKey, triggerRefresh, userId, t }) {
   const insets = useSafeAreaInsets();
   
   return (
