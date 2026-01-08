@@ -23,6 +23,7 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
   const [timeLeft, setTimeLeft] = useState(0);
   const lastClipboardContent = useRef('');
   const appState = useRef(AppState.currentState);
+  const clipboardCheckInterval = useRef(null);
   
   // Edit modal state
   const [showEditModal, setShowEditModal] = useState(false);
@@ -53,50 +54,84 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
       timer = setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
-            setSmartClipboardActive(false);
-            Toast.show({ type: 'info', text1: t.smartClipboard || 'Área de Transferência Inteligente', text2: t.smartClipboardDeactivated || 'Desativada' });
+            deactivateSmartClipboard();
             return 0;
           }
           return prev - 1;
         });
       }, 1000);
     }
-    return () => clearInterval(timer);
+    return () => {
+      if (timer) clearInterval(timer);
+    };
   }, [smartClipboardActive, timeLeft]);
 
   // Smart Clipboard - Monitor clipboard when active
   useEffect(() => {
-    let clipboardInterval;
-    
-    const checkClipboard = async () => {
-      if (!smartClipboardActive) return;
-      
-      try {
-        const content = await Clipboard.getStringAsync();
-        if (content && content !== lastClipboardContent.current && content.trim().length > 0) {
-          lastClipboardContent.current = content;
-          await autoSaveClipboard(content);
-        }
-      } catch (error) {
-        console.error('Error checking clipboard:', error);
-      }
-    };
-
     if (smartClipboardActive) {
-      clipboardInterval = setInterval(checkClipboard, 2000);
-      const subscription = AppState.addEventListener('change', (nextAppState) => {
-        if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
-          checkClipboard();
-        }
-        appState.current = nextAppState;
-      });
+      // Start monitoring clipboard
+      startClipboardMonitoring();
+      
+      // Monitor app state changes
+      const subscription = AppState.addEventListener('change', handleAppStateChange);
       
       return () => {
-        clearInterval(clipboardInterval);
+        stopClipboardMonitoring();
         subscription?.remove();
       };
+    } else {
+      stopClipboardMonitoring();
     }
   }, [smartClipboardActive]);
+
+  const handleAppStateChange = async (nextAppState) => {
+    if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
+      // App came to foreground - check clipboard immediately
+      if (smartClipboardActive) {
+        await checkAndSaveClipboard();
+      }
+    }
+    appState.current = nextAppState;
+  };
+
+  const startClipboardMonitoring = () => {
+    // Clear any existing interval
+    stopClipboardMonitoring();
+    
+    // Check clipboard every 1.5 seconds
+    clipboardCheckInterval.current = setInterval(async () => {
+      await checkAndSaveClipboard();
+    }, 1500);
+  };
+
+  const stopClipboardMonitoring = () => {
+    if (clipboardCheckInterval.current) {
+      clearInterval(clipboardCheckInterval.current);
+      clipboardCheckInterval.current = null;
+    }
+  };
+
+  const checkAndSaveClipboard = async () => {
+    if (!smartClipboardActive) return;
+    
+    try {
+      const content = await Clipboard.getStringAsync();
+      
+      // Only save if content is different and not empty
+      if (content && 
+          content.trim().length > 0 && 
+          content !== lastClipboardContent.current) {
+        
+        // Update last content immediately to prevent duplicates
+        lastClipboardContent.current = content;
+        
+        // Save to database
+        await autoSaveClipboard(content);
+      }
+    } catch (error) {
+      console.error('Error checking clipboard:', error);
+    }
+  };
 
   const autoSaveClipboard = async (content) => {
     try {
@@ -113,10 +148,16 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
         folderId: defaultFolder?.id,
         createdAt: new Date().toISOString(),
       };
+      
       const { error } = await supabase.from('links').insert([newNote]);
+      
       if (!error) {
+        // Add to local state immediately
         setNotes(prev => [newNote, ...prev]);
-        Toast.show({ type: 'success', text1: t.smartClipboard || 'Área Inteligente', text2: t.autoSaved || 'Conteúdo guardado automaticamente' });
+        Toast.show({ 
+          type: 'success', 
+          text1: t.autoSaved || 'Guardado automaticamente',
+        });
       }
     } catch (error) {
       console.error('Error auto-saving:', error);
@@ -169,6 +210,8 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
       if (error) throw error;
       setNotes([newNote, ...notes]);
       setNewContent('');
+      // Update last clipboard content to prevent auto-save of what we just added
+      lastClipboardContent.current = newContent;
       Toast.show({ type: 'success', text1: t.saved });
       if (triggerRefresh) triggerRefresh();
     } catch (error) {
@@ -179,6 +222,7 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
 
   const handleCopyNote = async (content) => {
     await Clipboard.setStringAsync(content);
+    // Update last content to prevent re-saving what we just copied
     lastClipboardContent.current = content;
     Toast.show({ type: 'success', text1: t.copied });
   };
@@ -264,6 +308,7 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
   };
 
   const activateSmartClipboard = async () => {
+    // Get current clipboard content so we don't save it immediately
     try {
       const currentContent = await Clipboard.getStringAsync();
       lastClipboardContent.current = currentContent || '';
@@ -272,21 +317,21 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
     }
     
     setSmartClipboardActive(true);
-    setTimeLeft(120);
+    setTimeLeft(120); // 2 minutes
     Toast.show({ 
       type: 'success', 
-      text1: t.smartClipboard || 'Área de Transferência Inteligente', 
-      text2: t.smartClipboardActivated || 'Ativada por 2 minutos' 
+      text1: t.smartClipboardActivated || 'Área Inteligente Ativada',
+      text2: t.smartClipboardInfo2 || 'A capturar tudo o que copias durante 2 minutos'
     });
   };
 
   const deactivateSmartClipboard = () => {
     setSmartClipboardActive(false);
     setTimeLeft(0);
+    stopClipboardMonitoring();
     Toast.show({ 
       type: 'info', 
-      text1: t.smartClipboard || 'Área de Transferência Inteligente', 
-      text2: t.smartClipboardDeactivated || 'Desativada' 
+      text1: t.smartClipboardDeactivated || 'Área Inteligente Desativada'
     });
   };
 
@@ -352,11 +397,46 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <CustomHeader title={t.tabClipboard || 'Área de Transferência'} />
       <View style={styles.container}>
-        {/* Add new content */}
+        {/* 1. Search - First */}
+        <View style={styles.searchContainer}>
+          <Ionicons name="search" size={20} color="#8E8E93" />
+          <TextInput 
+            style={styles.searchInput} 
+            placeholder={t.search || 'Pesquisar...'} 
+            placeholderTextColor="#8E8E93" 
+            value={searchQuery} 
+            onChangeText={setSearchQuery} 
+          />
+        </View>
+
+        {/* 2. Smart Clipboard - Second */}
+        <TouchableOpacity 
+          style={[styles.smartClipboard, smartClipboardActive && styles.smartClipboardActive]} 
+          onPress={smartClipboardActive ? deactivateSmartClipboard : activateSmartClipboard}
+        >
+          <View style={[styles.smartClipboardIcon, smartClipboardActive && styles.smartClipboardIconActive]}>
+            <Ionicons name="clipboard" size={24} color={smartClipboardActive ? '#FFFFFF' : '#007AFF'} />
+          </View>
+          <View style={styles.smartClipboardContent}>
+            <Text style={styles.smartClipboardTitle}>{t.smartClipboard || 'Área de Transferência Inteligente'}</Text>
+            <Text style={styles.smartClipboardInfo}>
+              {smartClipboardActive 
+                ? `${formatTime(timeLeft)} ${t.timeRemaining || 'restantes'}` 
+                : t.smartClipboardInfo || 'Guarda automaticamente tudo o que copiares enquanto estiver ativo.'}
+            </Text>
+          </View>
+          <View style={[styles.smartClipboardButton, smartClipboardActive && styles.smartClipboardButtonStop]}>
+            <Text style={styles.smartClipboardButtonText}>
+              {smartClipboardActive ? (t.stop || 'Parar') : (t.start || 'Iniciar')}
+            </Text>
+          </View>
+        </TouchableOpacity>
+
+        {/* 3. Add new content - Third */}
         <View style={styles.addContainer}>
           <TextInput 
             style={styles.addInput} 
-            placeholder={t.clipboardPlaceholder || 'Escreve ou cola texto aqui...'} 
+            placeholder={t.clipboardPlaceholder || 'Cola o texto aqui...'} 
             placeholderTextColor="#8E8E93" 
             value={newContent} 
             onChangeText={setNewContent} 
@@ -370,47 +450,12 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
               disabled={!newContent.trim()}
             >
               <Ionicons name="add" size={20} color="#FFFFFF" />
-              <Text style={styles.saveButtonText}>{t.save}</Text>
+              <Text style={styles.saveButtonText}>{t.save || 'Guardar'}</Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Smart Clipboard */}
-        <TouchableOpacity 
-          style={[styles.smartClipboard, smartClipboardActive && styles.smartClipboardActive]} 
-          onPress={smartClipboardActive ? deactivateSmartClipboard : activateSmartClipboard}
-        >
-          <View style={[styles.smartClipboardIcon, smartClipboardActive && styles.smartClipboardIconActive]}>
-            <Ionicons name="clipboard" size={24} color={smartClipboardActive ? '#FFFFFF' : '#007AFF'} />
-          </View>
-          <View style={styles.smartClipboardContent}>
-            <Text style={styles.smartClipboardTitle}>{t.smartClipboard || 'Área Inteligente'}</Text>
-            <Text style={styles.smartClipboardInfo}>
-              {smartClipboardActive 
-                ? `${formatTime(timeLeft)} ${t.timeRemaining || 'restantes'}` 
-                : t.smartClipboardInfo || 'Guarda automaticamente o que copias'}
-            </Text>
-          </View>
-          <View style={[styles.smartClipboardButton, smartClipboardActive && styles.smartClipboardButtonStop]}>
-            <Text style={styles.smartClipboardButtonText}>
-              {smartClipboardActive ? (t.deactivate || 'Parar') : (t.activate || 'Ativar')}
-            </Text>
-          </View>
-        </TouchableOpacity>
-
-        {/* Search */}
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color="#8E8E93" />
-          <TextInput 
-            style={styles.searchInput} 
-            placeholder={t.search} 
-            placeholderTextColor="#8E8E93" 
-            value={searchQuery} 
-            onChangeText={setSearchQuery} 
-          />
-        </View>
-
-        {/* Folder filter */}
+        {/* 4. Folder filter */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.folderList}>
           <TouchableOpacity 
             style={[styles.folderChip, selectedFolder === 'all' && styles.folderChipActive]} 
@@ -433,7 +478,7 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
           ))}
         </ScrollView>
 
-        {/* Notes list */}
+        {/* 5. Notes list */}
         {sortedNotes.length === 0 ? (
           <ScrollView 
             style={{ flex: 1 }} 
@@ -503,12 +548,10 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#000000' },
   container: { flex: 1, backgroundColor: '#000000' },
-  addContainer: { backgroundColor: '#1C1C1E', margin: 16, borderRadius: 16, padding: 12 },
-  addInput: { color: '#FFFFFF', fontSize: 16, minHeight: 80, textAlignVertical: 'top' },
-  addActions: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 },
-  saveButton: { backgroundColor: '#007AFF', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, gap: 4 },
-  saveButtonDisabled: { opacity: 0.5 },
-  saveButtonText: { color: '#FFFFFF', fontWeight: '600' },
+  // Search - First
+  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1C1C1E', marginHorizontal: 16, marginTop: 16, marginBottom: 12, paddingHorizontal: 12, borderRadius: 12, height: 44 },
+  searchInput: { flex: 1, marginLeft: 8, color: '#FFFFFF', fontSize: 16 },
+  // Smart Clipboard - Second
   smartClipboard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1C1C1E', marginHorizontal: 16, marginBottom: 12, borderRadius: 16, padding: 12, borderWidth: 1, borderColor: '#2C2C2E' },
   smartClipboardActive: { backgroundColor: 'rgba(0, 122, 255, 0.15)', borderColor: '#007AFF' },
   smartClipboardIcon: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(0, 122, 255, 0.2)', justifyContent: 'center', alignItems: 'center' },
@@ -516,16 +559,23 @@ const styles = StyleSheet.create({
   smartClipboardContent: { flex: 1, marginLeft: 12 },
   smartClipboardTitle: { color: '#FFFFFF', fontWeight: '600', fontSize: 14 },
   smartClipboardInfo: { color: '#8E8E93', fontSize: 12, marginTop: 2 },
-  smartClipboardButton: { backgroundColor: '#007AFF', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 14 },
+  smartClipboardButton: { backgroundColor: '#007AFF', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 14 },
   smartClipboardButtonStop: { backgroundColor: '#FF3B30' },
-  smartClipboardButtonText: { color: '#FFFFFF', fontSize: 12, fontWeight: '600' },
-  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1C1C1E', marginHorizontal: 16, marginBottom: 8, paddingHorizontal: 12, borderRadius: 12, height: 40 },
-  searchInput: { flex: 1, marginLeft: 8, color: '#FFFFFF', fontSize: 16 },
+  smartClipboardButtonText: { color: '#FFFFFF', fontSize: 13, fontWeight: '600' },
+  // Add container - Third
+  addContainer: { backgroundColor: '#1C1C1E', marginHorizontal: 16, marginBottom: 12, borderRadius: 16, padding: 12 },
+  addInput: { color: '#FFFFFF', fontSize: 16, minHeight: 60, textAlignVertical: 'top' },
+  addActions: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 },
+  saveButton: { backgroundColor: '#007AFF', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, gap: 4 },
+  saveButtonDisabled: { opacity: 0.5 },
+  saveButtonText: { color: '#FFFFFF', fontWeight: '600' },
+  // Folder filter
   folderList: { paddingHorizontal: 16, marginBottom: 8, maxHeight: 44 },
   folderChip: { backgroundColor: '#1C1C1E', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, marginRight: 8 },
   folderChipActive: { backgroundColor: '#007AFF' },
   folderChipText: { color: '#8E8E93', fontSize: 14 },
   folderChipTextActive: { color: '#FFFFFF' },
+  // List
   listContent: { padding: 16, paddingTop: 8, paddingBottom: 100 },
   noteCard: { backgroundColor: '#1C1C1E', borderRadius: 16, marginBottom: 12, padding: 12, flexDirection: 'row' },
   noteContent: { flex: 1 },
