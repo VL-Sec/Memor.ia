@@ -10,6 +10,7 @@ import * as Sharing from 'expo-sharing';
 import * as DocumentPicker from 'expo-document-picker';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { translations, languages, setLanguage as saveLanguage } from '../lib/i18n';
 import { activatePremium, getPremiumStatus } from '../lib/premium';
 import { supabase } from '../lib/supabase';
