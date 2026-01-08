@@ -197,11 +197,11 @@ export default function NotesScreen({ language }) {
           )}
         </View>
       </View>
-      <Text style={styles.noteContent} numberOfLines={4}>{item.content}</Text>
+      <Text style={styles.noteContent} numberOfLines={4}>{item.content || ''}</Text>
       <View style={styles.noteFooter}>
-        <Text style={styles.noteDate}>{formatDate(item.updatedAt)}</Text>
+        <Text style={styles.noteDate}>{formatDate(item.updatedAt || item.createdAt)}</Text>
         <View style={styles.noteActions}>
-          <TouchableOpacity onPress={() => handleCopyNote(item.content)} style={styles.actionButton}>
+          <TouchableOpacity onPress={() => handleCopyNote(item.content || '')} style={styles.actionButton}>
             <Ionicons name="copy-outline" size={18} color="#8E8E93" />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleToggleFavorite(item.id)} style={styles.actionButton}>
