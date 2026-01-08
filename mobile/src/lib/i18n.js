@@ -651,6 +651,8 @@ export const translations = {
     weeklySummaryEnabled: 'Récapitulatif hebdomadaire activé',
     weeklySummaryDisabled: 'Récapitulatif hebdomadaire désactivé',
     notificationPermissionRequired: 'Veuillez activer les notifications dans les réglages de votre appareil pour recevoir les récapitulatifs hebdomadaires.',
+    expoGoNotSupported: 'Les notifications ne sont pas disponibles dans Expo Go. Veuillez utiliser l\'application publiée pour activer cette fonctionnalité.',
+    notificationError: 'Impossible d\'activer les notifications. Veuillez réessayer plus tard.',
     
     // Days of week
     sunday: 'Dimanche',
