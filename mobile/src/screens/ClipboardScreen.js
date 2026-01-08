@@ -24,6 +24,17 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
   const lastClipboardContent = useRef('');
   const appState = useRef(AppState.currentState);
   const clipboardCheckInterval = useRef(null);
+  const smartClipboardActiveRef = useRef(false);
+  const foldersRef = useRef([]);
+  
+  // Keep refs in sync with state
+  useEffect(() => {
+    smartClipboardActiveRef.current = smartClipboardActive;
+  }, [smartClipboardActive]);
+  
+  useEffect(() => {
+    foldersRef.current = folders;
+  }, [folders]);
   
   // Edit modal state
   const [showEditModal, setShowEditModal] = useState(false);
