@@ -669,27 +669,36 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
           </View>
         </Modal>
 
-        {/* Time Modal */}
-        <Modal visible={showTimeModal} animationType="slide" transparent={true} onRequestClose={() => setShowTimeModal(false)}>
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>{t.selectTime || 'Selecionar hora'}</Text>
-                <TouchableOpacity onPress={() => setShowTimeModal(false)}>
-                  <Ionicons name="close" size={28} color="#FFFFFF" />
-                </TouchableOpacity>
-              </View>
-              <ScrollView style={styles.dayList}>
-                {HOURS.map((hour) => (
-                  <TouchableOpacity key={hour} style={[styles.dayOption, summaryHour === hour && styles.dayOptionActive]} onPress={() => handleTimeChange(hour)}>
-                    <Text style={styles.dayName}>{formatTimeForLocale(hour, 0)}</Text>
-                    {summaryHour === hour && <Ionicons name="checkmark" size={24} color="#007AFF" />}
+        {/* Time Picker - Native DateTimePicker */}
+        {showTimeModal && (
+          <Modal visible={showTimeModal} animationType="slide" transparent={true} onRequestClose={() => setShowTimeModal(false)}>
+            <View style={styles.modalOverlay}>
+              <View style={styles.timePickerModalContent}>
+                <View style={styles.modalHeader}>
+                  <Text style={styles.modalTitle}>{t.selectTime || 'Selecionar hora'}</Text>
+                  <TouchableOpacity onPress={() => setShowTimeModal(false)}>
+                    <Ionicons name="close" size={28} color="#FFFFFF" />
                   </TouchableOpacity>
-                ))}
-              </ScrollView>
+                </View>
+                <View style={styles.timePickerContainer}>
+                  <DateTimePicker
+                    value={getTimeAsDate()}
+                    mode="time"
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    onChange={handleTimeChange}
+                    textColor="#FFFFFF"
+                    themeVariant="dark"
+                  />
+                </View>
+                {Platform.OS === 'ios' && (
+                  <TouchableOpacity style={styles.timePickerDoneButton} onPress={() => setShowTimeModal(false)}>
+                    <Text style={styles.timePickerDoneText}>{t.done || 'Concluído'}</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
             </View>
-          </View>
-        </Modal>
+          </Modal>
+        )}
 
         {/* Activation Modal */}
         <Modal visible={showActivationModal} animationType="slide" transparent={true} onRequestClose={() => setShowActivationModal(false)}>
