@@ -287,39 +287,55 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
     return date.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
   };
 
-  const renderNoteItem = ({ item }) => (
-    <TouchableOpacity 
-      style={[
-        styles.noteCard, 
-        { borderLeftColor: getColorById(item.color), borderLeftWidth: 4 }
-      ]}
-      onPress={() => openEditNote(item)}
-    >
-      <View style={styles.noteHeader}>
-        {item.title ? (
-          <Text style={styles.noteTitle} numberOfLines={1}>{item.title}</Text>
-        ) : null}
-      </View>
-      <Text style={styles.noteContent} numberOfLines={4}>{item.content || ''}</Text>
-      <View style={styles.noteFooter}>
-        <Text style={styles.noteDate}>{formatDate(item.updatedAt || item.createdAt)}</Text>
-        <View style={styles.noteActions}>
-          <TouchableOpacity onPress={() => handleCopyNote(item.content || '')} style={styles.actionButton}>
-            <Ionicons name="copy-outline" size={18} color="#8E8E93" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleToggleFavorite(item.id)} style={styles.actionButton}>
-            <Ionicons name={item.isFavorite ? "heart" : "heart-outline"} size={18} color={item.isFavorite ? "#FF3B30" : "#8E8E93"} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleTogglePin(item.id)} style={styles.actionButton}>
-            <Ionicons name="pin" size={18} color={item.isPinned ? "#FFD60A" : "#8E8E93"} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleDeleteNote(item.id)} style={styles.actionButton}>
-            <Ionicons name="trash-outline" size={18} color="#FF3B30" />
-          </TouchableOpacity>
+  const renderNoteItem = ({ item }) => {
+    const hasReminder = item.reminder && item.reminder.date;
+    const reminderDateObj = hasReminder ? new Date(item.reminder.date) : null;
+    const isReminderPast = reminderDateObj && reminderDateObj < new Date();
+    
+    return (
+      <TouchableOpacity 
+        style={[
+          styles.noteCard, 
+          { borderLeftColor: getColorById(item.color), borderLeftWidth: 4 }
+        ]}
+        onPress={() => openEditNote(item)}
+      >
+        <View style={styles.noteHeader}>
+          {item.title ? (
+            <Text style={styles.noteTitle} numberOfLines={1}>{item.title}</Text>
+          ) : null}
         </View>
-      </View>
-    </TouchableOpacity>
-  );
+        <Text style={styles.noteContent} numberOfLines={4}>{item.content || ''}</Text>
+        <View style={styles.noteFooter}>
+          <View style={styles.noteMetaRow}>
+            <Text style={styles.noteDate}>{formatDate(item.updatedAt || item.createdAt)}</Text>
+            {hasReminder && !isReminderPast && (
+              <View style={styles.reminderBadge}>
+                <Ionicons name="notifications" size={12} color="#34C759" />
+                <Text style={styles.reminderBadgeText}>
+                  {reminderDateObj.toLocaleDateString(language === 'pt' ? 'pt-PT' : language, { day: '2-digit', month: '2-digit' })}
+                </Text>
+              </View>
+            )}
+          </View>
+          <View style={styles.noteActions}>
+            <TouchableOpacity onPress={() => handleCopyNote(item.content || '')} style={styles.actionButton}>
+              <Ionicons name="copy-outline" size={18} color="#8E8E93" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleToggleFavorite(item.id)} style={styles.actionButton}>
+              <Ionicons name={item.isFavorite ? "heart" : "heart-outline"} size={18} color={item.isFavorite ? "#FF3B30" : "#8E8E93"} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleTogglePin(item.id)} style={styles.actionButton}>
+              <Ionicons name="pin" size={18} color={item.isPinned ? "#FFD60A" : "#8E8E93"} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleDeleteNote(item.id)} style={styles.actionButton}>
+              <Ionicons name="trash-outline" size={18} color="#FF3B30" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
