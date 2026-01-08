@@ -537,12 +537,12 @@ const styles = StyleSheet.create({
   actionBtn: { padding: 6 },
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
   emptyText: { color: '#8E8E93', fontSize: 16, marginTop: 16 },
-  // Modal styles
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.9)' },
-  modalContent: { flex: 1, backgroundColor: '#000000' },
-  modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, borderBottomWidth: 1, borderBottomColor: '#2C2C2E' },
+  // Modal styles with proper safe area
+  modalContainer: { flex: 1, backgroundColor: '#000000' },
+  modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#2C2C2E', minHeight: 56 },
+  modalHeaderButton: { padding: 4, minWidth: 60 },
   modalTitle: { color: '#FFFFFF', fontSize: 18, fontWeight: '600' },
-  saveText: { color: '#007AFF', fontSize: 17, fontWeight: '600' },
+  saveText: { color: '#007AFF', fontSize: 17, fontWeight: '600', textAlign: 'right' },
   modalBody: { flex: 1, padding: 16 },
   editInput: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 16, color: '#FFFFFF', fontSize: 16, flex: 1, textAlignVertical: 'top' },
 });
