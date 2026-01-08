@@ -542,8 +542,9 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
           </View>
         </View>
 
-        {/* 4. Folder filter - Improved visibility */}
+        {/* 4. Folder section with title */}
         <View style={styles.folderSection}>
+          <Text style={styles.folderSectionTitle}>{t.folders || 'Pastas'}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.folderList} contentContainerStyle={styles.folderListContent}>
             <TouchableOpacity 
               style={[styles.folderChip, selectedFolder === 'all' && styles.folderChipActive]} 
