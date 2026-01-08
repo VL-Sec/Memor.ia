@@ -113,12 +113,16 @@ export default function LinksScreen({ language, refreshKey }) {
     setEditTitle(item.title || '');
     setEditFolderId(item.folderId || '');
     setIsPinnedEdit(item.isPinned || false);
-    if (item.reminder) {
+    if (item.reminder && item.reminder.date) {
       setReminderEnabled(true);
-      setReminderLocation(item.reminder.location || '');
+      setReminderDate(new Date(item.reminder.date));
     } else {
       setReminderEnabled(false);
-      setReminderLocation('');
+      // Set default to tomorrow at 9:00
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(9, 0, 0, 0);
+      setReminderDate(tomorrow);
     }
     setShowEditModal(true);
   };
@@ -128,13 +132,58 @@ export default function LinksScreen({ language, refreshKey }) {
     setEditingItem(null);
   };
 
+  const scheduleNotification = async (title, date) => {
+    try {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Toast.show({ type: 'error', text1: t.notificationPermissionDenied || 'Permissão de notificações negada' });
+        return null;
+      }
+      
+      const trigger = date;
+      const notificationId = await Notifications.scheduleNotificationAsync({
+        content: {
+          title: t.reminder || 'Lembrete',
+          body: title || t.reminderBody || 'Tens um link para ver!',
+          sound: true,
+        },
+        trigger,
+      });
+      return notificationId;
+    } catch (error) {
+      console.error('Error scheduling notification:', error);
+      return null;
+    }
+  };
+
+  const cancelNotification = async (notificationId) => {
+    if (notificationId) {
+      try {
+        await Notifications.cancelScheduledNotificationAsync(notificationId);
+      } catch (error) {
+        console.error('Error canceling notification:', error);
+      }
+    }
+  };
+
   const handleSaveEdit = async () => {
     if (!editingItem) return;
     try {
       let reminderData = null;
-      if (reminderEnabled && reminderLocation) {
-        reminderData = { location: reminderLocation };
+      
+      // Cancel existing notification if any
+      if (editingItem.reminder?.notificationId) {
+        await cancelNotification(editingItem.reminder.notificationId);
       }
+      
+      if (reminderEnabled && reminderDate > new Date()) {
+        const notificationId = await scheduleNotification(editTitle || editingItem.title, reminderDate);
+        reminderData = { 
+          date: reminderDate.toISOString(), 
+          notificationId 
+        };
+      }
+      
       const updateData = { title: editTitle, folderId: editFolderId || null, reminder: reminderData, isPinned: isPinnedEdit };
       await supabase.from('links').update(updateData).eq('id', editingItem.id);
       setLinks(links.map(l => l.id === editingItem.id ? { ...l, ...updateData } : l));
