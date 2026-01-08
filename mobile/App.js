@@ -135,7 +135,7 @@ export default function App() {
           tabBarStyle: { backgroundColor: '#1C1C1E', borderTopColor: '#2C2C2E', paddingTop: 5, height: 85 },
           headerStyle: { backgroundColor: '#000000' },
           headerTintColor: '#FFFFFF',
-          headerTitleStyle: { fontWeight: 'bold' },
+          headerTitleStyle: { fontWeight: '700' },
         })}
       >
         <Tab.Screen name="Links" options={{ title: t.tabLinks || 'Links', headerTitle: 'Memor.ia' }}>
