@@ -139,68 +139,82 @@ export default function App() {
     );
   }
 
-  // Tab bar height calculation
-  const TAB_BAR_HEIGHT = 60;
-
   return (
     <SafeAreaProvider>
-      <NavigationContainer theme={theme}>
-        <StatusBar style="light" />
-        <Tab.Navigator
-          screenOptions={({ route }) => ({
-            headerShown: false,
-            tabBarIcon: ({ focused, color }) => {
-              let iconName;
-              if (route.name === 'Links') iconName = focused ? 'link' : 'link-outline';
-              else if (route.name === 'Clipboard') iconName = focused ? 'clipboard' : 'clipboard-outline';
-              else if (route.name === 'Notes') iconName = focused ? 'document-text' : 'document-text-outline';
-              else if (route.name === 'Favorites') iconName = focused ? 'heart' : 'heart-outline';
-              else if (route.name === 'Settings') iconName = focused ? 'settings' : 'settings-outline';
-              return <Ionicons name={iconName} size={22} color={color} />;
-            },
-            tabBarActiveTintColor: '#007AFF',
-            tabBarInactiveTintColor: '#8E8E93',
-            tabBarStyle: { 
-              backgroundColor: '#1C1C1E', 
-              borderTopColor: '#2C2C2E',
-              borderTopWidth: 0.5,
-              height: TAB_BAR_HEIGHT + (Platform.OS === 'ios' ? 34 : 20),
-              paddingBottom: Platform.OS === 'ios' ? 34 : 20,
-              paddingTop: 8,
-            },
-            tabBarLabelStyle: {
-              fontSize: 10,
-              fontWeight: '500',
-            },
-          })}
-        >
-          {/* Order: Links → Clipboard → Notes → Favorites */}
-          <Tab.Screen name="Links" options={{ title: t.tabLinks || 'Links' }}>
-            {(props) => <LinksScreen {...props} language={language} premiumStatus={premiumStatus} refreshKey={refreshKey} />}
-          </Tab.Screen>
-          <Tab.Screen name="Clipboard" options={{ title: t.tabClipboard || 'Área' }}>
-            {(props) => <ClipboardScreen {...props} language={language} premiumStatus={premiumStatus} refreshKey={refreshKey} triggerRefresh={triggerRefresh} />}
-          </Tab.Screen>
-          <Tab.Screen name="Notes" options={{ title: t.tabNotes || 'Notas' }}>
-            {(props) => <NotesScreen {...props} language={language} refreshKey={refreshKey} triggerRefresh={triggerRefresh} />}
-          </Tab.Screen>
-          <Tab.Screen name="Favorites" options={{ title: t.tabFavorites || 'Favoritos' }}>
-            {(props) => <FavoritesScreen {...props} language={language} refreshKey={refreshKey} />}
-          </Tab.Screen>
-          {/* Settings - Hidden from tab bar, accessed via header icon */}
-          <Tab.Screen 
-            name="Settings" 
-            options={{ 
-              tabBarButton: () => null, // Hide from tab bar
-              tabBarStyle: { display: 'none' }, // Hide tab bar when on Settings
-            }}
-          >
-            {(props) => <SettingsScreen {...props} language={language} setLanguage={setLanguage} premiumStatus={premiumStatus} setPremiumStatus={setPremiumStatus} />}
-          </Tab.Screen>
-        </Tab.Navigator>
-        <Toast config={toastConfig} visibilityTime={3000} autoHide={true} />
-      </NavigationContainer>
+      <AppContent 
+        language={language} 
+        setLanguage={setLanguage}
+        premiumStatus={premiumStatus}
+        setPremiumStatus={setPremiumStatus}
+        refreshKey={refreshKey}
+        triggerRefresh={triggerRefresh}
+        t={t}
+      />
     </SafeAreaProvider>
+  );
+}
+
+// Separate component to use safe area insets
+function AppContent({ language, setLanguage, premiumStatus, setPremiumStatus, refreshKey, triggerRefresh, t }) {
+  const insets = useSafeAreaInsets();
+  
+  return (
+    <NavigationContainer theme={theme}>
+      <StatusBar style="light" />
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          headerShown: false,
+          tabBarIcon: ({ focused, color }) => {
+            let iconName;
+            if (route.name === 'Links') iconName = focused ? 'link' : 'link-outline';
+            else if (route.name === 'Clipboard') iconName = focused ? 'clipboard' : 'clipboard-outline';
+            else if (route.name === 'Notes') iconName = focused ? 'document-text' : 'document-text-outline';
+            else if (route.name === 'Favorites') iconName = focused ? 'heart' : 'heart-outline';
+            else if (route.name === 'Settings') iconName = focused ? 'settings' : 'settings-outline';
+            return <Ionicons name={iconName} size={22} color={color} />;
+          },
+          tabBarActiveTintColor: '#007AFF',
+          tabBarInactiveTintColor: '#8E8E93',
+          tabBarStyle: { 
+            backgroundColor: '#1C1C1E', 
+            borderTopColor: '#2C2C2E',
+            borderTopWidth: 0.5,
+            height: 55 + Math.max(insets.bottom, 10),
+            paddingBottom: Math.max(insets.bottom, 10),
+            paddingTop: 6,
+          },
+          tabBarLabelStyle: {
+            fontSize: 10,
+            fontWeight: '500',
+          },
+        })}
+      >
+        {/* Order: Links → Clipboard → Notes → Favorites */}
+        <Tab.Screen name="Links" options={{ title: t.tabLinks || 'Links' }}>
+          {(props) => <LinksScreen {...props} language={language} premiumStatus={premiumStatus} refreshKey={refreshKey} />}
+        </Tab.Screen>
+        <Tab.Screen name="Clipboard" options={{ title: t.tabClipboard || 'Área' }}>
+          {(props) => <ClipboardScreen {...props} language={language} premiumStatus={premiumStatus} refreshKey={refreshKey} triggerRefresh={triggerRefresh} />}
+        </Tab.Screen>
+        <Tab.Screen name="Notes" options={{ title: t.tabNotes || 'Notas' }}>
+          {(props) => <NotesScreen {...props} language={language} refreshKey={refreshKey} triggerRefresh={triggerRefresh} />}
+        </Tab.Screen>
+        <Tab.Screen name="Favorites" options={{ title: t.tabFavorites || 'Favoritos' }}>
+          {(props) => <FavoritesScreen {...props} language={language} refreshKey={refreshKey} />}
+        </Tab.Screen>
+        {/* Settings - Hidden from tab bar, accessed via header icon */}
+        <Tab.Screen 
+          name="Settings" 
+          options={{ 
+            tabBarButton: () => null,
+            tabBarStyle: { display: 'none' },
+          }}
+        >
+          {(props) => <SettingsScreen {...props} language={language} setLanguage={setLanguage} premiumStatus={premiumStatus} setPremiumStatus={setPremiumStatus} />}
+        </Tab.Screen>
+      </Tab.Navigator>
+      <Toast config={toastConfig} visibilityTime={3000} autoHide={true} />
+    </NavigationContainer>
   );
 }
 
