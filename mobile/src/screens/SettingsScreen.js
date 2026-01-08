@@ -4,12 +4,16 @@ import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
 import { translations, languages, setLanguage as saveLanguage } from '../lib/i18n';
 import { activatePremium, getPremiumStatus } from '../lib/premium';
 
 const API_URL = 'https://memor-clip.preview.emergentagent.com';
 const TERMS_URL = 'https://memor-clip.preview.emergentagent.com/terms';
 const PRIVACY_URL = 'https://memor-clip.preview.emergentagent.com/privacy';
+
+// Check if we're in Expo Go
+const isExpoGo = Constants.appOwnership === 'expo';
 
 const DAYS_OF_WEEK = [
   { value: 0, en: 'Sunday', pt: 'Domingo', es: 'Domingo', fr: 'Dimanche', de: 'Sonntag', it: 'Domenica' },
