@@ -691,6 +691,10 @@ export const translations = {
     deactivate: 'Arrêter',
     timeRemaining: 'restant',
     
+    // Links
+    linkTitle: 'Titre',
+    linkTitlePlaceholder: 'Nom du lien',
+    
     // Notes
     notesPlaceholder: 'Commencez à écrire...',
     noteTitle: 'Titre',
