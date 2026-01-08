@@ -491,37 +491,96 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
 
       {/* Date Picker */}
       {showDatePicker && (
-        <DateTimePicker
-          value={reminderDate}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={(event, selectedDate) => {
-            setShowDatePicker(Platform.OS === 'ios');
-            if (selectedDate) {
-              const newDate = new Date(reminderDate);
-              newDate.setFullYear(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
-              setReminderDate(newDate);
-            }
-          }}
-          minimumDate={new Date()}
-        />
+        Platform.OS === 'ios' ? (
+          <Modal visible={showDatePicker} animationType="slide" transparent={true}>
+            <View style={styles.pickerModalOverlay}>
+              <View style={styles.pickerModalContent}>
+                <View style={styles.pickerModalHeader}>
+                  <Text style={styles.pickerModalTitle}>{t.reminderDate || 'Data'}</Text>
+                  <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                    <Text style={styles.pickerDoneText}>{t.done || 'Concluído'}</Text>
+                  </TouchableOpacity>
+                </View>
+                <DateTimePicker
+                  value={reminderDate}
+                  mode="date"
+                  display="spinner"
+                  onChange={(event, selectedDate) => {
+                    if (selectedDate) {
+                      const newDate = new Date(reminderDate);
+                      newDate.setFullYear(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+                      setReminderDate(newDate);
+                    }
+                  }}
+                  minimumDate={new Date()}
+                  textColor="#FFFFFF"
+                  themeVariant="dark"
+                />
+              </View>
+            </View>
+          </Modal>
+        ) : (
+          <DateTimePicker
+            value={reminderDate}
+            mode="date"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowDatePicker(false);
+              if (selectedDate) {
+                const newDate = new Date(reminderDate);
+                newDate.setFullYear(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+                setReminderDate(newDate);
+              }
+            }}
+            minimumDate={new Date()}
+          />
+        )
       )}
 
       {/* Time Picker */}
       {showTimePicker && (
-        <DateTimePicker
-          value={reminderDate}
-          mode="time"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={(event, selectedTime) => {
-            setShowTimePicker(Platform.OS === 'ios');
-            if (selectedTime) {
-              const newDate = new Date(reminderDate);
-              newDate.setHours(selectedTime.getHours(), selectedTime.getMinutes());
-              setReminderDate(newDate);
-            }
-          }}
-        />
+        Platform.OS === 'ios' ? (
+          <Modal visible={showTimePicker} animationType="slide" transparent={true}>
+            <View style={styles.pickerModalOverlay}>
+              <View style={styles.pickerModalContent}>
+                <View style={styles.pickerModalHeader}>
+                  <Text style={styles.pickerModalTitle}>{t.reminderTime || 'Hora'}</Text>
+                  <TouchableOpacity onPress={() => setShowTimePicker(false)}>
+                    <Text style={styles.pickerDoneText}>{t.done || 'Concluído'}</Text>
+                  </TouchableOpacity>
+                </View>
+                <DateTimePicker
+                  value={reminderDate}
+                  mode="time"
+                  display="spinner"
+                  onChange={(event, selectedTime) => {
+                    if (selectedTime) {
+                      const newDate = new Date(reminderDate);
+                      newDate.setHours(selectedTime.getHours(), selectedTime.getMinutes());
+                      setReminderDate(newDate);
+                    }
+                  }}
+                  textColor="#FFFFFF"
+                  themeVariant="dark"
+                />
+              </View>
+            </View>
+          </Modal>
+        ) : (
+          <DateTimePicker
+            value={reminderDate}
+            mode="time"
+            display="default"
+            onChange={(event, selectedTime) => {
+              setShowTimePicker(false);
+              if (selectedTime) {
+                const newDate = new Date(reminderDate);
+                newDate.setHours(selectedTime.getHours(), selectedTime.getMinutes());
+                setReminderDate(newDate);
+              }
+            }}
+          />
+        )
       )}
       </View>
     </SafeAreaView>
