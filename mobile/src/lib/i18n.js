@@ -813,6 +813,7 @@ export const translations = {
     selectTime: 'Uhrzeit wählen',
     weeklySummaryEnabled: 'Wöchentliche Zusammenfassung aktiviert',
     weeklySummaryDisabled: 'Wöchentliche Zusammenfassung deaktiviert',
+    notificationPermissionRequired: 'Bitte aktiviere Benachrichtigungen in deinen Geräteeinstellungen, um wöchentliche Zusammenfassungen zu erhalten.',
     
     // Days of week
     sunday: 'Sonntag',
