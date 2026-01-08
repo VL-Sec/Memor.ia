@@ -478,7 +478,12 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <CustomHeader title={t.tabClipboard || 'Área de Transferência'} />
+      <CustomHeader 
+        title={t.tabClipboard || 'Área de Transferência'} 
+        rightIcon={smartClipboardActive ? "flash" : "flash-outline"}
+        rightIconColor={smartClipboardActive ? "#34C759" : "#8E8E93"}
+        onRightIconPress={() => setShowSmartModal(true)}
+      />
       <View style={styles.container}>
         {/* 1. Search - First */}
         <View style={styles.searchContainer}>
@@ -492,30 +497,7 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
           />
         </View>
 
-        {/* 2. Smart Clipboard - Second */}
-        <TouchableOpacity 
-          style={[styles.smartClipboard, smartClipboardActive && styles.smartClipboardActive]} 
-          onPress={smartClipboardActive ? deactivateSmartClipboard : activateSmartClipboard}
-        >
-          <View style={[styles.smartClipboardIcon, smartClipboardActive && styles.smartClipboardIconActive]}>
-            <Ionicons name="clipboard" size={24} color={smartClipboardActive ? '#FFFFFF' : '#007AFF'} />
-          </View>
-          <View style={styles.smartClipboardContent}>
-            <Text style={styles.smartClipboardTitle}>{t.smartClipboard || 'Área de Transferência Inteligente'}</Text>
-            <Text style={styles.smartClipboardInfo}>
-              {smartClipboardActive 
-                ? `${formatTime(timeLeft)} ${t.timeRemaining || 'restantes'}` 
-                : t.smartClipboardInfo || 'Guarda automaticamente tudo o que copiares enquanto estiver ativo.'}
-            </Text>
-          </View>
-          <View style={[styles.smartClipboardButton, smartClipboardActive && styles.smartClipboardButtonStop]}>
-            <Text style={styles.smartClipboardButtonText}>
-              {smartClipboardActive ? (t.stop || 'Parar') : (t.start || 'Iniciar')}
-            </Text>
-          </View>
-        </TouchableOpacity>
-
-        {/* 3. Add new content - Third */}
+        {/* 2. Add new content */}
         <View style={styles.addContainer}>
           <TextInput 
             style={styles.addInput} 
@@ -538,7 +520,7 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
           </View>
         </View>
 
-        {/* 4. Folder section with title */}
+        {/* 3. Folder section with title */}
         <View style={styles.folderSection}>
           <Text style={styles.folderSectionTitle}>{t.folders || 'Pastas'}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.folderList} contentContainerStyle={styles.folderListContent}>
