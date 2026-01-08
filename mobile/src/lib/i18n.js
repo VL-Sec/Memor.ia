@@ -877,6 +877,10 @@ export const translations = {
     deactivate: 'Stoppen',
     timeRemaining: 'verbleibend',
     
+    // Links
+    linkTitle: 'Titel',
+    linkTitlePlaceholder: 'Linkname',
+    
     // Notes
     notesPlaceholder: 'Beginne zu schreiben...',
     noteTitle: 'Titel',
