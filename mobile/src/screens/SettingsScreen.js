@@ -19,6 +19,10 @@ const API_URL = 'https://memofix.preview.emergentagent.com';
 const TERMS_URL = 'https://memofix.preview.emergentagent.com/terms';
 const PRIVACY_URL = 'https://memofix.preview.emergentagent.com/privacy';
 
+// Store URLs - Update these with your actual store URLs when published
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.memoria.app';
+const APP_STORE_URL = 'https://apps.apple.com/app/memoria/id000000000';
+
 // Check if we're in Expo Go
 const isExpoGo = Constants.appOwnership === 'expo';
 
