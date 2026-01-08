@@ -349,7 +349,7 @@ export default function LinksScreen({ language, refreshKey }) {
                 <Ionicons name="close" size={28} color="#FFFFFF" />
               </TouchableOpacity>
             </View>
-            <ScrollView style={styles.modalBody}>
+            <ScrollView style={styles.modalBody} contentContainerStyle={styles.modalBodyContent}>
               <Text style={styles.inputLabel}>{t.edit}</Text>
               <TextInput style={styles.textInput} value={editTitle} onChangeText={setEditTitle} placeholder={editingItem?.url} placeholderTextColor="#8E8E93" />
               <Text style={styles.inputLabel}>{t.moveToFolder}</Text>
@@ -359,7 +359,7 @@ export default function LinksScreen({ language, refreshKey }) {
                 <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
               </TouchableOpacity>
               <View style={styles.reminderSection}>
-                <View style={styles.reminderHeader}>>
+                <View style={styles.reminderHeader}>
                   <View style={styles.reminderHeaderLeft}>
                     <Ionicons name="pin-outline" size={24} color="#FFD60A" />
                     <Text style={styles.reminderTitle}>{t.pinToTop || 'Fixar no topo'}</Text>
@@ -381,10 +381,10 @@ export default function LinksScreen({ language, refreshKey }) {
                   </View>
                 )}
               </View>
+              <TouchableOpacity style={styles.saveButton} onPress={handleSaveEdit}>
+                <Text style={styles.saveButtonText}>{t.save}</Text>
+              </TouchableOpacity>
             </ScrollView>
-            <TouchableOpacity style={styles.saveButton} onPress={handleSaveEdit}>
-              <Text style={styles.saveButtonText}>{t.save}</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </Modal>
