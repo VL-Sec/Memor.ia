@@ -1,10 +1,20 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Crypto from 'expo-crypto';
 
 const USER_ID_KEY = '@memoria_user_id';
 const USER_CREATED_KEY = '@memoria_user_created';
 
 let cachedUserId = null;
+
+/**
+ * Generates a UUID v4 using pure JavaScript (no native modules needed)
+ */
+const generateUUID = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
 
 /**
  * Generates a unique user ID using UUID v4
@@ -14,8 +24,8 @@ let cachedUserId = null;
  * - Does not require login
  * - Accepted by Play Store (privacy-friendly)
  */
-export const generateUserId = async () => {
-  const uuid = await Crypto.randomUUID();
+export const generateUserId = () => {
+  const uuid = generateUUID();
   return `user_${uuid.replace(/-/g, '').substring(0, 16)}`;
 };
 
@@ -40,7 +50,7 @@ export const getUserId = async () => {
     }
 
     // First launch - generate new user ID
-    const newUserId = await generateUserId();
+    const newUserId = generateUserId();
     const createdAt = new Date().toISOString();
     
     await AsyncStorage.setItem(USER_ID_KEY, newUserId);
