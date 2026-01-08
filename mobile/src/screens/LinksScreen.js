@@ -507,4 +507,15 @@ const styles = StyleSheet.create({
   folderOptionActive: { backgroundColor: 'rgba(0, 122, 255, 0.1)' },
   folderOptionIcon: { fontSize: 24, marginRight: 12 },
   folderOptionName: { flex: 1, color: '#FFFFFF', fontSize: 16 },
+  // Folder Modal
+  folderModalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.8)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+  folderModalContent: { backgroundColor: '#1C1C1E', borderRadius: 20, width: '100%', maxWidth: 400, padding: 20 },
+  folderModalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  folderModalTitle: { color: '#FFFFFF', fontSize: 20, fontWeight: '700' },
+  folderNameInput: { backgroundColor: '#000000', borderRadius: 12, padding: 16, color: '#FFFFFF', fontSize: 16, marginBottom: 20 },
+  folderModalActions: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  deleteFolderBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12 },
+  deleteFolderText: { color: '#FF3B30', fontSize: 16, fontWeight: '600' },
+  saveFolderBtn: { backgroundColor: '#007AFF', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12, marginLeft: 'auto' },
+  saveFolderText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
 });
