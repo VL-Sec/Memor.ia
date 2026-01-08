@@ -345,6 +345,7 @@ export const translations = {
     reminderHint: 'Vais receber uma notificação nesta data e hora',
     notificationPermissionDenied: 'Permissão de notificações negada',
     reminderBody: 'Tens um link para ver!',
+    noteReminderBody: 'Tens uma nota para rever!',
     reminderSet: 'Lembrete definido',
     
     // Settings
