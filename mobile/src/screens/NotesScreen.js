@@ -154,7 +154,9 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
           sound: true,
         },
         trigger: {
+          type: 'timeInterval',
           seconds: seconds,
+          repeats: false,
         },
       });
       
@@ -162,6 +164,10 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
       return notificationId;
     } catch (error) {
       console.error('Error scheduling notification:', error);
+      Toast.show({ type: 'error', text1: t.errorSchedulingReminder || 'Erro ao criar lembrete' });
+      return null;
+    }
+  };
       return null;
     }
   };
