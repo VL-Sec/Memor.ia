@@ -470,30 +470,28 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
         <Modal
           visible={showEditModal}
           animationType="slide"
-          transparent={true}
+          transparent={false}
           onRequestClose={closeEditModal}
         >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <View style={styles.modalHeader}>
-                <TouchableOpacity onPress={closeEditModal}>
-                  <Ionicons name="close" size={28} color="#FFFFFF" />
-                </TouchableOpacity>
-                <Text style={styles.modalTitle}>{t.edit || 'Editar'}</Text>
-                <TouchableOpacity onPress={handleSaveEdit}>
-                  <Text style={styles.saveText}>{t.save || 'Guardar'}</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.modalBody}>
-                <TextInput
-                  style={styles.editInput}
-                  value={editContent}
-                  onChangeText={setEditContent}
-                  multiline
-                  textAlignVertical="top"
-                  autoFocus
-                />
-              </View>
+          <View style={[styles.modalContainer, { paddingTop: insets.top }]}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity onPress={closeEditModal} style={styles.modalHeaderButton}>
+                <Ionicons name="close" size={28} color="#FFFFFF" />
+              </TouchableOpacity>
+              <Text style={styles.modalTitle}>{t.edit || 'Editar'}</Text>
+              <TouchableOpacity onPress={handleSaveEdit} style={styles.modalHeaderButton}>
+                <Text style={styles.saveText}>{t.save || 'Guardar'}</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.modalBody}>
+              <TextInput
+                style={styles.editInput}
+                value={editContent}
+                onChangeText={setEditContent}
+                multiline
+                textAlignVertical="top"
+                autoFocus
+              />
             </View>
           </View>
         </Modal>
