@@ -159,17 +159,13 @@ export default function App() {
             tabBarInactiveTintColor: '#8E8E93',
             tabBarStyle: { 
               backgroundColor: '#1C1C1E', 
-              borderTopColor: '#2C2C2E', 
-              paddingTop: 10, 
-              height: 85,
-              paddingBottom: 20,
+              borderTopColor: '#2C2C2E',
+              height: 80,
+              paddingBottom: 15,
+              paddingTop: 8,
             },
             tabBarLabelStyle: {
-              fontSize: 12,
-              fontWeight: '500',
-            },
-            tabBarItemStyle: {
-              paddingVertical: 5,
+              fontSize: 10,
             },
           })}
         >
