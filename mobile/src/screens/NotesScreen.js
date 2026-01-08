@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, RefreshControl, Modal, ScrollView, Alert, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,7 +21,7 @@ const NOTE_COLORS = [
 
 const STORAGE_KEY = 'memoria-notes';
 
-export default function NotesScreen({ language }) {
+export default function NotesScreen({ language, refreshKey, triggerRefresh }) {
   const [notes, setNotes] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -32,15 +33,26 @@ export default function NotesScreen({ language }) {
 
   const t = translations[language] || translations.en;
 
+  // Load notes when screen is focused (for sync with Favorites)
+  useFocusEffect(
+    useCallback(() => {
+      loadNotes();
+    }, [])
+  );
+
+  // Also reload when refreshKey changes
   useEffect(() => {
-    loadNotes();
-  }, []);
+    if (refreshKey > 0) {
+      loadNotes();
+    }
+  }, [refreshKey]);
 
   const loadNotes = async () => {
     try {
       const data = await AsyncStorage.getItem(STORAGE_KEY);
       if (data) {
-        setNotes(JSON.parse(data));
+        const parsedNotes = JSON.parse(data);
+        setNotes(parsedNotes);
       }
     } catch (error) {
       console.error('Error loading notes:', error);
@@ -53,6 +65,8 @@ export default function NotesScreen({ language }) {
     try {
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newNotes));
       setNotes(newNotes);
+      // Trigger refresh on other screens
+      if (triggerRefresh) triggerRefresh();
     } catch (error) {
       console.error('Error saving notes:', error);
     }
@@ -128,21 +142,28 @@ export default function NotesScreen({ language }) {
   };
 
   const handleTogglePin = (noteId) => {
-    const updatedNotes = notes.map(n =>
-      n.id === noteId ? { ...n, isPinned: !n.isPinned } : n
-    );
-    saveNotes(updatedNotes);
-  };
-
-  const handleToggleFavorite = (noteId) => {
     const note = notes.find(n => n.id === noteId);
+    const newPinState = !note.isPinned;
     const updatedNotes = notes.map(n =>
-      n.id === noteId ? { ...n, isFavorite: !n.isFavorite } : n
+      n.id === noteId ? { ...n, isPinned: newPinState } : n
     );
     saveNotes(updatedNotes);
     Toast.show({ 
       type: 'success', 
-      text1: note?.isFavorite ? (t.removedFromFavorites || 'Removido dos favoritos') : (t.addedToFavorites || 'Adicionado aos favoritos')
+      text1: newPinState ? (t.pinned || 'Fixado no topo') : (t.unpinned || 'Desafixado')
+    });
+  };
+
+  const handleToggleFavorite = (noteId) => {
+    const note = notes.find(n => n.id === noteId);
+    const newFavoriteState = !note.isFavorite;
+    const updatedNotes = notes.map(n =>
+      n.id === noteId ? { ...n, isFavorite: newFavoriteState } : n
+    );
+    saveNotes(updatedNotes);
+    Toast.show({ 
+      type: 'success', 
+      text1: newFavoriteState ? (t.addedToFavorites || 'Adicionado aos favoritos') : (t.removedFromFavorites || 'Removido dos favoritos')
     });
   };
 
@@ -167,10 +188,11 @@ export default function NotesScreen({ language }) {
            note.content?.toLowerCase().includes(query);
   });
 
+  // Sort: pinned items first, then by date
   const sortedNotes = [...filteredNotes].sort((a, b) => {
     if (a.isPinned && !b.isPinned) return -1;
     if (!a.isPinned && b.isPinned) return 1;
-    return 0;
+    return new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt);
   });
 
   const formatDate = (dateStr) => {
@@ -190,12 +212,13 @@ export default function NotesScreen({ language }) {
         {item.title ? (
           <Text style={styles.noteTitle} numberOfLines={1}>{item.title}</Text>
         ) : null}
+        {/* Status indicators - only show small icons in header */}
         <View style={styles.noteIcons}>
           {item.isPinned && (
-            <Ionicons name="pin" size={16} color="#FFD60A" />
+            <Ionicons name="pin" size={14} color="#FFD60A" />
           )}
           {item.isFavorite && (
-            <Ionicons name="heart" size={16} color="#FF3B30" style={{ marginLeft: 4 }} />
+            <Ionicons name="heart" size={14} color="#FF3B30" style={{ marginLeft: 4 }} />
           )}
         </View>
       </View>
@@ -222,7 +245,7 @@ export default function NotesScreen({ language }) {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <CustomHeader title={t.tabNotes || 'Notes'} />
+      <CustomHeader title={t.tabNotes || 'Notas'} />
       <View style={styles.container}>
         {/* Search */}
         <View style={styles.searchContainer}>
