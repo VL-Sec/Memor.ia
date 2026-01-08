@@ -360,13 +360,9 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
   };
 
   const handleDeleteFolder = (folder) => {
-    if (folder.isDefault) {
-      Toast.show({ type: 'error', text1: t.cannotDeleteDefault || 'Não podes eliminar a pasta padrão' });
-      return;
-    }
     Alert.alert(
       t.deleteFolder || 'Eliminar pasta',
-      t.deleteFolderConfirm || 'Tens a certeza? Os itens serão movidos para a pasta Geral.',
+      t.deleteFolderConfirmSimple || 'Tens a certeza que queres eliminar esta pasta?',
       [
         { text: t.cancel || 'Cancelar', style: 'cancel' },
         {
@@ -374,11 +370,8 @@ export default function ClipboardScreen({ language, refreshKey, triggerRefresh }
           style: 'destructive',
           onPress: async () => {
             try {
-              // Move items to default folder
-              const defaultFolder = folders.find(f => f.isDefault);
-              if (defaultFolder) {
-                await supabase.from('links').update({ folderId: defaultFolder.id }).eq('folderId', folder.id);
-              }
+              // Set folderId to null for items in this folder
+              await supabase.from('links').update({ folderId: null }).eq('folderId', folder.id);
               // Delete folder
               await supabase.from('folders').delete().eq('id', folder.id);
               setFolders(folders.filter(f => f.id !== folder.id));
