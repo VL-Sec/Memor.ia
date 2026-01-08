@@ -31,10 +31,6 @@ Notifications.setNotificationHandler({
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const TAB_COUNT = 4;
-const TAB_WIDTH = SCREEN_WIDTH / TAB_COUNT;
-
 // Extend DarkTheme
 const theme = {
   ...DarkTheme,
