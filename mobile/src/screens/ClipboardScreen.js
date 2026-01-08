@@ -789,4 +789,16 @@ const styles = StyleSheet.create({
   deleteFolderText: { color: '#FF3B30', fontSize: 16, fontWeight: '600' },
   saveFolderBtn: { backgroundColor: '#007AFF', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12, marginLeft: 'auto' },
   saveFolderText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
+  // Smart Clipboard Modal
+  smartModalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.8)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+  smartModalContent: { backgroundColor: '#1C1C1E', borderRadius: 20, width: '100%', maxWidth: 400, padding: 24 },
+  smartModalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
+  smartModalTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  smartModalTitle: { color: '#FFFFFF', fontSize: 20, fontWeight: '700' },
+  smartModalInfo: { color: '#8E8E93', fontSize: 14, lineHeight: 20, marginBottom: 20 },
+  smartModalTimer: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: 'rgba(52, 199, 89, 0.15)', padding: 12, borderRadius: 12, marginBottom: 20 },
+  smartModalTimerText: { color: '#34C759', fontSize: 16, fontWeight: '600' },
+  smartModalButton: { backgroundColor: '#007AFF', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, padding: 16, borderRadius: 12 },
+  smartModalButtonStop: { backgroundColor: '#FF3B30' },
+  smartModalButtonText: { color: '#FFFFFF', fontSize: 18, fontWeight: '600' },
 });
