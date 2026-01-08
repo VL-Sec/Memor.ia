@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Modal, Switch, Platform } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Modal, Switch, Platform, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -7,6 +7,8 @@ import { translations, languages, setLanguage as saveLanguage } from '../lib/i18
 import { activatePremium, getPremiumStatus } from '../lib/premium';
 
 const API_URL = 'https://memor-clip.preview.emergentagent.com';
+const TERMS_URL = 'https://memor-clip.preview.emergentagent.com/terms';
+const PRIVACY_URL = 'https://memor-clip.preview.emergentagent.com/privacy';
 
 const DAYS_OF_WEEK = [
   { value: 0, en: 'Sunday', pt: 'Domingo', es: 'Domingo', fr: 'Dimanche', de: 'Sonntag', it: 'Domenica' },
