@@ -32,9 +32,6 @@ Notifications.setNotificationHandler({
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-// Get screen width for tab calculation
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-
 // Extend DarkTheme
 const theme = {
   ...DarkTheme,
