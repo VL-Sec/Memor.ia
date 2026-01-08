@@ -674,6 +674,19 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
                 </TouchableOpacity>
               </View>
               <ScrollView>
+                {/* Create New Folder Option */}
+                <TouchableOpacity 
+                  style={styles.createFolderOption} 
+                  onPress={() => { setShowFolderPicker(false); openFolderModal(); }}
+                >
+                  <View style={styles.createFolderIcon}>
+                    <Ionicons name="add" size={24} color="#007AFF" />
+                  </View>
+                  <Text style={styles.createFolderText}>{t.createNewFolder || 'Criar nova pasta'}</Text>
+                </TouchableOpacity>
+                
+                <View style={styles.folderDivider} />
+                
                 <TouchableOpacity 
                   style={[styles.folderOption, !editFolderId && styles.folderOptionActive]} 
                   onPress={() => { setEditFolderId(null); setShowFolderPicker(false); }}
