@@ -345,6 +345,21 @@ export const translations = {
     pinned: 'Fixado no topo',
     unpinned: 'Desafixado',
     pinToTop: 'Fixar no topo',
+    timeSaved: 'Hora guardada',
+    
+    // Local Backup
+    exportBackup: 'Exportar Backup',
+    exportBackupInfo: 'Guardar todos os dados num ficheiro JSON',
+    importBackup: 'Importar Backup',
+    importBackupInfo: 'Restaurar dados de um ficheiro de backup',
+    backupExported: 'Backup exportado com sucesso!',
+    backupImported: 'Backup importado com sucesso!',
+    exportError: 'Erro ao exportar backup',
+    importError: 'Erro ao importar backup',
+    importWarning: 'Isto irá substituir todos os seus dados atuais. Deseja continuar?',
+    invalidBackupFile: 'Ficheiro de backup inválido',
+    continue: 'Continuar',
+    sharingNotAvailable: 'Partilha não disponível',
     
     // Reminders
     reminder: 'Lembrete',
