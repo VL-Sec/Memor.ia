@@ -26,6 +26,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
   const [smartClipboardActive, setSmartClipboardActive] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
   const lastClipboardContent = useRef('');
+  const savedClipboardContents = useRef(new Set()); // Track all saved contents
   const appState = useRef(AppState.currentState);
   const clipboardCheckInterval = useRef(null);
   const smartClipboardActiveRef = useRef(false);
