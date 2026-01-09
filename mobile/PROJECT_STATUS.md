@@ -312,11 +312,18 @@ eas build --platform ios --profile preview
 
 ---
 
-# 🎯 PRÓXIMOS PASSOS (Opcionais)
+# 🎯 CORREÇÕES APLICADAS (Janeiro 2025 - Sessão Atual)
 
-1. Verificar distribuição uniforme dos ícones na tab bar
-2. Testes em dispositivos iOS
-3. Publicação nas stores
+1. ✅ Tab Bar com traduções dinâmicas (`t.tabLinks`, `t.tabNotes`, etc.)
+2. ✅ Tab Bar com `tabBarItemStyle: { flex: 1 }` para distribuição uniforme
+3. ✅ Novo splash.png atualizado
+
+---
+
+# 📋 PRÓXIMOS PASSOS
+
+1. Testes em dispositivos iOS
+2. Publicação nas stores
 
 ---
 
