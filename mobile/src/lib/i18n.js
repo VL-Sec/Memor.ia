@@ -373,6 +373,10 @@ export const translations = {
     reminderInPast: 'A data deve ser no futuro',
     errorSchedulingReminder: 'Erro ao criar lembrete',
     
+    // Validation
+    titleOrUrlRequired: 'Título ou URL é obrigatório',
+    titleOrContentRequired: 'Título ou conteúdo é obrigatório',
+    
     // Links
     addLink: 'Adicionar Link',
     urlRequired: 'URL é obrigatório',
