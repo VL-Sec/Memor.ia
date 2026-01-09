@@ -51,6 +51,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
   const [showFolderModal, setShowFolderModal] = useState(false);
   const [editingFolder, setEditingFolder] = useState(null);
   const [folderName, setFolderName] = useState('');
+  const [creatingFolderFromPicker, setCreatingFolderFromPicker] = useState(false);
   
   // Smart Clipboard modal state
   const [showSmartModal, setShowSmartModal] = useState(false);
