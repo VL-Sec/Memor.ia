@@ -816,6 +816,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
         </Modal>
       </View>
     </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 }
 
