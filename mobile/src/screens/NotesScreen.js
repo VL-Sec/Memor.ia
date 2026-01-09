@@ -606,31 +606,35 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
       {/* Time Picker */}
       {showTimePicker && (
         Platform.OS === 'ios' ? (
-          <Modal visible={showTimePicker} animationType="slide" transparent={true}>
-            <View style={styles.pickerModalOverlay}>
-              <View style={styles.pickerModalContent}>
-                <View style={styles.pickerModalHeader}>
-                  <Text style={styles.pickerModalTitle}>{t.reminderTime || 'Hora'}</Text>
-                  <TouchableOpacity onPress={() => setShowTimePicker(false)}>
-                    <Text style={styles.pickerDoneText}>{t.done || 'Concluído'}</Text>
-                  </TouchableOpacity>
-                </View>
-                <DateTimePicker
-                  value={reminderDate}
-                  mode="time"
-                  display="spinner"
-                  onChange={(event, selectedTime) => {
-                    if (selectedTime) {
-                      const newDate = new Date(reminderDate);
-                      newDate.setHours(selectedTime.getHours(), selectedTime.getMinutes());
-                      setReminderDate(newDate);
-                    }
-                  }}
-                  textColor="#FFFFFF"
-                  themeVariant="dark"
-                />
+          <Modal visible={showTimePicker} animationType="slide" transparent={true} onRequestClose={() => setShowTimePicker(false)}>
+            <TouchableWithoutFeedback onPress={() => setShowTimePicker(false)}>
+              <View style={styles.pickerModalOverlay}>
+                <TouchableWithoutFeedback onPress={() => {}}>
+                  <View style={styles.pickerModalContent}>
+                    <View style={styles.pickerModalHeader}>
+                      <Text style={styles.pickerModalTitle}>{t.reminderTime || 'Hora'}</Text>
+                      <TouchableOpacity onPress={() => setShowTimePicker(false)}>
+                        <Text style={styles.pickerDoneText}>{t.done || 'Concluído'}</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <DateTimePicker
+                      value={reminderDate}
+                      mode="time"
+                      display="spinner"
+                      onChange={(event, selectedTime) => {
+                        if (selectedTime) {
+                          const newDate = new Date(reminderDate);
+                          newDate.setHours(selectedTime.getHours(), selectedTime.getMinutes());
+                          setReminderDate(newDate);
+                        }
+                      }}
+                      textColor="#FFFFFF"
+                      themeVariant="dark"
+                    />
+                  </View>
+                </TouchableWithoutFeedback>
               </View>
-            </View>
+            </TouchableWithoutFeedback>
           </Modal>
         ) : (
           <DateTimePicker
