@@ -20,6 +20,8 @@ git pull
 - ❌ Usar campo `reminder` (objeto) no Supabase
 - ❌ Usar npm (sempre YARN)
 - ❌ Modificar assets sem nova build
+- ❌ Adicionar lembretes/notificações (removido - causava erros Supabase)
+- ❌ Adicionar resumo semanal (removido)
 
 ---
 
@@ -48,7 +50,7 @@ Stack.Navigator (raiz)
 |----------|-----------|
 | `icon.png` | Ícone principal (logo azul novo) |
 | `adaptive-icon.png` | Ícone Android (logo azul novo) |
-| `splash.png` | Tela de splash (logo azul novo) |
+| `splash.png` | Tela de splash (logo azul novo) - ATUALIZADO |
 | `favicon.ico` | Favicon |
 | `favicon.png` | Favicon PNG |
 
@@ -70,12 +72,12 @@ Stack.Navigator (raiz)
 - ✅ Favoritos e Pin (fixar no topo)
 - ✅ Pastas (criar, mover, eliminar)
 - ✅ Criar pasta no modal "Mover para" (auto-seleciona)
-- ✅ Lembretes com notificações locais
 - ✅ Pesquisa
 - ✅ Teclado desaparece ao tocar fora
 - ✅ Modais fecham ao tocar fora
 - ✅ Permite guardar só com título OU só com URL
-- ✅ Não mostra data (apenas lembrete se existir)
+- ✅ Não mostra data
+- ❌ REMOVIDO: Lembretes (causava erro Supabase "reminderAt column not found")
 
 ## 3. ClipboardScreen.js
 - ✅ Colar texto manual
@@ -92,11 +94,11 @@ Stack.Navigator (raiz)
 - ✅ Criar, editar, eliminar notas
 - ✅ Cores personalizadas
 - ✅ Favoritos e Pin
-- ✅ Lembretes com notificações locais
 - ✅ Armazenamento LOCAL (AsyncStorage)
 - ✅ Pesquisa
 - ✅ Permite guardar só com título OU só com conteúdo
 - ✅ Mostra data de criação
+- ❌ REMOVIDO: Lembretes
 
 ## 5. FavoritesScreen.js
 - ✅ Mostra todos os favoritos (links, notas, clipboard)
@@ -106,21 +108,22 @@ Stack.Navigator (raiz)
 ## 6. SettingsScreen.js
 - ✅ Seleção de idioma (6 idiomas)
 - ✅ Premium / Código de ativação
-- ✅ Resumo semanal (notificação)
 - ✅ Backup Cloud simplificado (1 alerta apenas)
 - ✅ Links legais discretos (sem ícones)
+- ❌ REMOVIDO: Resumo semanal (causava problemas)
 - ❌ REMOVIDO: Backup manual
-- ❌ REMOVIDO: Segundo alerta do backup
 
 ## 7. Notificações
-- ❌ **REMOVIDO** - Lembretes em Links (causava erros com Supabase)
-- ❌ **REMOVIDO** - Lembretes em Notas
-- ❌ **REMOVIDO** - Resumo Semanal
+- ❌ **COMPLETAMENTE REMOVIDO** - Causava erros com Supabase
+- Não há lembretes em Links
+- Não há lembretes em Notas
+- Não há Resumo Semanal
 
 ## 8. UX Global
 - ✅ Teclado desaparece ao tocar fora (todas as telas)
 - ✅ Modais fecham ao tocar fora + fecham teclado
 - ✅ `keyboardShouldPersistTaps="handled"` em listas
+- ✅ Toast notifications mais rápidas (1.5 segundos)
 
 ---
 
@@ -146,18 +149,16 @@ Stack.Navigator (raiz)
 ## Supabase (Cloud)
 | Tabela | Campos Importantes |
 |--------|-------------------|
-| `links` | id, userId, url, title, contentType, isFavorite, isPinned, folderId, **reminderAt**, createdAt |
+| `links` | id, userId, url, title, contentType, isFavorite, isPinned, folderId, createdAt |
 | `folders` | id, userId, name, icon, isDefault, folderType, createdAt |
 
-**⚠️ CRÍTICO:** Usar `reminderAt` (string ISO) - NÃO usar `reminder` (objeto)
+**⚠️ NOTA:** Campo `reminderAt` NÃO existe na tabela - não usar!
 
 ## AsyncStorage (Local)
 | Chave | Descrição |
 |-------|-----------|
 | `@memoria_user_id` | ID único do dispositivo |
 | `memoria-notes-{userId}` | Notas do utilizador |
-| `memoria-link-notifications` | IDs de notificações (JSON) |
-| `memoria-weekly-summary` | Config resumo semanal |
 | `memoria-cloud-backup-enabled` | Preferência backup |
 | `memoria-premium` | Status premium |
 | `memoria-language` | Idioma selecionado |
@@ -184,9 +185,7 @@ Stack.Navigator (raiz)
   "@react-navigation/native": "^7.x",
   "@react-navigation/bottom-tabs": "^7.x",
   "@react-navigation/native-stack": "^7.x",
-  "expo-notifications": "~0.32.0",
   "@react-native-async-storage/async-storage": "2.1.x",
-  "@react-native-community/datetimepicker": "8.x",
   "react-native-toast-message": "^2.x",
   "@supabase/supabase-js": "^2.x"
 }
@@ -242,11 +241,14 @@ eas build --platform ios --profile preview
 | Backup manual | Apenas backup cloud |
 | expo-crypto | UUID puro JavaScript |
 | Teclado não desaparece | TouchableWithoutFeedback + Keyboard.dismiss |
-| Erro Supabase "reminder" | Campo `reminderAt` (string) |
+| Erro Supabase "reminder" | **REMOVIDO lembretes completamente** |
+| Erro Supabase "reminderAt" | **REMOVIDO lembretes completamente** |
 | Smart Clipboard duplica | Set para rastrear conteúdos |
 | Cards Clipboard grandes | Compactados, numberOfLines={2}, sem data |
 | Segundo alert backup | Removido |
 | Links legais com ícones | Discretos, só texto |
+| Resumo semanal | **REMOVIDO completamente** |
+| Toast muito lento | Reduzido para 1.5 segundos |
 
 ---
 
@@ -254,14 +256,14 @@ eas build --platform ios --profile preview
 
 ```
 /app/mobile/
-├── App.js                 # Navegação principal
+├── App.js                 # Navegação principal + Toast config (1.5s)
 ├── app.json               # Config Expo
 ├── package.json           # Dependências
 ├── PROJECT_STATUS.md      # Este ficheiro
 ├── assets/
 │   ├── icon.png           # Logo novo
 │   ├── adaptive-icon.png  # Logo Android
-│   ├── splash.png         # Splash screen
+│   ├── splash.png         # Splash screen (ATUALIZADO)
 │   ├── favicon.ico
 │   └── favicon.png
 └── src/
@@ -273,11 +275,11 @@ eas build --platform ios --profile preview
     │   ├── supabase.js    # Cliente Supabase
     │   └── userManager.js # ID único dispositivo
     └── screens/
-        ├── LinksScreen.js
+        ├── LinksScreen.js      # SEM lembretes
         ├── ClipboardScreen.js
-        ├── NotesScreen.js
+        ├── NotesScreen.js      # SEM lembretes
         ├── FavoritesScreen.js
-        └── SettingsScreen.js
+        └── SettingsScreen.js   # SEM resumo semanal
 ```
 
 ---
@@ -290,15 +292,18 @@ eas build --platform ios --profile preview
 - Ignora conteúdo que já estava no clipboard ao ativar
 - Timer de 2 minutos (120 segundos)
 
-## Notificações
-- Formato trigger: `{ seconds: X, repeats: false }`
-- IDs guardados localmente para poder cancelar
-- Permissões pedidas ao utilizador
-
 ## Modais
 - Todos têm `TouchableWithoutFeedback` no overlay
 - Ao tocar fora: fecha modal + `Keyboard.dismiss()`
 - Conteúdo interno tem `onPress={Keyboard.dismiss}`
+
+## Toast Notifications
+- Tempo de visibilidade: **1.5 segundos** (era 3 segundos)
+- Configurado em `App.js`: `visibilityTime={1500}`
+
+## Tab Bar
+- Usa traduções dinâmicas: `t.tabLinks`, `t.tabClipboard`, `t.tabNotes`, `t.tabFavorites`
+- `tabBarItemStyle: { flex: 1 }` para distribuição uniforme
 
 ---
 
@@ -315,6 +320,10 @@ eas build --platform ios --profile preview
 1. ✅ Tab Bar com traduções dinâmicas (`t.tabLinks`, `t.tabNotes`, etc.)
 2. ✅ Tab Bar com `tabBarItemStyle: { flex: 1 }` para distribuição uniforme
 3. ✅ Novo splash.png atualizado
+4. ✅ **REMOVIDO todos os lembretes** (Links e Notas) - erro Supabase
+5. ✅ **REMOVIDO resumo semanal** - causava problemas
+6. ✅ Teclado desaparece ao tocar fora em LinksScreen
+7. ✅ Toast notifications mais rápidas (1.5s em vez de 3s)
 
 ---
 
