@@ -351,4 +351,41 @@ eas build --platform ios --profile preview
 
 ---
 
+# 🚀 RELEASE & MONETIZAÇÃO
+
+## Android Release
+- **Formato:** Android App Bundle (.aab) para Google Play Store
+- **Comando:** `eas build --platform android --profile production`
+- **Profile production** deve ser configurado no `eas.json`
+
+## Monetização - Subscrições
+- **Planos:** Mensal + Anual
+- **Sistema:** Google Play Billing (in-app subscriptions)
+- **Biblioteca:** `react-native-iap` (React Native In-App Purchases)
+- **Autenticação:** Não requer login - vinculado à conta Google do utilizador
+
+### Implementação Necessária:
+1. Instalar `react-native-iap`:
+   ```bash
+   yarn add react-native-iap
+   ```
+
+2. Configurar produtos na Google Play Console:
+   - `memoria_monthly` - Subscrição mensal
+   - `memoria_yearly` - Subscrição anual
+
+3. Criar `src/lib/purchases.js` para gerir compras
+
+4. Integrar no `SettingsScreen.js`:
+   - Mostrar planos disponíveis
+   - Botão de subscrição
+   - Verificar estado da subscrição
+
+### Notas:
+- Não usar pagamentos externos (Stripe, etc.) - usar apenas Google Play Billing
+- Subscrições são geridas pela conta Google do utilizador
+- Restaurar compras automaticamente baseado na conta Google
+
+---
+
 **FIM DO DOCUMENTO - GUARDAR SEMPRE ESTA INFORMAÇÃO**
