@@ -268,7 +268,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
       closeEditModal();
     } catch (error) {
       console.error('Error saving:', error);
-      Toast.show({ type: 'error', text1: t.error });
+      Toast.show({ type: 'error', text1: t.error, text2: error.message || '' });
     }
   };
 
