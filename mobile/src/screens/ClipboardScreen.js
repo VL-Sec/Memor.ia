@@ -25,12 +25,16 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
   const [refreshing, setRefreshing] = useState(false);
   const [smartClipboardActive, setSmartClipboardActive] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
+  
+  // Smart Clipboard refs - using refs to avoid stale closures
   const lastClipboardContent = useRef('');
-  const savedClipboardContents = useRef(new Set()); // Track all saved contents
+  const savedClipboardContents = useRef(new Set()); // Track all saved contents by content
   const appState = useRef(AppState.currentState);
   const clipboardCheckInterval = useRef(null);
   const smartClipboardActiveRef = useRef(false);
   const foldersRef = useRef([]);
+  const userIdRef = useRef(userId);
+  const isSavingRef = useRef(false); // Prevent concurrent saves
   
   // Keep refs in sync with state
   useEffect(() => {
@@ -40,6 +44,10 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
   useEffect(() => {
     foldersRef.current = folders;
   }, [folders]);
+  
+  useEffect(() => {
+    userIdRef.current = userId;
+  }, [userId]);
   
   // Edit modal state
   const [showEditModal, setShowEditModal] = useState(false);
