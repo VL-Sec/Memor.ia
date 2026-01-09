@@ -52,6 +52,7 @@ export const translations = {
     selectFolder: 'Choose a folder',
     manageFolders: 'Manage Folders',
     folderCreated: 'Folder created',
+    folderCreatedAndSelected: 'Folder created and selected',
     deleteFolder: 'Delete folder',
     deleteFolderConfirm: 'Are you sure? Items will be moved to the General folder.',
     cannotDeleteDefault: 'Cannot delete the default folder',
