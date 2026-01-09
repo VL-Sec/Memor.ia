@@ -611,7 +611,8 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
             data={sortedNotes} 
             keyExtractor={(item) => item.id} 
             renderItem={renderNoteItem} 
-            contentContainerStyle={styles.listContent} 
+            contentContainerStyle={styles.listContent}
+            keyboardShouldPersistTaps="handled"
             refreshControl={
               <RefreshControl 
                 refreshing={refreshing} 
