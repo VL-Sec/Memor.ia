@@ -454,8 +454,8 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
   };
 
   const activateSmartClipboard = async () => {
-    // Reset debounce timer - first capture will be on first interval or AppState change
-    lastCaptureTime.current = Date.now();
+    // Reset last captured value - will capture on first clipboard change
+    lastCapturedValueRef.current = null;
     
     setSmartClipboardActive(true);
     setTimeLeft(120);
@@ -465,8 +465,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
       text2: t.smartClipboardInfo2 || 'A capturar tudo o que copias durante 2 minutos'
     });
     
-    // Do NOT capture immediately - wait for first interval or AppState change
-    console.log('[Smart Clipboard] Activated - waiting for first copy event');
+    console.log('[Smart Clipboard] Activated - waiting for clipboard changes');
   };
 
   const deactivateSmartClipboard = () => {
