@@ -522,6 +522,7 @@ export const translations = {
     selectFolder: 'Elegir carpeta',
     manageFolders: 'Gestionar Carpetas',
     folderCreated: 'Carpeta creada',
+    folderCreatedAndSelected: 'Carpeta creada y seleccionada',
     deleteFolder: 'Eliminar carpeta',
     deleteFolderConfirm: '¿Estás seguro? Los elementos se moverán a la carpeta General.',
     cannotDeleteDefault: 'No puedes eliminar la carpeta predeterminada',
