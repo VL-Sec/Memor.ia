@@ -554,6 +554,11 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
 
         {/* Folder Management Modal */}
         <Modal visible={showFolderModal} animationType="slide" transparent={true} onRequestClose={closeFolderModal}>
+          <KeyboardAvoidingView 
+            style={{ flex: 1 }} 
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={insets.top + 44}
+          >
           <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); closeFolderModal(); }}>
             <View style={styles.folderModalOverlay}>
               <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -589,6 +594,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
               </TouchableWithoutFeedback>
             </View>
           </TouchableWithoutFeedback>
+          </KeyboardAvoidingView>
         </Modal>
       </View>
     </SafeAreaView>
