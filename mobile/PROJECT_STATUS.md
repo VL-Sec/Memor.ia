@@ -294,11 +294,14 @@ eas build --platform ios --profile preview
 - **Lógica:** Captura quando o VALOR do clipboard MUDA
 - **Anti-spam:** `lastCapturedValueRef` rastreia último valor capturado
 - **Intervalo:** Verifica a cada 3 segundos
-- **Fluxo:**
+- **Reset:** `lastCapturedValueRef = null` ao ATIVAR e ao DESATIVAR (estado limpo entre sessões)
+- **Código Final:**
   ```javascript
   const lastCapturedValueRef = useRef(null);
   
-  async function captureClipboardEntry() {
+  const captureClipboardEntry = async () => {
+    if (!smartClipboardActiveRef.current) return;
+    
     const value = await Clipboard.getStringAsync();
     if (!value || value.trim() === '') return;
     
@@ -306,16 +309,28 @@ eas build --platform ios --profile preview
     if (value === lastCapturedValueRef.current) return;
     
     lastCapturedValueRef.current = value;
-    saveClipboardEntry({ id: generateId(), content: value, timestamp: Date.now() });
-  }
+    await saveClipboardEntry(value);
+  };
+  
+  const activateSmartClipboard = () => {
+    lastCapturedValueRef.current = null; // Reset
+    setSmartClipboardActive(true);
+    setTimeLeft(120);
+  };
+  
+  const deactivateSmartClipboard = () => {
+    lastCapturedValueRef.current = null; // Reset entre sessões
+    setSmartClipboardActive(false);
+    setTimeLeft(0);
+    stopClipboardMonitoring();
+  };
   ```
 - **Comportamento:**
   - Copiar "ABC" → entrada 1 (lastCaptured = "ABC")
   - Intervalo passa → clipboard ainda "ABC" → ignorado (anti-spam)
   - Copiar "XYZ" → entrada 2 (lastCaptured = "XYZ")
   - Copiar "ABC" → entrada 3 (diferente de "XYZ", logo nova entrada)
-- **Ativar:** Reset `lastCapturedValueRef = null` → primeira cópia será capturada
-- **AppState:** Quando app volta ao foreground → verifica clipboard
+- **Nota:** Lock `isSavingRef` apenas em `saveClipboardEntry()`, não em `captureClipboardEntry()` (evita perder cópias rápidas)
 
 ## Modais
 - Todos têm `TouchableWithoutFeedback` no overlay
