@@ -387,11 +387,16 @@ export default function LinksScreen({ language, userId, refreshKey }) {
       Toast.show({ type: 'error', text1: t.error || 'Nome obrigatório' });
       return;
     }
+    
+    // Save the flag before closing modal
+    const shouldSelectFolder = creatingFolderFromPicker;
+    
     try {
       if (editingFolder) {
         await supabase.from('folders').update({ name: folderName }).eq('id', editingFolder.id);
         setFolders(folders.map(f => f.id === editingFolder.id ? { ...f, name: folderName } : f));
         Toast.show({ type: 'success', text1: t.saved || 'Guardado' });
+        closeFolderModal();
       } else {
         const newFolder = {
           id: generateId(),
@@ -406,15 +411,20 @@ export default function LinksScreen({ language, userId, refreshKey }) {
         if (error) throw error;
         setFolders([...folders, newFolder]);
         
+        // Close modal first
+        setShowFolderModal(false);
+        setEditingFolder(null);
+        setFolderName('');
+        setCreatingFolderFromPicker(false);
+        
         // Se estamos a criar pasta a partir do picker, seleciona automaticamente
-        if (creatingFolderFromPicker) {
+        if (shouldSelectFolder) {
           setEditFolderId(newFolder.id);
           Toast.show({ type: 'success', text1: t.folderCreatedAndSelected || 'Pasta criada e selecionada' });
         } else {
           Toast.show({ type: 'success', text1: t.folderCreated || 'Pasta criada' });
         }
       }
-      closeFolderModal();
     } catch (error) {
       console.error('Error saving folder:', error);
       Toast.show({ type: 'error', text1: t.error || 'Erro' });
