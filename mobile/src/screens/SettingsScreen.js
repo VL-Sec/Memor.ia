@@ -657,4 +657,7 @@ const styles = StyleSheet.create({
   timePickerContainer: { alignItems: 'center', paddingVertical: 20 },
   timePickerDoneButton: { backgroundColor: '#007AFF', marginHorizontal: 20, padding: 16, borderRadius: 12, alignItems: 'center' },
   timePickerDoneText: { color: '#FFFFFF', fontSize: 18, fontWeight: '600' },
+  // Cloud backup active info
+  cloudBackupActiveInfo: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingVertical: 12, backgroundColor: 'rgba(52, 199, 89, 0.1)', marginHorizontal: 16, marginBottom: 8, borderRadius: 8 },
+  cloudBackupActiveText: { color: '#34C759', fontSize: 13, flex: 1 },
 });
