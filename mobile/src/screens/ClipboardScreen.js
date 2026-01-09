@@ -125,10 +125,10 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
 
   const startClipboardMonitoring = () => {
     stopClipboardMonitoring();
-    // Check every 1.5 seconds to avoid race conditions
+    // Check every 1 second for clipboard changes
     clipboardCheckInterval.current = setInterval(async () => {
       await checkAndSaveClipboard();
-    }, 1500);
+    }, 1000);
   };
 
   const stopClipboardMonitoring = () => {
@@ -138,51 +138,41 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
     }
   };
 
+  // EVENT-DRIVEN CAPTURE: Save whenever clipboard VALUE CHANGES
+  // Each change = one copy event = one entry (regardless of content being repeated)
   const checkAndSaveClipboard = async () => {
-    // Guard clauses
     if (!smartClipboardActiveRef.current) return;
-    if (isSavingRef.current) return; // Skip if already saving
+    if (isSavingRef.current) return;
     
     try {
       const content = await Clipboard.getStringAsync();
       const trimmedContent = content?.trim();
       
-      // Validate content
+      // Skip if empty
       if (!trimmedContent || trimmedContent.length === 0) return;
       
-      // Check if this exact content was already saved
-      if (savedClipboardContents.current.has(trimmedContent)) {
-        return; // Already saved, skip
-      }
-      
-      // Check if it's the same as last check (no new copy)
+      // ONLY check if clipboard VALUE changed (detecting a copy event)
+      // NO content-based deduplication - each change = new entry
       if (trimmedContent === lastClipboardContent.current) {
-        return; // Same content, skip
+        return; // Same value, no new copy event
       }
       
-      console.log('[Smart Clipboard] New content detected:', trimmedContent.substring(0, 30) + '...');
+      console.log('[Smart Clipboard] Copy event detected:', trimmedContent.substring(0, 30) + '...');
       
-      // Update last content BEFORE saving to prevent duplicates
+      // Update last content to detect next change
       lastClipboardContent.current = trimmedContent;
       
-      // Mark as being processed
-      savedClipboardContents.current.add(trimmedContent);
-      
-      // Save to database
+      // Save this copy event as a new entry
       await autoSaveClipboard(trimmedContent);
       
     } catch (error) {
-      console.error('[Smart Clipboard] Error checking clipboard:', error);
+      console.error('[Smart Clipboard] Error:', error);
     }
   };
 
+  // Save entry unconditionally - no deduplication
   const autoSaveClipboard = async (content) => {
-    // Prevent concurrent saves
-    if (isSavingRef.current) {
-      console.log('[Smart Clipboard] Already saving, queuing...');
-      return;
-    }
-    
+    if (isSavingRef.current) return;
     isSavingRef.current = true;
     
     try {
@@ -191,12 +181,11 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
       const currentUserId = userIdRef.current;
       
       if (!currentUserId) {
-        console.error('[Smart Clipboard] No userId available');
-        savedClipboardContents.current.delete(content);
+        console.error('[Smart Clipboard] No userId');
         return;
       }
       
-      // Generate unique ID and timestamp
+      // Each entry gets unique ID and timestamp
       const entryId = generateId();
       const entryTimestamp = new Date().toISOString();
       
@@ -206,7 +195,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
         title: content.slice(0, 50) + (content.length > 50 ? '...' : ''),
         content: content,
         contentType: 'text',
-        tags: ['auto-saved', 'smart-clipboard'],
+        tags: ['smart-clipboard'],
         isFavorite: false,
         isPinned: false,
         folderId: defaultFolder?.id || null,
@@ -215,37 +204,26 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
       
       console.log('[Smart Clipboard] Saving entry:', entryId);
       
-      // Insert into Supabase
-      const { data, error } = await supabase.from('links').insert([newNote]).select();
+      const { error } = await supabase.from('links').insert([newNote]);
       
       if (error) {
-        console.error('[Smart Clipboard] Supabase error:', error);
-        // Remove from Set so it can be retried
-        savedClipboardContents.current.delete(content);
+        console.error('[Smart Clipboard] DB error:', error);
         return;
       }
       
-      console.log('[Smart Clipboard] Entry saved successfully:', entryId);
-      
-      // Add to local state - prepend to existing notes
-      setNotes(prevNotes => {
-        // Double-check it's not already in the list
-        if (prevNotes.some(n => n.id === entryId || n.content === content)) {
-          return prevNotes;
-        }
-        return [newNote, ...prevNotes];
-      });
+      // Add to local state
+      setNotes(prevNotes => [newNote, ...prevNotes]);
       
       Toast.show({ 
         type: 'success', 
-        text1: t.autoSaved || 'Guardado automaticamente',
-        text2: content.slice(0, 30) + (content.length > 30 ? '...' : ''),
+        text1: t.autoSaved || 'Guardado',
+        text2: content.slice(0, 30) + '...',
       });
       
+      console.log('[Smart Clipboard] Saved:', entryId);
+      
     } catch (error) {
-      console.error('[Smart Clipboard] Error auto-saving:', error);
-      // Remove from Set so it can be retried
-      savedClipboardContents.current.delete(content);
+      console.error('[Smart Clipboard] Error:', error);
     } finally {
       isSavingRef.current = false;
     }
