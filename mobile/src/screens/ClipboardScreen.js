@@ -775,53 +775,57 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
           transparent={true}
           onRequestClose={() => setShowSmartModal(false)}
         >
-          <View style={styles.smartModalOverlay}>
-            <View style={styles.smartModalContent}>
-              <View style={styles.smartModalHeader}>
-                <View style={styles.smartModalTitleRow}>
-                  <Ionicons name="flash" size={24} color="#007AFF" />
-                  <Text style={styles.smartModalTitle}>{t.smartClipboard || 'Área Inteligente'}</Text>
-                </View>
-                <TouchableOpacity onPress={() => setShowSmartModal(false)}>
-                  <Ionicons name="close" size={28} color="#FFFFFF" />
-                </TouchableOpacity>
-              </View>
-              
-              <Text style={styles.smartModalInfo}>
-                {t.smartClipboardInfo || 'Guarda automaticamente tudo o que copiares enquanto estiver ativo.'}
-              </Text>
-              
-              {smartClipboardActive && (
-                <View style={styles.smartModalTimer}>
-                  <Ionicons name="time-outline" size={20} color="#34C759" />
-                  <Text style={styles.smartModalTimerText}>
-                    {formatTime(timeLeft)} {t.timeRemaining || 'restantes'}
+          <TouchableWithoutFeedback onPress={() => setShowSmartModal(false)}>
+            <View style={styles.smartModalOverlay}>
+              <TouchableWithoutFeedback onPress={() => {}}>
+                <View style={styles.smartModalContent}>
+                  <View style={styles.smartModalHeader}>
+                    <View style={styles.smartModalTitleRow}>
+                      <Ionicons name="flash" size={24} color="#007AFF" />
+                      <Text style={styles.smartModalTitle}>{t.smartClipboard || 'Área Inteligente'}</Text>
+                    </View>
+                    <TouchableOpacity onPress={() => setShowSmartModal(false)}>
+                      <Ionicons name="close" size={28} color="#FFFFFF" />
+                    </TouchableOpacity>
+                  </View>
+                  
+                  <Text style={styles.smartModalInfo}>
+                    {t.smartClipboardInfo || 'Guarda automaticamente tudo o que copiares enquanto estiver ativo.'}
                   </Text>
+                  
+                  {smartClipboardActive && (
+                    <View style={styles.smartModalTimer}>
+                      <Ionicons name="time-outline" size={20} color="#34C759" />
+                      <Text style={styles.smartModalTimerText}>
+                        {formatTime(timeLeft)} {t.timeRemaining || 'restantes'}
+                      </Text>
+                    </View>
+                  )}
+                  
+                  <TouchableOpacity 
+                    style={[styles.smartModalButton, smartClipboardActive && styles.smartModalButtonStop]} 
+                    onPress={() => {
+                      if (smartClipboardActive) {
+                        deactivateSmartClipboard();
+                      } else {
+                        activateSmartClipboard();
+                      }
+                      setShowSmartModal(false);
+                    }}
+                  >
+                    <Ionicons 
+                      name={smartClipboardActive ? "stop-circle" : "play-circle"} 
+                      size={24} 
+                      color="#FFFFFF" 
+                    />
+                    <Text style={styles.smartModalButtonText}>
+                      {smartClipboardActive ? (t.deactivate || 'Desativar') : (t.activate || 'Ativar')}
+                    </Text>
+                  </TouchableOpacity>
                 </View>
-              )}
-              
-              <TouchableOpacity 
-                style={[styles.smartModalButton, smartClipboardActive && styles.smartModalButtonStop]} 
-                onPress={() => {
-                  if (smartClipboardActive) {
-                    deactivateSmartClipboard();
-                  } else {
-                    activateSmartClipboard();
-                  }
-                  setShowSmartModal(false);
-                }}
-              >
-                <Ionicons 
-                  name={smartClipboardActive ? "stop-circle" : "play-circle"} 
-                  size={24} 
-                  color="#FFFFFF" 
-                />
-                <Text style={styles.smartModalButtonText}>
-                  {smartClipboardActive ? (t.stop || 'Parar') : (t.start || 'Iniciar')}
-                </Text>
-              </TouchableOpacity>
+              </TouchableWithoutFeedback>
             </View>
-          </View>
+          </TouchableWithoutFeedback>
         </Modal>
       </View>
     </SafeAreaView>
