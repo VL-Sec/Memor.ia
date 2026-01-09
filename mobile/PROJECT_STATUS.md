@@ -113,11 +113,9 @@ Stack.Navigator (raiz)
 - ❌ REMOVIDO: Segundo alerta do backup
 
 ## 7. Notificações
-- ✅ Lembretes em Links
-- ✅ Lembretes em Notas
-- ✅ Resumo Semanal
-- **Formato:** `{ seconds: X, repeats: false }`
-- **⚠️ NÃO funciona no Expo Go** - apenas em builds
+- ❌ **REMOVIDO** - Lembretes em Links (causava erros com Supabase)
+- ❌ **REMOVIDO** - Lembretes em Notas
+- ❌ **REMOVIDO** - Resumo Semanal
 
 ## 8. UX Global
 - ✅ Teclado desaparece ao tocar fora (todas as telas)
