@@ -289,17 +289,29 @@ eas build --platform ios --profile preview
 
 # 📝 NOTAS TÉCNICAS
 
-## Smart Clipboard (Captura Inteligente)
-- Usa `useRef` para `lastClipboardContent` e `savedClipboardContents` (Set)
-- Verifica a cada 1 segundo se há novo conteúdo
+## Smart Clipboard (Captura Inteligente) - REFATORADO
+- Usa `useRef` para evitar stale closures:
+  - `lastClipboardContent` - último conteúdo verificado
+  - `savedClipboardContents` (Set) - todos os conteúdos já guardados
+  - `isSavingRef` - previne saves concorrentes
+  - `userIdRef` - userId actualizado
+- Verifica a cada **1.5 segundos** (era 1s - evita race conditions)
 - Ignora conteúdo que já estava no clipboard ao ativar
 - Timer de 2 minutos (120 segundos)
-- **Lógica de acumulação:**
-  1. Marca conteúdo como "guardado" ANTES de inserir (evita duplicados)
-  2. Gera ID único (`generateId()`) + timestamp para cada entrada
-  3. Insere no Supabase
-  4. Adiciona ao estado local com verificação de ID existente
-  5. Se falhar, remove do Set para poder tentar novamente
+- **Lógica de acumulação robusta:**
+  1. Guard clauses: verifica se está activo e não está a guardar
+  2. Valida conteúdo (não vazio, diferente do último, não no Set)
+  3. Actualiza `lastClipboardContent` ANTES de guardar
+  4. Adiciona ao Set ANTES de inserir no Supabase
+  5. Gera ID único + timestamp
+  6. Insere no Supabase com `.select()` para confirmar
+  7. Verifica duplicados no estado local antes de adicionar
+  8. Se falhar, remove do Set para retry
+  9. `isSavingRef = false` no finally
+- **Prevenção de duplicados:**
+  - `handleAddNote()` adiciona conteúdo ao Set
+  - `handleCopyNote()` adiciona conteúdo ao Set
+  - `fetchData()` adiciona todos os conteúdos existentes ao Set
 
 ## Modais
 - Todos têm `TouchableWithoutFeedback` no overlay
