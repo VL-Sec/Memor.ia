@@ -686,8 +686,10 @@ export default function LinksScreen({ language, userId, refreshKey }) {
               </TouchableOpacity>
             </ScrollView>
           </View>
-        </View>
-      </Modal>
+        </TouchableWithoutFeedback>
+      </View>
+    </TouchableWithoutFeedback>
+  </Modal>
 
       {showDatePicker && (
         <DateTimePicker
