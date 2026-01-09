@@ -607,9 +607,9 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
       {showTimePicker && (
         Platform.OS === 'ios' ? (
           <Modal visible={showTimePicker} animationType="slide" transparent={true} onRequestClose={() => setShowTimePicker(false)}>
-            <TouchableWithoutFeedback onPress={() => setShowTimePicker(false)}>
+            <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); setShowTimePicker(false); }}>
               <View style={styles.pickerModalOverlay}>
-                <TouchableWithoutFeedback onPress={() => {}}>
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                   <View style={styles.pickerModalContent}>
                     <View style={styles.pickerModalHeader}>
                       <Text style={styles.pickerModalTitle}>{t.reminderTime || 'Hora'}</Text>
