@@ -540,7 +540,8 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
             placeholder={t.search || 'Pesquisar...'} 
             placeholderTextColor="#8E8E93" 
             value={searchQuery} 
-            onChangeText={setSearchQuery} 
+            onChangeText={setSearchQuery}
+            onBlur={() => setSearchQuery('')}
           />
         </View>
 
