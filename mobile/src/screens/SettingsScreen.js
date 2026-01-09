@@ -207,6 +207,7 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
       // Cancel any existing weekly notifications first
       await cancelWeeklyNotification();
       
+      // Use weekly trigger format
       const notificationId = await Notifications.scheduleNotificationAsync({
         content: {
           title: t.weeklySummaryTitle || 'Memor.ia - Resumo Semanal',
@@ -214,7 +215,6 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
           sound: true,
         },
         trigger: {
-          type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
           weekday: dayOfWeek + 1, // Notifications uses 1-7 (Sunday = 1), we use 0-6
           hour: hour,
           minute: minute,
@@ -224,7 +224,8 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
       
       // Save the notification ID so we can cancel it later
       await AsyncStorage.setItem('memoria-weekly-notification-id', notificationId);
-      console.log('Weekly notification scheduled:', notificationId);
+      console.log('Weekly notification scheduled:', notificationId, 'for weekday', dayOfWeek + 1, 'at', hour + ':' + minute);
+      Toast.show({ type: 'success', text1: t.reminderSet || 'Lembrete agendado' });
       
     } catch (error) {
       console.error('Error scheduling weekly notification:', error);
