@@ -133,6 +133,10 @@ export const translations = {
     reminderInPast: 'Date must be in the future',
     errorSchedulingReminder: 'Error creating reminder',
     
+    // Validation
+    titleOrUrlRequired: 'Title or URL is required',
+    titleOrContentRequired: 'Title or content is required',
+    
     // Links
     addLink: 'Add Link',
     urlRequired: 'URL is required',
