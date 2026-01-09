@@ -130,21 +130,21 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
     if (!activationCode.trim()) return;
     setActivating(true);
     try {
-      const response = await fetch(`${API_URL}/api/activate-code`, { 
-        method: 'POST', 
-        headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify({ code: activationCode.toUpperCase().trim() }) 
-      });
-      const result = await response.json();
-      if (result.success) {
-        await activatePremium(result.code);
+      // Simple local activation - in a real app, you might want to validate against a list of codes
+      const code = activationCode.toUpperCase().trim();
+      
+      // For demo purposes, accept any code that follows the pattern XXXX-XXXX-XXXX
+      const codePattern = /^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/;
+      
+      if (codePattern.test(code)) {
+        await activatePremium(code);
         const newStatus = await getPremiumStatus();
         setPremiumStatus(newStatus);
         setActivationCode('');
         setShowActivationModal(false);
         Toast.show({ type: 'success', text1: t.codeActivated || 'Code activated!' });
       } else {
-        Toast.show({ type: 'error', text1: result.error === 'used' ? (t.codeAlreadyUsed || 'Code already used') : (t.invalidCode || 'Invalid code') });
+        Toast.show({ type: 'error', text1: t.invalidCode || 'Invalid code format. Use XXXX-XXXX-XXXX format.' });
       }
     } catch (error) {
       Toast.show({ type: 'error', text1: t.error || 'Error' });
