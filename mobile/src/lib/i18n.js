@@ -1144,11 +1144,11 @@ export const translations = {
     clipboardPlaceholder: 'Incolla il testo qui...',
     noClipboardItems: 'Ancora niente qui',
     chars: 'caratteri',
-    smartClipboard: 'Appunti Intelligenti',
-    smartClipboardInfo: 'Salva automaticamente tutto ciò che copi mentre è attivo.',
-    smartClipboardActivated: 'Appunti intelligenti attivati',
-    activate: 'Avvia',
-    deactivate: 'Ferma',
+    smartClipboard: 'Cattura Intelligente',
+    smartClipboardInfo: 'Salva automaticamente tutto ciò che copi per 2 minuti.',
+    smartClipboardActivated: 'Cattura intelligente attivata',
+    activate: 'Attiva',
+    deactivate: 'Disattiva',
     timeRemaining: 'rimanente',
     
     // Links
