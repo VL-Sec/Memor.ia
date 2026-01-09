@@ -114,9 +114,11 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
   }, [smartClipboardActive]);
 
   const handleAppStateChange = async (nextAppState) => {
+    // When app comes back to foreground, capture clipboard (likely a new copy happened)
     if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
-      if (smartClipboardActive) {
-        await checkAndSaveClipboard();
+      if (smartClipboardActiveRef.current) {
+        console.log('[Smart Clipboard] App returned to foreground - capturing');
+        await captureClipboardEntry();
       }
     }
     appState.current = nextAppState;
