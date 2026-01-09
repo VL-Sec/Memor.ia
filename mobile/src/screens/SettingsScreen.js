@@ -109,6 +109,29 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
               setCloudBackupEnabled(true);
               await AsyncStorage.setItem('memoria-cloud-backup-enabled', 'true');
               Toast.show({ type: 'success', text1: t.cloudBackupActivated || 'Backup cloud ativado' });
+              
+              // Open device settings so user can enable backup
+              setTimeout(() => {
+                Alert.alert(
+                  t.openBackupSettings || 'Ativar Backup',
+                  Platform.OS === 'ios'
+                    ? (t.openICloudSettings || 'Para garantir que os teus dados são guardados, ativa o backup do iCloud nas Definições do iPhone.')
+                    : (t.openGoogleSettings || 'Para garantir que os teus dados são guardados, ativa o backup nas Definições do Android.'),
+                  [
+                    { text: t.later || 'Mais tarde', style: 'cancel' },
+                    { 
+                      text: t.openSettings || 'Abrir Definições', 
+                      onPress: () => {
+                        if (Platform.OS === 'ios') {
+                          Linking.openURL('app-settings:');
+                        } else {
+                          Linking.openSettings();
+                        }
+                      }
+                    },
+                  ]
+                );
+              }, 500);
             },
           },
         ]
