@@ -65,7 +65,7 @@ const getBackupInfo = () => {
   };
 };
 
-export default function SettingsScreen({ language, setLanguage, premiumStatus, setPremiumStatus }) {
+export default function SettingsScreen({ language, setLanguage, premiumStatus, setPremiumStatus, userId }) {
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showActivationModal, setShowActivationModal] = useState(false);
   const [showDayModal, setShowDayModal] = useState(false);
@@ -78,6 +78,9 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
   const [summaryMinute, setSummaryMinute] = useState(0);
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+  
+  // Dynamic storage key based on userId
+  const getNotesStorageKey = () => `memoria-notes-${userId || 'default'}`;
 
   const t = translations[language] || translations.en;
   const backupInfo = getBackupInfo();
