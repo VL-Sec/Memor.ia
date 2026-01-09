@@ -1,193 +1,231 @@
-# 📱 Memor.ia - Estado do Projeto (Janeiro 2025)
-
-## ⚠️ IMPORTANTE PARA PRÓXIMAS SESSÕES
-**NÃO REVERTER NADA! O projeto está funcional e estável.**
-**Sempre fazer git pull do GitHub antes de começar!**
+# 📱 Memor.ia - ESTADO COMPLETO DO PROJETO
+## Última Atualização: Janeiro 2025
 
 ---
 
-## 🏗️ Arquitetura de Navegação (DEFINITIVA)
+# ⚠️ INSTRUÇÕES CRÍTICAS PARA NOVAS SESSÕES
 
-```
-Stack.Navigator (raiz)
-├── MainTabs (Tab.Navigator) - 4 tabs APENAS
-│   ├── Links (LinksScreen)
-│   ├── Clipboard (ClipboardScreen)
-│   ├── Notas (NotesScreen)
-│   └── Favoritos (FavoritesScreen)
-│
-└── Settings (SettingsScreen) - FORA do Tab.Navigator
-    └── Acessível via ícone ⚙️ no header (CustomHeader)
-```
-
-### ❌ NÃO FAZER:
-- Adicionar Settings como 5º tab
-- Criar CustomTabBar
-- Usar DEMO_USER
-- Adicionar tabs vazios ou ocultos
-- Reverter para código antigo
-
----
-
-## 🖼️ Assets (ATUALIZADOS - Janeiro 2025)
-Localização: `/app/mobile/assets/`
-- `icon.png` - Ícone principal (NOVO logo azul)
-- `adaptive-icon.png` - Ícone Android (NOVO logo azul)
-- `splash.png` - Tela de splash (NOVO logo azul)
-- `favicon.ico` - Favicon
-- `favicon.png` - Favicon PNG
-
-**NOTA:** Para ver novos assets, é necessária NOVA BUILD (não muda com hot reload)
-
----
-
-## ✅ Funcionalidades Implementadas
-
-### 1. Sistema de Autenticação
-- **SEM login/password** - Usa ID único do dispositivo
-- Gerado em `/app/mobile/src/lib/userManager.js`
-- Armazenado em AsyncStorage como `@memoria_user_id`
-- NUNCA usar `DEMO_USER`
-
-### 2. Links (LinksScreen.js)
-- ✅ Adicionar links (abre modal completo)
-- ✅ Editar, eliminar, copiar
-- ✅ Favoritos e Pin (fixar no topo)
-- ✅ Pastas (criar, mover, eliminar)
-- ✅ Criar pasta diretamente no modal "Mover para" (auto-seleciona)
-- ✅ Lembretes com notificações locais (campo `reminderAt` no Supabase)
-- ✅ Pesquisa
-- ✅ Teclado desaparece ao tocar fora
-- ✅ Modais fecham ao tocar fora
-- ✅ Permite guardar apenas com título OU apenas com URL
-- ❌ NÃO mostra data de criação (apenas lembrete se existir)
-
-### 3. Clipboard (ClipboardScreen.js)
-- ✅ Colar texto manual
-- ✅ **Captura Inteligente** (2 minutos) - Guarda CADA texto copiado separadamente
-- ✅ Favoritos e Pin
-- ✅ Pastas (criar, mover)
-- ✅ Criar pasta diretamente no modal "Mover para" (auto-seleciona)
-- ✅ Pesquisa
-- ✅ Teclado desaparece ao tocar fora
-- ✅ Cards compactos (sem data)
-
-### 4. Notas (NotesScreen.js)
-- ✅ Criar, editar, eliminar notas
-- ✅ Cores personalizadas
-- ✅ Favoritos e Pin
-- ✅ Lembretes com notificações locais
-- ✅ Armazenamento LOCAL (AsyncStorage)
-- ✅ Pesquisa
-- ✅ Teclado desaparece ao tocar fora
-- ✅ Permite guardar apenas com título OU apenas com conteúdo
-- ✅ Mostra data de criação
-
-### 5. Favoritos (FavoritesScreen.js)
-- ✅ Mostra todos os itens favoritos (links, notas, clipboard)
-- ✅ Filtros por tipo
-- ✅ Pesquisa
-- ✅ Teclado desaparece ao tocar fora
-
-### 6. Definições (SettingsScreen.js)
-- ✅ Seleção de idioma (6 idiomas)
-- ✅ Premium / Código de ativação
-- ✅ Resumo semanal (notificação)
-- ✅ Backup Cloud simplificado (apenas 1 alerta de confirmação)
-- ✅ Links legais (Termos, Privacidade)
-- ❌ REMOVIDO: Backup manual (exportar/importar JSON)
-- ❌ REMOVIDO: Segundo alerta do backup (abrir definições)
-
-### 7. Notificações
-- ✅ Lembretes em Links
-- ✅ Lembretes em Notas
-- ✅ Resumo Semanal
-- **Formato trigger:** `{ seconds: X, repeats: false }`
-- **NOTA:** Não funciona no Expo Go, apenas em development/preview build
-
-### 8. UX
-- ✅ Teclado desaparece ao tocar fora (todas as telas)
-- ✅ Modais fecham ao tocar fora (todas as telas)
-- ✅ Teclado desaparece ao tocar dentro dos modais
-
----
-
-## 🌐 Traduções (6 idiomas)
-Ficheiro: `/app/mobile/src/lib/i18n.js`
-
-| Idioma | Tabs | Smart Clipboard |
-|--------|------|-----------------|
-| 🇬🇧 EN | Links, Clipboard, Notes, Favorites | Smart Capture |
-| 🇵🇹 PT | Links, Clipboard, Notas, Favoritos | Captura Inteligente |
-| 🇪🇸 ES | Enlaces, Portapapeles, Notas, Favoritos | Captura Inteligente |
-| 🇫🇷 FR | Liens, Presse-papiers, Notes, Favoris | Capture Intelligente |
-| 🇩🇪 DE | Links, Zwischenablage, Notizen, Favoriten | Intelligente Erfassung |
-| 🇮🇹 IT | Link, Appunti, Note, Preferiti | Cattura Intelligente |
-
-**Botões Ativar/Desativar** traduzidos corretamente em todos os idiomas.
-
----
-
-## 💾 Armazenamento
-
-### Supabase (Cloud)
-- `links` - Links E itens de Clipboard (campo `contentType`)
-  - **IMPORTANTE:** Campo `reminderAt` (string ISO date) para lembretes
-  - NÃO usar campo `reminder` (objeto) - não existe na tabela
-- `folders` - Pastas
-
-### AsyncStorage (Local)
-- `@memoria_user_id` - ID único do dispositivo
-- `memoria-notes-{userId}` - Notas do utilizador
-- `memoria-link-notifications` - IDs de notificações de links (JSON)
-- `memoria-weekly-summary` - Config do resumo semanal
-- `memoria-cloud-backup-enabled` - Preferência de backup
-- `memoria-premium` - Status premium
-- `memoria-language` - Idioma selecionado
-
----
-
-## 📦 Dependências Principais
-- Expo SDK 54
-- React 19
-- React Navigation 7
-- expo-notifications
-- @react-native-async-storage/async-storage
-- @react-native-community/datetimepicker
-- react-native-toast-message
-
-**Package manager:** YARN (nunca usar npm)
-
----
-
-## 🔧 Comandos de Instalação e Build
-
-### 1. Atualizar código do GitHub
+## ANTES DE COMEÇAR QUALQUER TRABALHO:
 ```bash
 cd C:\Projetos\Memor.ia
 git checkout -- mobile/assets/
 git pull
 ```
 
-### 2. Iniciar desenvolvimento
+## NUNCA FAZER:
+- ❌ Reverter código para versões anteriores
+- ❌ Usar DEMO_USER
+- ❌ Criar CustomTabBar
+- ❌ Adicionar Settings como 5º tab
+- ❌ Usar campo `reminder` (objeto) no Supabase
+- ❌ Usar npm (sempre YARN)
+- ❌ Modificar assets sem nova build
+
+---
+
+# 🏗️ ARQUITETURA DE NAVEGAÇÃO
+
+```
+Stack.Navigator (raiz)
+│
+├── MainTabs (Tab.Navigator) ─── 4 TABS APENAS
+│   ├── Links      → LinksScreen.js
+│   ├── Clipboard  → ClipboardScreen.js
+│   ├── Notas      → NotesScreen.js
+│   └── Favoritos  → FavoritesScreen.js
+│
+└── Settings → SettingsScreen.js
+    └── Acesso via ícone ⚙️ no CustomHeader (FORA do Tab.Navigator)
+```
+
+---
+
+# 🖼️ ASSETS (Atualizados Janeiro 2025)
+
+**Localização:** `/app/mobile/assets/`
+
+| Ficheiro | Descrição |
+|----------|-----------|
+| `icon.png` | Ícone principal (logo azul novo) |
+| `adaptive-icon.png` | Ícone Android (logo azul novo) |
+| `splash.png` | Tela de splash (logo azul novo) |
+| `favicon.ico` | Favicon |
+| `favicon.png` | Favicon PNG |
+
+**⚠️ IMPORTANTE:** Assets só mudam com NOVA BUILD (hot reload não atualiza)
+
+---
+
+# ✅ FUNCIONALIDADES IMPLEMENTADAS
+
+## 1. Autenticação
+- **SEM login/password**
+- Usa ID único do dispositivo
+- Ficheiro: `/app/mobile/src/lib/userManager.js`
+- Chave AsyncStorage: `@memoria_user_id`
+
+## 2. LinksScreen.js
+- ✅ Adicionar links (modal completo)
+- ✅ Editar, eliminar, copiar
+- ✅ Favoritos e Pin (fixar no topo)
+- ✅ Pastas (criar, mover, eliminar)
+- ✅ Criar pasta no modal "Mover para" (auto-seleciona)
+- ✅ Lembretes com notificações locais
+- ✅ Pesquisa
+- ✅ Teclado desaparece ao tocar fora
+- ✅ Modais fecham ao tocar fora
+- ✅ Permite guardar só com título OU só com URL
+- ✅ Não mostra data (apenas lembrete se existir)
+
+## 3. ClipboardScreen.js
+- ✅ Colar texto manual
+- ✅ **Captura Inteligente** (2 min) - guarda CADA texto separadamente
+- ✅ Usa Set para evitar duplicados
+- ✅ Favoritos e Pin
+- ✅ Pastas (criar, mover)
+- ✅ Criar pasta no modal "Mover para" (auto-seleciona)
+- ✅ Pesquisa
+- ✅ Cards compactos (sem data)
+- ✅ numberOfLines={2}
+
+## 4. NotesScreen.js
+- ✅ Criar, editar, eliminar notas
+- ✅ Cores personalizadas
+- ✅ Favoritos e Pin
+- ✅ Lembretes com notificações locais
+- ✅ Armazenamento LOCAL (AsyncStorage)
+- ✅ Pesquisa
+- ✅ Permite guardar só com título OU só com conteúdo
+- ✅ Mostra data de criação
+
+## 5. FavoritesScreen.js
+- ✅ Mostra todos os favoritos (links, notas, clipboard)
+- ✅ Filtros por tipo
+- ✅ Pesquisa
+
+## 6. SettingsScreen.js
+- ✅ Seleção de idioma (6 idiomas)
+- ✅ Premium / Código de ativação
+- ✅ Resumo semanal (notificação)
+- ✅ Backup Cloud simplificado (1 alerta apenas)
+- ✅ Links legais discretos (sem ícones)
+- ❌ REMOVIDO: Backup manual
+- ❌ REMOVIDO: Segundo alerta do backup
+
+## 7. Notificações
+- ✅ Lembretes em Links
+- ✅ Lembretes em Notas
+- ✅ Resumo Semanal
+- **Formato:** `{ seconds: X, repeats: false }`
+- **⚠️ NÃO funciona no Expo Go** - apenas em builds
+
+## 8. UX Global
+- ✅ Teclado desaparece ao tocar fora (todas as telas)
+- ✅ Modais fecham ao tocar fora + fecham teclado
+- ✅ `keyboardShouldPersistTaps="handled"` em listas
+
+---
+
+# 🌐 TRADUÇÕES (6 Idiomas)
+
+**Ficheiro:** `/app/mobile/src/lib/i18n.js`
+
+| Idioma | Código | Tabs | Smart Clipboard |
+|--------|--------|------|-----------------|
+| 🇬🇧 English | en | Links, Clipboard, Notes, Favorites | Smart Capture |
+| 🇵🇹 Português | pt | Links, Clipboard, Notas, Favoritos | Captura Inteligente |
+| 🇪🇸 Español | es | Enlaces, Portapapeles, Notas, Favoritos | Captura Inteligente |
+| 🇫🇷 Français | fr | Liens, Presse-papiers, Notes, Favoris | Capture Intelligente |
+| 🇩🇪 Deutsch | de | Links, Zwischenablage, Notizen, Favoriten | Intelligente Erfassung |
+| 🇮🇹 Italiano | it | Link, Appunti, Note, Preferiti | Cattura Intelligente |
+
+**Botões:** Ativar/Desativar traduzidos corretamente (não Iniciar/Parar)
+
+---
+
+# 💾 ARMAZENAMENTO
+
+## Supabase (Cloud)
+| Tabela | Campos Importantes |
+|--------|-------------------|
+| `links` | id, userId, url, title, contentType, isFavorite, isPinned, folderId, **reminderAt**, createdAt |
+| `folders` | id, userId, name, icon, isDefault, folderType, createdAt |
+
+**⚠️ CRÍTICO:** Usar `reminderAt` (string ISO) - NÃO usar `reminder` (objeto)
+
+## AsyncStorage (Local)
+| Chave | Descrição |
+|-------|-----------|
+| `@memoria_user_id` | ID único do dispositivo |
+| `memoria-notes-{userId}` | Notas do utilizador |
+| `memoria-link-notifications` | IDs de notificações (JSON) |
+| `memoria-weekly-summary` | Config resumo semanal |
+| `memoria-cloud-backup-enabled` | Preferência backup |
+| `memoria-premium` | Status premium |
+| `memoria-language` | Idioma selecionado |
+
+---
+
+# 🔗 URLS OFICIAIS
+
+| Tipo | URL |
+|------|-----|
+| Terms of Service | `https://www.notion.so/Terms-of-Service-Memor-ia-2e3f9fe156fc80fc8c5bf9f9f9f008e1` |
+| Privacy Policy | `https://www.notion.so/Privacy-Policy-Memor-ia-2e3f9fe156fc80edb1d2e6d0bd5f91e7` |
+| GitHub | `https://github.com/VL-Sec/Memor.ia` |
+
+---
+
+# 📦 DEPENDÊNCIAS
+
+```json
+{
+  "expo": "~54.0.0",
+  "react": "19.x",
+  "react-native": "0.76.x",
+  "@react-navigation/native": "^7.x",
+  "@react-navigation/bottom-tabs": "^7.x",
+  "@react-navigation/native-stack": "^7.x",
+  "expo-notifications": "~0.32.0",
+  "@react-native-async-storage/async-storage": "2.1.x",
+  "@react-native-community/datetimepicker": "8.x",
+  "react-native-toast-message": "^2.x",
+  "@supabase/supabase-js": "^2.x"
+}
+```
+
+**Package Manager:** YARN (nunca npm)
+
+---
+
+# 🔧 COMANDOS
+
+## Atualizar do GitHub
+```bash
+cd C:\Projetos\Memor.ia
+git checkout -- mobile/assets/
+git pull
+```
+
+## Desenvolvimento
 ```bash
 cd mobile
 npx expo start --dev-client --clear
 ```
 
-### 3. Build Android Preview (APK standalone)
+## Build Android Preview (APK standalone)
 ```bash
 cd C:\Projetos\Memor.ia\mobile
 eas build --platform android --profile preview
 ```
 
-### 4. Build Android Development (com hot reload)
+## Build Android Development (hot reload)
 ```bash
 cd C:\Projetos\Memor.ia\mobile
 eas build --platform android --profile development
 ```
 
-### 5. Build iOS
+## Build iOS
 ```bash
 cd C:\Projetos\Memor.ia\mobile
 eas build --platform ios --profile preview
@@ -195,50 +233,91 @@ eas build --platform ios --profile preview
 
 ---
 
-## 📋 Tarefas Pendentes
+# 🚫 PROBLEMAS RESOLVIDOS (NÃO REINTRODUZIR)
 
-1. **Bug Tab Bar** - Verificar distribuição uniforme dos ícones
-2. **URLs de Políticas** - Adicionar URLs reais quando disponíveis
-3. **Publicação nas Stores** - Configurar quando pronto
-
----
-
-## 🚫 Problemas Resolvidos (NÃO REINTRODUZIR)
-
-| Problema | Solução |
-|----------|---------|
-| DEMO_USER | Usa userId único por dispositivo |
-| CustomTabBar | Tab bar padrão do React Navigation |
-| Settings no Tab.Navigator | Settings está no Stack (acesso via ⚙️) |
+| Problema | Solução Aplicada |
+|----------|------------------|
+| DEMO_USER | userId único por dispositivo |
+| CustomTabBar | Tab bar padrão React Navigation |
+| Settings no Tab.Navigator | Settings no Stack (acesso via ⚙️) |
 | Badge "Geral" nos itens | Removida completamente |
-| Backup manual | Apenas backup cloud simplificado |
-| expo-crypto | Substituído por UUID puro JS |
+| Backup manual | Apenas backup cloud |
+| expo-crypto | UUID puro JavaScript |
 | Teclado não desaparece | TouchableWithoutFeedback + Keyboard.dismiss |
-| Erro Supabase "reminder" | Usa campo `reminderAt` (string) |
-| Smart Clipboard duplica | Usa Set para rastrear conteúdos já salvos |
-| Cards Clipboard grandes | Compactados, sem data |
+| Erro Supabase "reminder" | Campo `reminderAt` (string) |
+| Smart Clipboard duplica | Set para rastrear conteúdos |
+| Cards Clipboard grandes | Compactados, numberOfLines={2}, sem data |
+| Segundo alert backup | Removido |
+| Links legais com ícones | Discretos, só texto |
 
 ---
 
-## 🔑 Informação Crítica para Builds
+# 📋 ESTRUTURA DE FICHEIROS
 
-### Assets só mudam com nova build
-- Ícone, splash, etc. são compilados na build
-- Hot reload NÃO atualiza assets
-
-### Notificações só funcionam em builds
-- Expo Go não suporta notificações
-- Usar `development` ou `preview` build
-
-### Profiles de Build
-| Profile | Download? | Precisa PC? | Uso |
-|---------|-----------|-------------|-----|
-| development | ✅ APK | ✅ Metro | Dev com hot reload |
-| preview | ✅ APK | ❌ | Testar standalone |
-| production | ✅ AAB | ❌ | Play Store |
+```
+/app/mobile/
+├── App.js                 # Navegação principal
+├── app.json               # Config Expo
+├── package.json           # Dependências
+├── PROJECT_STATUS.md      # Este ficheiro
+├── assets/
+│   ├── icon.png           # Logo novo
+│   ├── adaptive-icon.png  # Logo Android
+│   ├── splash.png         # Splash screen
+│   ├── favicon.ico
+│   └── favicon.png
+└── src/
+    ├── components/
+    │   └── CustomHeader.js
+    ├── lib/
+    │   ├── i18n.js        # Traduções (6 idiomas)
+    │   ├── premium.js     # Lógica premium
+    │   ├── supabase.js    # Cliente Supabase
+    │   └── userManager.js # ID único dispositivo
+    └── screens/
+        ├── LinksScreen.js
+        ├── ClipboardScreen.js
+        ├── NotesScreen.js
+        ├── FavoritesScreen.js
+        └── SettingsScreen.js
+```
 
 ---
 
-**Última atualização:** Janeiro 2025
+# 📝 NOTAS TÉCNICAS
+
+## Smart Clipboard
+- Usa `useRef` para `lastClipboardContent` e `savedClipboardContents` (Set)
+- Verifica a cada 1 segundo se há novo conteúdo
+- Ignora conteúdo que já estava no clipboard ao ativar
+- Timer de 2 minutos (120 segundos)
+
+## Notificações
+- Formato trigger: `{ seconds: X, repeats: false }`
+- IDs guardados localmente para poder cancelar
+- Permissões pedidas ao utilizador
+
+## Modais
+- Todos têm `TouchableWithoutFeedback` no overlay
+- Ao tocar fora: fecha modal + `Keyboard.dismiss()`
+- Conteúdo interno tem `onPress={Keyboard.dismiss}`
+
+---
+
+# ✅ ESTADO ATUAL
+
+**Data:** Janeiro 2025
 **Estado:** ✅ Funcional e Estável
-**GitHub:** https://github.com/VL-Sec/Memor.ia
+**Pronto para:** Build de produção
+
+---
+
+# 🎯 PRÓXIMOS PASSOS (Opcionais)
+
+1. Verificar distribuição uniforme dos ícones na tab bar
+2. Testes em dispositivos iOS
+3. Publicação nas stores
+
+---
+
+**FIM DO DOCUMENTO - GUARDAR SEMPRE ESTA INFORMAÇÃO**
