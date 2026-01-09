@@ -81,12 +81,15 @@ Stack.Navigator (raiz)
 
 ## 3. ClipboardScreen.js
 - ✅ Colar texto manual
-- ✅ **Captura Inteligente** (2 min) - guarda CADA texto separadamente
-- ✅ Usa Set para evitar duplicados
+- ✅ **Captura Inteligente** (2 min) - guarda CADA texto como entrada separada
+- ✅ Usa Set para evitar duplicados (por conteúdo)
+- ✅ Cada entrada tem ID único e timestamp próprio
+- ✅ Entradas são ACUMULADAS, não substituídas
+- ✅ Verificação de duplicados antes de adicionar ao estado local
 - ✅ Favoritos e Pin
 - ✅ Pastas (criar, mover)
 - ✅ Criar pasta no modal "Mover para" (auto-seleciona)
-- ✅ Pesquisa
+- ✅ Pesquisa (limpa ao perder foco)
 - ✅ Cards compactos (sem data)
 - ✅ numberOfLines={2}
 
