@@ -652,4 +652,8 @@ const styles = StyleSheet.create({
   // Cloud backup active info
   cloudBackupActiveInfo: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingVertical: 12, backgroundColor: 'rgba(52, 199, 89, 0.1)', marginHorizontal: 16, marginBottom: 8, borderRadius: 8 },
   cloudBackupActiveText: { color: '#34C759', fontSize: 13, flex: 1 },
+  // Legal links - discrete
+  legalSection: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingVertical: 16, gap: 8 },
+  legalLink: { color: '#6E6E73', fontSize: 12 },
+  legalSeparator: { color: '#6E6E73', fontSize: 12 },
 });
