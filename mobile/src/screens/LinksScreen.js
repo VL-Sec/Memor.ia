@@ -553,9 +553,8 @@ export default function LinksScreen({ language, userId, refreshKey }) {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
-      </View>
+      </Pressable>
     </SafeAreaView>
-    </TouchableWithoutFeedback>
   );
 }
 
