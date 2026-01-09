@@ -623,7 +623,7 @@ const styles = StyleSheet.create({
   listContent: { padding: 16, paddingTop: 8, paddingBottom: 100 },
   noteCard: { backgroundColor: '#1C1C1E', borderRadius: 12, marginBottom: 10, flexDirection: 'row', overflow: 'hidden' },
   noteContent: { flex: 1, padding: 14 },
-  noteText: { color: '#FFFFFF', fontSize: 15, lineHeight: 20 },
+  noteText: { color: '#FFFFFF', fontSize: 13, lineHeight: 18 },
   noteActions: { justifyContent: 'center', alignItems: 'center', paddingHorizontal: 6, gap: 2, backgroundColor: '#1C1C1E', borderLeftWidth: 1, borderLeftColor: '#2C2C2E' },
   actionBtn: { padding: 6 },
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 100 },
