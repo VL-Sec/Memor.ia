@@ -947,11 +947,11 @@ export const translations = {
     clipboardPlaceholder: 'Text hier einfügen...',
     noClipboardItems: 'Noch nichts hier',
     chars: 'Zeichen',
-    smartClipboard: 'Intelligente Zwischenablage',
-    smartClipboardInfo: 'Speichert automatisch alles, was du kopierst, solange sie aktiv ist.',
-    smartClipboardActivated: 'Intelligente Zwischenablage aktiviert',
-    activate: 'Starten',
-    deactivate: 'Stoppen',
+    smartClipboard: 'Intelligente Erfassung',
+    smartClipboardInfo: 'Speichert automatisch alles, was du kopierst, für 2 Minuten.',
+    smartClipboardActivated: 'Intelligente Erfassung aktiviert',
+    activate: 'Aktivieren',
+    deactivate: 'Deaktivieren',
     timeRemaining: 'verbleibend',
     
     // Links
