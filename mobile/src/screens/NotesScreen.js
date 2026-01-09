@@ -555,9 +555,9 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
       {showDatePicker && (
         Platform.OS === 'ios' ? (
           <Modal visible={showDatePicker} animationType="slide" transparent={true} onRequestClose={() => setShowDatePicker(false)}>
-            <TouchableWithoutFeedback onPress={() => setShowDatePicker(false)}>
+            <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); setShowDatePicker(false); }}>
               <View style={styles.pickerModalOverlay}>
-                <TouchableWithoutFeedback onPress={() => {}}>
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                   <View style={styles.pickerModalContent}>
                     <View style={styles.pickerModalHeader}>
                       <Text style={styles.pickerModalTitle}>{t.reminderDate || 'Data'}</Text>
