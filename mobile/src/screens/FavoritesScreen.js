@@ -197,18 +197,8 @@ export default function FavoritesScreen({ language, userId, refreshKey }) {
     );
   };
 
-  const FilterChip = ({ value, label }) => (
-    <TouchableOpacity 
-      style={[styles.filterChip, filter === value && styles.filterChipActive]} 
-      onPress={() => setFilter(value)}
-    >
-      <Text style={[styles.filterChipText, filter === value && styles.filterChipTextActive]}>
-        {label}
-      </Text>
-    </TouchableOpacity>
-  );
-
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <CustomHeader title={t.tabFavorites || 'Favoritos'} />
       <View style={styles.container}>
