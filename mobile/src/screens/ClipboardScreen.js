@@ -135,14 +135,18 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
     
     try {
       const content = await Clipboard.getStringAsync();
+      const trimmedContent = content?.trim();
       
-      if (content && 
-          content.trim().length > 0 && 
-          content.trim() !== lastClipboardContent.current?.trim()) {
+      // Check if content exists, is different from last check, and hasn't been saved before
+      if (trimmedContent && 
+          trimmedContent.length > 0 && 
+          trimmedContent !== lastClipboardContent.current?.trim() &&
+          !savedClipboardContents.current.has(trimmedContent)) {
         
-        console.log('Smart Clipboard: New content detected!', content.substring(0, 50));
-        lastClipboardContent.current = content;
-        await autoSaveClipboard(content);
+        console.log('Smart Clipboard: New content detected!', trimmedContent.substring(0, 50));
+        lastClipboardContent.current = trimmedContent;
+        savedClipboardContents.current.add(trimmedContent); // Mark as saved
+        await autoSaveClipboard(trimmedContent);
       }
     } catch (error) {
       console.error('Error checking clipboard:', error);
