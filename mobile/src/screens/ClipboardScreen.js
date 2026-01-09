@@ -140,12 +140,15 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
       // Check if content exists, is different from last check, and hasn't been saved before
       if (trimmedContent && 
           trimmedContent.length > 0 && 
-          trimmedContent !== lastClipboardContent.current?.trim() &&
           !savedClipboardContents.current.has(trimmedContent)) {
         
-        console.log('Smart Clipboard: New content detected!', trimmedContent.substring(0, 50));
+        console.log('Smart Clipboard: New unique content detected!', trimmedContent.substring(0, 50));
+        
+        // Mark as saved IMMEDIATELY to prevent duplicates
+        savedClipboardContents.current.add(trimmedContent);
         lastClipboardContent.current = trimmedContent;
-        savedClipboardContents.current.add(trimmedContent); // Mark as saved
+        
+        // Create unique entry with timestamp
         await autoSaveClipboard(trimmedContent);
       }
     } catch (error) {
@@ -157,8 +160,13 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
     try {
       const currentFolders = foldersRef.current;
       const defaultFolder = currentFolders.find(f => f.isDefault);
+      
+      // Generate unique ID and timestamp for this entry
+      const entryId = generateId();
+      const entryTimestamp = new Date().toISOString();
+      
       const newNote = {
-        id: generateId(),
+        id: entryId,
         userId: userId,
         title: content.slice(0, 50) + (content.length > 50 ? '...' : ''),
         content: content,
@@ -167,23 +175,37 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
         isFavorite: false,
         isPinned: false,
         folderId: defaultFolder?.id || null,
-        createdAt: new Date().toISOString(),
+        createdAt: entryTimestamp,
       };
       
+      // Insert into Supabase
       const { error } = await supabase.from('links').insert([newNote]);
       
       if (!error) {
-        setNotes(prev => [newNote, ...prev]);
+        // Add to local state WITHOUT replacing existing entries
+        setNotes(prevNotes => {
+          // Check if entry already exists (by id) to prevent duplicates
+          const exists = prevNotes.some(n => n.id === entryId);
+          if (exists) return prevNotes;
+          return [newNote, ...prevNotes];
+        });
+        
         Toast.show({ 
           type: 'success', 
           text1: t.autoSaved || 'Guardado automaticamente',
           text2: content.slice(0, 40) + (content.length > 40 ? '...' : ''),
         });
+        
+        console.log('Smart Clipboard: Entry saved with ID:', entryId);
       } else {
         console.error('Supabase insert error:', error);
+        // Remove from Set so it can be retried
+        savedClipboardContents.current.delete(content);
       }
     } catch (error) {
       console.error('Error auto-saving:', error);
+      // Remove from Set so it can be retried
+      savedClipboardContents.current.delete(content);
     }
   };
 
