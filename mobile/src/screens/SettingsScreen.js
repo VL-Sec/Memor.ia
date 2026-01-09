@@ -262,12 +262,12 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
       const { data: linksData, error: linksError } = await supabase
         .from('links')
         .select('*')
-        .eq('userId', DEMO_USER);
+        .eq('userId', userId);
       
       const { data: foldersData, error: foldersError } = await supabase
         .from('folders')
         .select('*')
-        .eq('userId', DEMO_USER);
+        .eq('userId', userId);
       
       if (linksError) console.error('Links fetch error:', linksError);
       if (foldersError) console.error('Folders fetch error:', foldersError);
