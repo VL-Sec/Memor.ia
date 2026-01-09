@@ -95,7 +95,7 @@ eas submit --platform ios
 - Uso único
 
 ### Admin Dashboard
-- URL: https://memofix.preview.emergentagent.com/admin
+- URL: https://memor-app-revamp.preview.emergentagent.com/admin
 - Criar e gerir códigos de influencers
 
 ## 📁 Estrutura
