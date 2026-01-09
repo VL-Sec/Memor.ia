@@ -33,7 +33,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
   const foldersRef = useRef([]);
   const userIdRef = useRef(userId);
   const isSavingRef = useRef(false);
-  const lastCaptureTime = useRef(0); // For debounce - minimum 2s between captures
+  const lastCapturedValueRef = useRef(null); // Anti-spam: track last captured value
   
   // Keep refs in sync with state
   useEffect(() => {
