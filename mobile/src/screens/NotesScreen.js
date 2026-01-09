@@ -436,6 +436,7 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
           keyExtractor={(item) => item.id}
           renderItem={renderNoteItem}
           contentContainerStyle={styles.listContent}
+          keyboardShouldPersistTaps="handled"
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
