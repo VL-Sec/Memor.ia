@@ -833,9 +833,7 @@ const styles = StyleSheet.create({
   noteCard: { backgroundColor: '#1C1C1E', borderRadius: 16, marginBottom: 12, flexDirection: 'row', overflow: 'hidden' },
   noteMainContent: { flex: 1, padding: 12 },
   noteText: { color: '#FFFFFF', fontSize: 15, lineHeight: 22, marginBottom: 8 },
-  noteMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-  folderBadge: { backgroundColor: 'rgba(0, 122, 255, 0.2)', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 },
-  folderBadgeText: { color: '#007AFF', fontSize: 11 },
+  noteMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' },
   dateText: { color: '#8E8E93', fontSize: 11 },
   // Actions column - separate touch zone
   actionButtons: { justifyContent: 'center', alignItems: 'center', gap: 8, paddingHorizontal: 8, backgroundColor: '#1C1C1E', borderLeftWidth: 1, borderLeftColor: '#2C2C2E' },
