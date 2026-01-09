@@ -464,22 +464,14 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
           </View>
         </View>
 
-        {/* Legal Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Legal</Text>
-          <TouchableOpacity style={styles.settingItem} onPress={() => Linking.openURL(TERMS_URL)}>
-            <View style={styles.settingLeft}>
-              <Ionicons name="document-text-outline" size={24} color="#8E8E93" />
-              <Text style={styles.settingLabel}>{t.termsOfService || 'Terms of Service'}</Text>
-            </View>
-            <Ionicons name="open-outline" size={20} color="#8E8E93" />
+        {/* Legal Links - Discrete */}
+        <View style={styles.legalSection}>
+          <TouchableOpacity onPress={() => Linking.openURL(TERMS_URL)}>
+            <Text style={styles.legalLink}>{t.termsOfService || 'Terms of Service'}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.settingItem, { borderBottomWidth: 0 }]} onPress={() => Linking.openURL(PRIVACY_URL)}>
-            <View style={styles.settingLeft}>
-              <Ionicons name="shield-checkmark-outline" size={24} color="#8E8E93" />
-              <Text style={styles.settingLabel}>{t.privacyPolicy || 'Privacy Policy'}</Text>
-            </View>
-            <Ionicons name="open-outline" size={20} color="#8E8E93" />
+          <Text style={styles.legalSeparator}>•</Text>
+          <TouchableOpacity onPress={() => Linking.openURL(PRIVACY_URL)}>
+            <Text style={styles.legalLink}>{t.privacyPolicy || 'Privacy Policy'}</Text>
           </TouchableOpacity>
         </View>
 
