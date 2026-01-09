@@ -140,11 +140,18 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
     }
   };
 
-  // EVENT-BASED CAPTURE: Every read = potential new entry
-  // No value comparison - if there's content, save it
+  // EVENT-BASED CAPTURE with time-based debounce (not content-based)
+  // Minimum 2 seconds between captures to reduce spam
   const captureClipboardEntry = async () => {
     if (!smartClipboardActiveRef.current) return;
     if (isSavingRef.current) return;
+    
+    // TIME-BASED DEBOUNCE: minimum 2s between captures
+    const now = Date.now();
+    if (now - lastCaptureTime.current < 2000) {
+      console.log('[Smart Clipboard] Debounce - skipping (less than 2s since last capture)');
+      return;
+    }
     
     try {
       const content = await Clipboard.getStringAsync();
@@ -153,8 +160,10 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
       // Skip if empty
       if (!trimmedContent || trimmedContent.length === 0) return;
       
-      // NO VALUE COMPARISON - every capture with content = new entry
       console.log('[Smart Clipboard] Capturing entry:', trimmedContent.substring(0, 30) + '...');
+      
+      // Update debounce timestamp BEFORE saving
+      lastCaptureTime.current = now;
       
       await saveClipboardEntry(trimmedContent);
       
