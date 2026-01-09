@@ -369,7 +369,8 @@ eas build --platform ios --profile preview
    - `lastCapturedValueRef` rastreia último valor capturado
    - Só cria entrada quando valor MUDA
    - Previne duplicação infinita
-   - Ao ativar, reset do ref = null
+   - Reset `lastCapturedValueRef = null` ao ATIVAR e DESATIVAR
+   - Lock `isSavingRef` apenas em `saveClipboardEntry()` (não perde cópias rápidas)
 10. ✅ **Favoritos:** Datas só aparecem para Notas (Links e Clipboard sem data)
 
 ---
