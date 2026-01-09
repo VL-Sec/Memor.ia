@@ -248,16 +248,6 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
       
       setFolders(foldersData || []);
       setNotes(notesData || []);
-      
-      // IMPORTANT: Add all existing content to the Set to prevent duplicates
-      // when Smart Clipboard is active
-      if (notesData && notesData.length > 0) {
-        notesData.forEach(note => {
-          if (note.content?.trim()) {
-            savedClipboardContents.current.add(note.content.trim());
-          }
-        });
-      }
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
