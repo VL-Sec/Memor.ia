@@ -178,7 +178,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
           sound: true,
         },
         trigger: {
-          type: 'timeInterval',
+          type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
           seconds: seconds,
           repeats: false,
         },
