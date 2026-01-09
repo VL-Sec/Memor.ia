@@ -643,6 +643,7 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
       )}
       </View>
     </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 }
 
