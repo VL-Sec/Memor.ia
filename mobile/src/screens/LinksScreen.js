@@ -589,35 +589,37 @@ export default function LinksScreen({ language, userId, refreshKey }) {
       )}
       
       <Modal visible={showEditModal} animationType="slide" transparent={true} onRequestClose={closeEditModal}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{isAddingNew ? (t.addLink || 'Adicionar Link') : t.editItem}</Text>
-              <TouchableOpacity onPress={closeEditModal}>
-                <Ionicons name="close" size={28} color="#FFFFFF" />
-              </TouchableOpacity>
-            </View>
-            <ScrollView style={styles.modalBody} contentContainerStyle={styles.modalBodyContent}>
-              <Text style={styles.inputLabel}>URL</Text>
-              {isAddingNew ? (
-                <TextInput 
-                  style={styles.textInput} 
-                  value={editUrl} 
-                  onChangeText={setEditUrl} 
-                  placeholder="https://..." 
-                  placeholderTextColor="#8E8E93"
-                  autoCapitalize="none"
-                  keyboardType="url"
-                />
-              ) : (
-                <View style={styles.urlContainer}>
-                  <Text style={styles.urlText} numberOfLines={2}>{editingItem?.url}</Text>
-                  <TouchableOpacity 
-                    style={styles.copyUrlButton} 
-                    onPress={() => {
-                      Clipboard.setStringAsync(editingItem?.url || '');
-                      Toast.show({ type: 'success', text1: t.copied || 'Copiado!' });
-                    }}
+        <TouchableWithoutFeedback onPress={closeEditModal}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback onPress={() => {}}>
+              <View style={styles.modalContent}>
+                <View style={styles.modalHeader}>
+                  <Text style={styles.modalTitle}>{isAddingNew ? (t.addLink || 'Adicionar Link') : t.editItem}</Text>
+                  <TouchableOpacity onPress={closeEditModal}>
+                    <Ionicons name="close" size={28} color="#FFFFFF" />
+                  </TouchableOpacity>
+                </View>
+                <ScrollView style={styles.modalBody} contentContainerStyle={styles.modalBodyContent} keyboardShouldPersistTaps="handled">
+                  <Text style={styles.inputLabel}>URL</Text>
+                  {isAddingNew ? (
+                    <TextInput 
+                      style={styles.textInput} 
+                      value={editUrl} 
+                      onChangeText={setEditUrl} 
+                      placeholder="https://..." 
+                      placeholderTextColor="#8E8E93"
+                      autoCapitalize="none"
+                      keyboardType="url"
+                    />
+                  ) : (
+                    <View style={styles.urlContainer}>
+                      <Text style={styles.urlText} numberOfLines={2}>{editingItem?.url}</Text>
+                      <TouchableOpacity 
+                        style={styles.copyUrlButton} 
+                        onPress={() => {
+                          Clipboard.setStringAsync(editingItem?.url || '');
+                          Toast.show({ type: 'success', text1: t.copied || 'Copiado!' });
+                        }}
                   >
                     <Ionicons name="copy-outline" size={20} color="#007AFF" />
                   </TouchableOpacity>
