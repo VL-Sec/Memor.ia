@@ -283,11 +283,12 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
     if (!newContent.trim()) return;
     try {
       const defaultFolder = folders.find(f => f.isDefault);
+      const trimmedContent = newContent.trim();
       const newNote = {
         id: generateId(),
         userId: userId,
-        title: newContent.slice(0, 50) + (newContent.length > 50 ? '...' : ''),
-        content: newContent,
+        title: trimmedContent.slice(0, 50) + (trimmedContent.length > 50 ? '...' : ''),
+        content: trimmedContent,
         contentType: 'text',
         tags: [],
         isFavorite: false,
@@ -299,7 +300,11 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
       if (error) throw error;
       setNotes([newNote, ...notes]);
       setNewContent('');
-      lastClipboardContent.current = newContent;
+      
+      // IMPORTANT: Mark as saved to prevent Smart Clipboard from duplicating
+      lastClipboardContent.current = trimmedContent;
+      savedClipboardContents.current.add(trimmedContent);
+      
       Toast.show({ type: 'success', text1: t.saved });
       if (triggerRefresh) triggerRefresh();
     } catch (error) {
@@ -310,8 +315,13 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
 
   const handleCopyNote = async (content, e) => {
     if (e) e.stopPropagation();
-    await Clipboard.setStringAsync(content);
-    lastClipboardContent.current = content;
+    const trimmedContent = content?.trim() || '';
+    await Clipboard.setStringAsync(trimmedContent);
+    
+    // IMPORTANT: Mark as saved to prevent Smart Clipboard from re-saving
+    lastClipboardContent.current = trimmedContent;
+    savedClipboardContents.current.add(trimmedContent);
+    
     Toast.show({ type: 'success', text1: t.copied });
   };
 
