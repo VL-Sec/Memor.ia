@@ -169,6 +169,10 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
           );
           return;
         }
+        
+        // Schedule the weekly notification
+        await scheduleWeeklyNotification(summaryDay, summaryHour, summaryMinute);
+        
       } catch (error) {
         console.log('Notification permission error:', error);
         Alert.alert(
@@ -178,6 +182,9 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
         );
         return;
       }
+    } else {
+      // Cancel existing weekly notification when disabling
+      await cancelWeeklyNotification();
     }
     
     setSummaryEnabled(value);
@@ -191,6 +198,51 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
       Toast.show({ type: 'success', text1: value ? (t.weeklySummaryEnabled || 'Weekly summary enabled') : (t.weeklySummaryDisabled || 'Weekly summary disabled') });
     } catch (e) {
       console.error('Error saving settings:', e);
+    }
+  };
+  
+  // Schedule weekly notification
+  const scheduleWeeklyNotification = async (dayOfWeek, hour, minute) => {
+    try {
+      // Cancel any existing weekly notifications first
+      await cancelWeeklyNotification();
+      
+      const notificationId = await Notifications.scheduleNotificationAsync({
+        content: {
+          title: t.weeklySummaryTitle || 'Memor.ia - Resumo Semanal',
+          body: t.weeklySummaryBody || 'Tens links e notas guardados para rever!',
+          sound: true,
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
+          weekday: dayOfWeek + 1, // Notifications uses 1-7 (Sunday = 1), we use 0-6
+          hour: hour,
+          minute: minute,
+          repeats: true,
+        },
+      });
+      
+      // Save the notification ID so we can cancel it later
+      await AsyncStorage.setItem('memoria-weekly-notification-id', notificationId);
+      console.log('Weekly notification scheduled:', notificationId);
+      
+    } catch (error) {
+      console.error('Error scheduling weekly notification:', error);
+      throw error;
+    }
+  };
+  
+  // Cancel weekly notification
+  const cancelWeeklyNotification = async () => {
+    try {
+      const notificationId = await AsyncStorage.getItem('memoria-weekly-notification-id');
+      if (notificationId) {
+        await Notifications.cancelScheduledNotificationAsync(notificationId);
+        await AsyncStorage.removeItem('memoria-weekly-notification-id');
+        console.log('Weekly notification cancelled');
+      }
+    } catch (error) {
+      console.error('Error cancelling weekly notification:', error);
     }
   };
 
