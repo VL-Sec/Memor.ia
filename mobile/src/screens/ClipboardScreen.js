@@ -783,9 +783,9 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
           transparent={true}
           onRequestClose={() => setShowSmartModal(false)}
         >
-          <TouchableWithoutFeedback onPress={() => setShowSmartModal(false)}>
+          <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); setShowSmartModal(false); }}>
             <View style={styles.smartModalOverlay}>
-              <TouchableWithoutFeedback onPress={() => {}}>
+              <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <View style={styles.smartModalContent}>
                   <View style={styles.smartModalHeader}>
                     <View style={styles.smartModalTitleRow}>
