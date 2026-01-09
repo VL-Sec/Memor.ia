@@ -139,14 +139,17 @@ function TabNavigator({ language, userId, premiumStatus, refreshKey, triggerRefr
         },
         tabBarActiveTintColor: '#007AFF',
         tabBarInactiveTintColor: '#8E8E93',
-        // MINIMAL STYLE - just colors, no layout changes
+        // STYLE: Distribute tabs evenly
         tabBarStyle: { 
           backgroundColor: '#1C1C1E', 
           borderTopColor: '#2C2C2E',
         },
+        tabBarItemStyle: {
+          flex: 1,
+        },
       })}
     >
-      <Tab.Screen name="Links" options={{ title: 'Links' }}>
+      <Tab.Screen name="Links" options={{ title: t.tabLinks || 'Links' }}>
         {(props) => (
           <LinksScreen 
             {...props} 
@@ -157,7 +160,7 @@ function TabNavigator({ language, userId, premiumStatus, refreshKey, triggerRefr
           />
         )}
       </Tab.Screen>
-      <Tab.Screen name="Clipboard" options={{ title: 'Clipboard' }}>
+      <Tab.Screen name="Clipboard" options={{ title: t.tabClipboard || 'Clipboard' }}>
         {(props) => (
           <ClipboardScreen 
             {...props} 
@@ -169,7 +172,7 @@ function TabNavigator({ language, userId, premiumStatus, refreshKey, triggerRefr
           />
         )}
       </Tab.Screen>
-      <Tab.Screen name="Notes" options={{ title: 'Notas' }}>
+      <Tab.Screen name="Notes" options={{ title: t.tabNotes || 'Notes' }}>
         {(props) => (
           <NotesScreen 
             {...props} 
@@ -180,7 +183,7 @@ function TabNavigator({ language, userId, premiumStatus, refreshKey, triggerRefr
           />
         )}
       </Tab.Screen>
-      <Tab.Screen name="Favorites" options={{ title: 'Favoritos' }}>
+      <Tab.Screen name="Favorites" options={{ title: t.tabFavorites || 'Favorites' }}>
         {(props) => (
           <FavoritesScreen 
             {...props} 
