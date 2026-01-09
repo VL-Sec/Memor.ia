@@ -257,6 +257,9 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
           hour: summaryHour, 
           minute: summaryMinute 
         }));
+        // Reschedule notification with new day
+        await scheduleWeeklyNotification(dayValue, summaryHour, summaryMinute);
+        Toast.show({ type: 'success', text1: t.daySaved || 'Dia guardado' });
       } catch (e) {
         console.error('Error saving settings:', e);
       }
@@ -282,6 +285,8 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
             hour: hour, 
             minute: minute 
           }));
+          // Reschedule notification with new time
+          await scheduleWeeklyNotification(summaryDay, hour, minute);
           Toast.show({ type: 'success', text1: t.timeSaved || 'Hora guardada' });
         } catch (e) {
           console.error('Error saving settings:', e);
