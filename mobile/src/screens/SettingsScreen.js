@@ -44,21 +44,7 @@ const formatTimeForLocale = (hour, minute) => {
   return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 };
 
-// Get platform-specific backup info
-const getBackupInfo = () => {
-  if (Platform.OS === 'ios') {
-    return {
-      icon: 'logo-apple',
-      name: 'iCloud',
-      description: 'iCloud Backup',
-    };
-  }
-  return {
-    icon: 'logo-google',
-    name: 'Google',
-    description: 'Google Backup',
-  };
-};
+ 
 
 export default function SettingsScreen({ language, setLanguage, premiumStatus, setPremiumStatus, userId }) {
   const [showLanguageModal, setShowLanguageModal] = useState(false);
