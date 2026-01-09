@@ -290,18 +290,32 @@ eas build --platform ios --profile preview
 
 # 📝 NOTAS TÉCNICAS
 
-## Smart Clipboard (Captura Inteligente) - EVENT-BASED
-- **Abordagem:** Cada leitura = potencial nova entrada
-- **Intervalo:** 3 segundos
-- **Debounce:** Mínimo 2 segundos entre capturas (baseado em tempo, NÃO em conteúdo)
-- **Sem captura imediata:** Ao ativar, NÃO captura o clipboard atual
+## Smart Clipboard (Captura Inteligente) - ANTI-SPAM FINAL
+- **Lógica:** Captura quando o VALOR do clipboard MUDA
+- **Anti-spam:** `lastCapturedValueRef` rastreia último valor capturado
+- **Intervalo:** Verifica a cada 3 segundos
 - **Fluxo:**
-  1. Ativar → NÃO captura imediatamente (evita capturar conteúdo antigo)
-  2. A cada 3s: lê clipboard → se tiver conteúdo E passou 2s desde última captura → nova entrada
-  3. AppState: quando app volta ao foreground → captura (respeitando debounce)
-  4. Cada entrada: ID único + timestamp
-- **Limitação técnica:** React Native não tem eventos de cópia (`onCopy`)
-- **Trade-off controlado:** Debounce de 2s reduz spam sem bloquear por conteúdo
+  ```javascript
+  const lastCapturedValueRef = useRef(null);
+  
+  async function captureClipboardEntry() {
+    const value = await Clipboard.getStringAsync();
+    if (!value || value.trim() === '') return;
+    
+    // ANTI-SPAM: Skip if same as last captured
+    if (value === lastCapturedValueRef.current) return;
+    
+    lastCapturedValueRef.current = value;
+    saveClipboardEntry({ id: generateId(), content: value, timestamp: Date.now() });
+  }
+  ```
+- **Comportamento:**
+  - Copiar "ABC" → entrada 1 (lastCaptured = "ABC")
+  - Intervalo passa → clipboard ainda "ABC" → ignorado (anti-spam)
+  - Copiar "XYZ" → entrada 2 (lastCaptured = "XYZ")
+  - Copiar "ABC" → entrada 3 (diferente de "XYZ", logo nova entrada)
+- **Ativar:** Reset `lastCapturedValueRef = null` → primeira cópia será capturada
+- **AppState:** Quando app volta ao foreground → verifica clipboard
 
 ## Modais
 - Todos têm `TouchableWithoutFeedback` no overlay
