@@ -244,7 +244,7 @@ eas build --platform ios --profile preview
 | Teclado não desaparece | TouchableWithoutFeedback + Keyboard.dismiss |
 | Erro Supabase "reminder" | **REMOVIDO lembretes completamente** |
 | Erro Supabase "reminderAt" | **REMOVIDO lembretes completamente** |
-| Smart Clipboard sobrescreve | Cada entrada com ID único + Set + verificação duplicados |
+| Smart Clipboard | **REMOVIDO** - limitação técnica JS |
 | Cards Clipboard grandes | Compactados, numberOfLines={2}, sem data |
 | Segundo alert backup | Removido |
 | Links legais com ícones | Discretos, só texto |
