@@ -420,15 +420,21 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
     try {
       const currentContent = await Clipboard.getStringAsync();
       lastClipboardContent.current = currentContent || '';
+      // Initialize saved contents with current clipboard (don't save what's already there)
+      savedClipboardContents.current = new Set();
+      if (currentContent?.trim()) {
+        savedClipboardContents.current.add(currentContent.trim());
+      }
     } catch (e) {
       lastClipboardContent.current = '';
+      savedClipboardContents.current = new Set();
     }
     
     setSmartClipboardActive(true);
     setTimeLeft(120);
     Toast.show({ 
       type: 'success', 
-      text1: t.smartClipboardActivated || 'Área Inteligente Ativada',
+      text1: t.smartClipboardActivated || 'Captura Inteligente Ativada',
       text2: t.smartClipboardInfo2 || 'A capturar tudo o que copias durante 2 minutos'
     });
   };
