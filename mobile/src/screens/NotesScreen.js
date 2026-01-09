@@ -168,9 +168,6 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
       return null;
     }
   };
-      return null;
-    }
-  };
 
   // Cancel scheduled notification
   const cancelNotification = async (notificationId) => {
