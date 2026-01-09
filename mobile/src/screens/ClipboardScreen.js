@@ -266,10 +266,6 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
       if (error) throw error;
       setNotes([newNote, ...notes]);
       setNewContent('');
-      
-      // Update lastClipboardContent to avoid Smart Clipboard re-capturing this
-      lastClipboardContent.current = trimmedContent;
-      
       Toast.show({ type: 'success', text1: t.saved });
       if (triggerRefresh) triggerRefresh();
     } catch (error) {
@@ -282,10 +278,6 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
     if (e) e.stopPropagation();
     const trimmedContent = content?.trim() || '';
     await Clipboard.setStringAsync(trimmedContent);
-    
-    // Update lastClipboardContent so Smart Clipboard doesn't re-capture this
-    lastClipboardContent.current = trimmedContent;
-    
     Toast.show({ type: 'success', text1: t.copied });
   };
 
