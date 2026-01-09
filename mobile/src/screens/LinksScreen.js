@@ -343,9 +343,10 @@ export default function LinksScreen({ language, userId, refreshKey }) {
   };
 
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <CustomHeader title="Memor.ia" />
-      <Pressable style={styles.container} onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
         <View style={styles.searchContainer}>
           <Ionicons name="search" size={20} color="#8E8E93" />
           <TextInput style={styles.searchInput} placeholder={t.search} placeholderTextColor="#8E8E93" value={searchQuery} onChangeText={setSearchQuery} />
@@ -360,7 +361,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
 
         <View style={styles.folderSection}>
           <Text style={styles.folderSectionTitle}>{t.folders || 'Pastas'}</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.folderList} contentContainerStyle={styles.folderListContent} keyboardShouldPersistTaps="handled" onScrollBeginDrag={Keyboard.dismiss}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.folderList} contentContainerStyle={styles.folderListContent} keyboardShouldPersistTaps="handled">
             <TouchableOpacity style={[styles.folderChip, selectedFolder === 'all' && styles.folderChipActive]} onPress={() => setSelectedFolder('all')}>
               <Text style={[styles.folderChipText, selectedFolder === 'all' && styles.folderChipTextActive]}>{t.allLinks || 'Todos'}</Text>
             </TouchableOpacity>
@@ -383,14 +384,14 @@ export default function LinksScreen({ language, userId, refreshKey }) {
         </View>
 
       {filteredLinks.length === 0 ? (
-        <ScrollView style={{ flex: 1 }} onScrollBeginDrag={Keyboard.dismiss} keyboardShouldPersistTaps="handled" refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchData(); }} tintColor="#007AFF" />}>
-          <Pressable style={styles.emptyState} onPress={Keyboard.dismiss}>
+        <ScrollView style={{ flex: 1 }} keyboardShouldPersistTaps="handled" refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchData(); }} tintColor="#007AFF" />}>
+          <View style={styles.emptyState}>
             <Ionicons name="link-outline" size={64} color="#8E8E93" />
             <Text style={styles.emptyText}>{t.noClipboardItems}</Text>
-          </Pressable>
+          </View>
         </ScrollView>
       ) : (
-        <FlatList data={sortedLinks} keyExtractor={(item) => item.id} renderItem={renderLinkItem} contentContainerStyle={styles.listContent} keyboardShouldPersistTaps="handled" onScrollBeginDrag={Keyboard.dismiss} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchData(); }} tintColor="#007AFF" />} />
+        <FlatList data={sortedLinks} keyExtractor={(item) => item.id} renderItem={renderLinkItem} contentContainerStyle={styles.listContent} keyboardShouldPersistTaps="handled" refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchData(); }} tintColor="#007AFF" />} />
       )}
       
       <Modal visible={showEditModal} animationType="slide" transparent={true} onRequestClose={closeEditModal}>
