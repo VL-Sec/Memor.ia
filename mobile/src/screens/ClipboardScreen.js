@@ -452,6 +452,11 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
 
         {/* Edit Modal */}
         <Modal visible={showEditModal} animationType="slide" transparent={true} onRequestClose={closeEditModal}>
+          <KeyboardAvoidingView 
+            style={{ flex: 1 }} 
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={insets.top + 44}
+          >
           <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); closeEditModal(); }}>
             <View style={styles.modalOverlay}>
               <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -493,6 +498,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
               </TouchableWithoutFeedback>
             </View>
           </TouchableWithoutFeedback>
+          </KeyboardAvoidingView>
         </Modal>
 
         {/* Folder Picker Modal */}
