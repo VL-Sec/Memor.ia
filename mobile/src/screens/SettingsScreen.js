@@ -26,9 +26,6 @@ const APP_STORE_URL = 'https://apps.apple.com/app/memoria/id000000000';
 // Check if we're in Expo Go
 const isExpoGo = Constants.appOwnership === 'expo';
 
-const DEMO_USER = 'demo_user';
-const LOCAL_NOTES_KEY = 'memoria-notes';
-
 const DAYS_OF_WEEK = [
   { value: 0, en: 'Sunday', pt: 'Domingo', es: 'Domingo', fr: 'Dimanche', de: 'Sonntag', it: 'Domenica' },
   { value: 1, en: 'Monday', pt: 'Segunda-feira', es: 'Lunes', fr: 'Lundi', de: 'Montag', it: 'Lunedì' },
