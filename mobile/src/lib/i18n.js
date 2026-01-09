@@ -311,11 +311,11 @@ export const translations = {
     clipboardPlaceholder: 'Cola o texto aqui...',
     noClipboardItems: 'Ainda não há nada aqui',
     chars: 'caracteres',
-    smartClipboard: 'Área de Transferência Inteligente',
-    smartClipboardInfo: 'Guarda automaticamente tudo o que copiares enquanto estiver ativo.',
-    smartClipboardActivated: 'Área de transferência inteligente ativada',
-    activate: 'Iniciar',
-    deactivate: 'Parar',
+    smartClipboard: 'Captura Inteligente',
+    smartClipboardInfo: 'Guarda automaticamente tudo o que copiares durante 2 minutos.',
+    smartClipboardActivated: 'Captura inteligente ativada',
+    activate: 'Ativar',
+    deactivate: 'Desativar',
     timeRemaining: 'restante',
     
     // Links
