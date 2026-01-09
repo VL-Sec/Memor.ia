@@ -151,25 +151,18 @@ export const translations = {
     termsOfService: 'Terms of Service',
     privacyPolicy: 'Privacy Policy',
     
-    // Cloud Backup Card
-    cloudBackupTitle: 'Automatic Backup',
-    cloudBackupSubtitle: 'Your data is protected',
-    cloudBackupDescription: 'All your links, notes, and settings sync automatically across your devices.',
-    cloudBackupIOS: 'iCloud Backup',
-    cloudBackupAndroid: 'Google Backup',
-    cloudBackupEnabled: 'Enabled',
-    cloudBackupTip: 'Make sure cloud backup is turned on in your device settings.',
-    
-    // Platform-specific backup
+    // Cloud Backup - Simple
+    backup: 'Backup',
+    cloudBackupInfo: 'Automatically save your data to the cloud',
+    cloudBackupActivated: 'Cloud backup enabled',
+    cloudBackupDeactivated: 'Cloud backup disabled',
     iCloudBackup: 'iCloud Backup',
     googleBackup: 'Google Backup',
-    systemBackupSubtitle: 'Automatic system backup',
-    iCloudBackupDescription: 'App data is automatically included in iCloud backup. When you reinstall the app or switch iPhones, your data will be restored.',
-    googleBackupDescription: 'App data is automatically included in Google backup. When you reinstall the app or switch phones, your data will be restored.',
-    iCloudBackupTip: 'Make sure iCloud backup is enabled in Settings > [Your Name] > iCloud > Backup',
-    googleBackupTip: 'Make sure backup is enabled in Settings > Google > Backup',
-    openSettings: 'Open Settings',
-    manualBackup: 'Manual Backup',
+    iCloudBackupConfirm: 'Do you accept saving your data to iCloud? This allows restoring your data when reinstalling the app or switching devices.',
+    googleBackupConfirm: 'Do you accept saving your data to Google Backup? This allows restoring your data when reinstalling the app or switching devices.',
+    iCloudBackupActive: 'Your data is being saved to iCloud',
+    googleBackupActive: 'Your data is being saved to Google Backup',
+    accept: 'Accept',
     general: 'General',
     
     // Notifications
