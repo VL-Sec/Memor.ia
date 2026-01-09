@@ -178,7 +178,10 @@ export default function FavoritesScreen({ language, userId, refreshKey }) {
           <View style={styles.cardHeader}>
             <Ionicons name={getItemIcon(itemType)} size={14} color="#8E8E93" />
             <Text style={styles.cardType}>{getItemLabel(itemType)}</Text>
-            <Text style={styles.cardDate}>{formatDateLocale(item.createdAt)}</Text>
+            {/* Only show date for Notes */}
+            {itemType === 'note' && item.createdAt && (
+              <Text style={styles.cardDate}>{formatDateLocale(item.createdAt)}</Text>
+            )}
           </View>
           <Text style={styles.cardTitle} numberOfLines={2}>
             {item.title || item.content?.slice(0, 50) || ''}
