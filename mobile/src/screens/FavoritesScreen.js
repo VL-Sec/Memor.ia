@@ -10,7 +10,11 @@ import { supabase } from '../lib/supabase';
 import { translations } from '../lib/i18n';
 import CustomHeader from '../components/CustomHeader';
 
-const LOCAL_NOTES_KEY = 'memoria-notes';
+// Helper function to format date according to user's system locale
+const formatDateLocale = (dateStr) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+};
 
 export default function FavoritesScreen({ language, userId, refreshKey }) {
   const [favorites, setFavorites] = useState([]);
@@ -20,22 +24,29 @@ export default function FavoritesScreen({ language, userId, refreshKey }) {
   const [filter, setFilter] = useState('all');
 
   const t = translations[language] || translations.en;
+  
+  // Dynamic storage key based on userId
+  const getNotesStorageKey = () => `memoria-notes-${userId || 'default'}`;
 
   // Reload when screen is focused
   useFocusEffect(
     useCallback(() => {
-      fetchFavorites();
-    }, [])
+      if (userId) {
+        fetchFavorites();
+      }
+    }, [userId])
   );
 
   // Also reload when refreshKey changes
   useEffect(() => {
-    if (refreshKey > 0) {
+    if (refreshKey > 0 && userId) {
       fetchFavorites();
     }
-  }, [refreshKey]);
+  }, [refreshKey, userId]);
 
   const fetchFavorites = async () => {
+    if (!userId) return;
+    
     try {
       // Fetch from Supabase (links and clipboard items)
       const { data: supabaseData } = await supabase
@@ -45,8 +56,8 @@ export default function FavoritesScreen({ language, userId, refreshKey }) {
         .eq('isFavorite', true)
         .order('createdAt', { ascending: false });
       
-      // Fetch local notes
-      const localNotesStr = await AsyncStorage.getItem(LOCAL_NOTES_KEY);
+      // Fetch local notes with userId-specific key
+      const localNotesStr = await AsyncStorage.getItem(getNotesStorageKey());
       const localNotes = localNotesStr ? JSON.parse(localNotesStr) : [];
       const favoriteNotes = localNotes
         .filter(n => n.isFavorite === true)
@@ -80,12 +91,12 @@ export default function FavoritesScreen({ language, userId, refreshKey }) {
     try {
       if (item.source === 'local') {
         // Update local notes
-        const localNotesStr = await AsyncStorage.getItem(LOCAL_NOTES_KEY);
+        const localNotesStr = await AsyncStorage.getItem(getNotesStorageKey());
         const localNotes = localNotesStr ? JSON.parse(localNotesStr) : [];
         const updatedNotes = localNotes.map(n => 
           n.id === item.id ? { ...n, isFavorite: false } : n
         );
-        await AsyncStorage.setItem(LOCAL_NOTES_KEY, JSON.stringify(updatedNotes));
+        await AsyncStorage.setItem(getNotesStorageKey(), JSON.stringify(updatedNotes));
       } else {
         // Update Supabase
         await supabase.from('links').update({ isFavorite: false }).eq('id', item.id);
@@ -118,7 +129,7 @@ export default function FavoritesScreen({ language, userId, refreshKey }) {
     switch (type) {
       case 'link': return 'Link';
       case 'note': return t.tabNotes || 'Nota';
-      case 'clipboard': return t.tabClipboard || 'Área de Transferência';
+      case 'clipboard': return 'Clipboard';
       default: return 'Item';
     }
   };
@@ -145,14 +156,16 @@ export default function FavoritesScreen({ language, userId, refreshKey }) {
       <TouchableOpacity 
         style={styles.card} 
         onPress={() => isLink ? handleOpenLink(item.url) : handleCopyContent(item.content || '')}
+        activeOpacity={0.7}
       >
         {isLink && item.imageUrl && (
           <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
         )}
         <View style={styles.cardContent}>
           <View style={styles.cardHeader}>
-            <Ionicons name={getItemIcon(itemType)} size={16} color="#8E8E93" />
+            <Ionicons name={getItemIcon(itemType)} size={14} color="#8E8E93" />
             <Text style={styles.cardType}>{getItemLabel(itemType)}</Text>
+            <Text style={styles.cardDate}>{formatDateLocale(item.createdAt)}</Text>
           </View>
           <Text style={styles.cardTitle} numberOfLines={2}>
             {item.title || item.content?.slice(0, 50) || ''}
@@ -160,7 +173,11 @@ export default function FavoritesScreen({ language, userId, refreshKey }) {
           {isLink && <Text style={styles.cardUrl} numberOfLines={1}>{item.url || ''}</Text>}
           {!isLink && <Text style={styles.cardPreview} numberOfLines={2}>{item.content || ''}</Text>}
         </View>
-        <TouchableOpacity style={styles.favoriteButton} onPress={() => handleRemoveFavorite(item)}>
+        <TouchableOpacity 
+          style={styles.favoriteButton} 
+          onPress={() => handleRemoveFavorite(item)}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
           <Ionicons name="heart" size={24} color="#FF3B30" />
         </TouchableOpacity>
       </TouchableOpacity>
@@ -193,12 +210,18 @@ export default function FavoritesScreen({ language, userId, refreshKey }) {
           />
         </View>
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterContainer}>
-          <FilterChip value="all" label={t.all || 'Todos'} />
-          <FilterChip value="links" label="Links" />
-          <FilterChip value="notes" label={t.tabNotes || 'Notas'} />
-          <FilterChip value="clipboard" label={t.tabClipboard || 'Área'} />
-        </ScrollView>
+        <View style={styles.filterWrapper}>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false} 
+            contentContainerStyle={styles.filterContainer}
+          >
+            <FilterChip value="all" label={t.all || 'Todos'} />
+            <FilterChip value="links" label="Links" />
+            <FilterChip value="notes" label={t.tabNotes || 'Notas'} />
+            <FilterChip value="clipboard" label="Clipboard" />
+          </ScrollView>
+        </View>
 
         {filteredFavorites.length === 0 ? (
           <ScrollView 
@@ -242,23 +265,66 @@ export default function FavoritesScreen({ language, userId, refreshKey }) {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#000000' },
   container: { flex: 1, backgroundColor: '#000000' },
-  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1C1C1E', margin: 16, marginBottom: 8, paddingHorizontal: 12, borderRadius: 12, height: 44 },
+  searchContainer: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    backgroundColor: '#1C1C1E', 
+    marginHorizontal: 16, 
+    marginTop: 16,
+    marginBottom: 12, 
+    paddingHorizontal: 12, 
+    borderRadius: 12, 
+    height: 44 
+  },
   searchInput: { flex: 1, marginLeft: 8, color: '#FFFFFF', fontSize: 16 },
-  filterContainer: { paddingHorizontal: 16, marginBottom: 12, minHeight: 44 },
-  filterChip: { backgroundColor: '#2C2C2E', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20, marginRight: 10, borderWidth: 1, borderColor: '#3A3A3C' },
+  filterWrapper: { 
+    marginBottom: 12,
+  },
+  filterContainer: { 
+    paddingHorizontal: 16,
+    alignItems: 'center',
+  },
+  filterChip: { 
+    backgroundColor: '#2C2C2E', 
+    paddingHorizontal: 16, 
+    paddingVertical: 8, 
+    borderRadius: 20, 
+    marginRight: 10, 
+    borderWidth: 1, 
+    borderColor: '#3A3A3C',
+    minWidth: 60,
+    alignItems: 'center',
+  },
   filterChipActive: { backgroundColor: '#007AFF', borderColor: '#007AFF' },
   filterChipText: { color: '#FFFFFF', fontSize: 14, fontWeight: '500' },
   filterChipTextActive: { color: '#FFFFFF' },
-  listContent: { padding: 16, paddingTop: 0, paddingBottom: 100 },
-  card: { backgroundColor: '#1C1C1E', borderRadius: 16, marginBottom: 12, flexDirection: 'row', overflow: 'hidden' },
+  listContent: { paddingHorizontal: 16, paddingBottom: 100 },
+  card: { 
+    backgroundColor: '#1C1C1E', 
+    borderRadius: 16, 
+    marginBottom: 12, 
+    flexDirection: 'row', 
+    overflow: 'hidden' 
+  },
   cardImage: { width: 80, height: 80 },
   cardContent: { flex: 1, padding: 12 },
-  cardHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 4, gap: 4 },
-  cardType: { color: '#8E8E93', fontSize: 12 },
-  cardTitle: { color: '#FFFFFF', fontSize: 16, fontWeight: '600', marginBottom: 4 },
-  cardUrl: { color: '#8E8E93', fontSize: 12 },
+  cardHeader: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    marginBottom: 6, 
+    gap: 6 
+  },
+  cardType: { color: '#8E8E93', fontSize: 12, fontWeight: '500' },
+  cardDate: { color: '#8E8E93', fontSize: 11, marginLeft: 'auto' },
+  cardTitle: { color: '#FFFFFF', fontSize: 15, fontWeight: '600', marginBottom: 4 },
+  cardUrl: { color: '#007AFF', fontSize: 12 },
   cardPreview: { color: '#8E8E93', fontSize: 13, lineHeight: 18 },
-  favoriteButton: { justifyContent: 'center', paddingHorizontal: 12 },
+  favoriteButton: { 
+    justifyContent: 'center', 
+    paddingHorizontal: 16,
+    borderLeftWidth: 1,
+    borderLeftColor: '#2C2C2E',
+  },
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 80 },
   emptyText: { color: '#8E8E93', fontSize: 18, fontWeight: '600', marginTop: 16 },
   emptySubtext: { color: '#8E8E93', fontSize: 14, marginTop: 8, textAlign: 'center', paddingHorizontal: 40 },
