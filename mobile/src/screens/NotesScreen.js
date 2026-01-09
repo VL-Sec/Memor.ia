@@ -182,8 +182,9 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
   };
 
   const handleSaveNote = async () => {
-    if (!noteContent.trim()) {
-      Toast.show({ type: 'error', text1: t.error });
+    // Allow saving with just title OR just content
+    if (!noteContent.trim() && !noteTitle.trim()) {
+      Toast.show({ type: 'error', text1: t.titleOrContentRequired || 'Título ou conteúdo é obrigatório' });
       return;
     }
 
@@ -200,7 +201,7 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
       if (reminderEnabled && reminderDate > new Date()) {
         const notificationId = await scheduleNotification(
           noteTitle || t.reminder,
-          noteContent.substring(0, 100),
+          noteContent.substring(0, 100) || noteTitle,
           reminderDate
         );
         reminderData = { date: reminderDate.toISOString(), notificationId };
