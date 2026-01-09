@@ -11,8 +11,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { translations, languages, setLanguage as saveLanguage } from '../lib/i18n';
 import { activatePremium, getPremiumStatus } from '../lib/premium';
 
-const TERMS_URL = 'https://memofix.preview.emergentagent.com/terms';
-const PRIVACY_URL = 'https://memofix.preview.emergentagent.com/privacy';
+const TERMS_URL = 'https://www.notion.so/Terms-of-Service-Memor-ia-2e3f9fe156fc80fc8c5bf9f9f9f008e1';
+const PRIVACY_URL = 'https://www.notion.so/Privacy-Policy-Memor-ia-2e3f9fe156fc80edb1d2e6d0bd5f91e7';
 
 // Store URLs - Update these with your actual store URLs when published
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.memoria.app';
