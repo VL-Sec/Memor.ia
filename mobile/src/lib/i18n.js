@@ -709,6 +709,7 @@ export const translations = {
     selectFolder: 'Choisir un dossier',
     manageFolders: 'Gérer les Dossiers',
     folderCreated: 'Dossier créé',
+    folderCreatedAndSelected: 'Dossier créé et sélectionné',
     deleteFolder: 'Supprimer le dossier',
     deleteFolderConfirm: 'Êtes-vous sûr ? Les éléments seront déplacés vers le dossier Général.',
     cannotDeleteDefault: 'Impossible de supprimer le dossier par défaut',
