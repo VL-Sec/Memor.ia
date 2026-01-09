@@ -476,10 +476,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
           onPress={() => openEditModal(item)}
           activeOpacity={0.7}
         >
-          <Text style={styles.noteText} numberOfLines={3}>{item.content || ''}</Text>
-          <View style={styles.noteMeta}>
-            <Text style={styles.dateText}>{formatDateLocale(item.createdAt)}</Text>
-          </View>
+          <Text style={styles.noteText} numberOfLines={2}>{item.content || ''}</Text>
         </TouchableOpacity>
         
         {/* Action buttons - Order: Copy, Heart, Pin, Trash */}
