@@ -178,6 +178,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
         return null;
       }
       
+      // Use simpler trigger format that works reliably
       const notificationId = await Notifications.scheduleNotificationAsync({
         content: {
           title: t.reminder || 'Lembrete',
@@ -185,13 +186,13 @@ export default function LinksScreen({ language, userId, refreshKey }) {
           sound: true,
         },
         trigger: {
-          type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
           seconds: seconds,
           repeats: false,
         },
       });
       
-      Toast.show({ type: 'success', text1: t.reminderSet || 'Lembrete definido' });
+      console.log('Notification scheduled:', notificationId, 'in', seconds, 'seconds');
+      Toast.show({ type: 'success', text1: t.reminderSet || 'Lembrete definido', text2: `Em ${Math.round(seconds/60)} minutos` });
       return notificationId;
     } catch (error) {
       console.error('Error scheduling notification:', error);
