@@ -5,9 +5,6 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Notifications from 'expo-notifications';
-import Constants from 'expo-constants';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { translations, languages, setLanguage as saveLanguage } from '../lib/i18n';
 import { activatePremium, getPremiumStatus } from '../lib/premium';
 
@@ -18,65 +15,18 @@ const PRIVACY_URL = 'https://www.notion.so/Privacy-Policy-Memor-ia-2e3f9fe156fc8
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.memoria.app';
 const APP_STORE_URL = 'https://apps.apple.com/app/memoria/id000000000';
 
-// Check if we're in Expo Go
-const isExpoGo = Constants.appOwnership === 'expo';
-
-const DAYS_OF_WEEK = [
-  { value: 0, en: 'Sunday', pt: 'Domingo', es: 'Domingo', fr: 'Dimanche', de: 'Sonntag', it: 'Domenica' },
-  { value: 1, en: 'Monday', pt: 'Segunda-feira', es: 'Lunes', fr: 'Lundi', de: 'Montag', it: 'Lunedì' },
-  { value: 2, en: 'Tuesday', pt: 'Terça-feira', es: 'Martes', fr: 'Mardi', de: 'Dienstag', it: 'Martedì' },
-  { value: 3, en: 'Wednesday', pt: 'Quarta-feira', es: 'Miércoles', fr: 'Mercredi', de: 'Mittwoch', it: 'Mercoledì' },
-  { value: 4, en: 'Thursday', pt: 'Quinta-feira', es: 'Jueves', fr: 'Jeudi', de: 'Donnerstag', it: 'Giovedì' },
-  { value: 5, en: 'Friday', pt: 'Sexta-feira', es: 'Viernes', fr: 'Vendredi', de: 'Freitag', it: 'Venerdì' },
-  { value: 6, en: 'Saturday', pt: 'Sábado', es: 'Sábado', fr: 'Samedi', de: 'Samstag', it: 'Sabato' },
-];
-
-const HOURS = Array.from({ length: 24 }, (_, i) => i);
-
-const getDayName = (dayValue, language) => {
-  const day = DAYS_OF_WEEK.find(d => d.value === dayValue);
-  return day ? (day[language] || day.en) : '';
-};
-
-const formatTimeForLocale = (hour, minute) => {
-  const date = new Date();
-  date.setHours(hour, minute, 0, 0);
-  return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-};
-
- 
-
 export default function SettingsScreen({ language, setLanguage, premiumStatus, setPremiumStatus, userId }) {
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showActivationModal, setShowActivationModal] = useState(false);
-  const [showDayModal, setShowDayModal] = useState(false);
-  const [showTimeModal, setShowTimeModal] = useState(false);
   const [activationCode, setActivationCode] = useState('');
   const [activating, setActivating] = useState(false);
-  const [summaryEnabled, setSummaryEnabled] = useState(false);
-  const [summaryDay, setSummaryDay] = useState(0);
-  const [summaryHour, setSummaryHour] = useState(19);
-  const [summaryMinute, setSummaryMinute] = useState(0);
   const [cloudBackupEnabled, setCloudBackupEnabled] = useState(false);
-  
-  // Dynamic storage key based on userId
-  const getNotesStorageKey = () => `memoria-notes-${userId || 'default'}`;
 
   const t = translations[language] || translations.en;
 
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        // Load weekly summary settings
-        const data = await AsyncStorage.getItem('memoria-weekly-summary');
-        if (data) {
-          const settings = JSON.parse(data);
-          setSummaryEnabled(settings.enabled || false);
-          setSummaryDay(settings.dayOfWeek || 0);
-          setSummaryHour(settings.hour || 19);
-          setSummaryMinute(settings.minute || 0);
-        }
-        
         // Load cloud backup preference
         const backupEnabled = await AsyncStorage.getItem('memoria-cloud-backup-enabled');
         if (backupEnabled !== null) {
@@ -92,17 +42,13 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
   // Handle cloud backup toggle with confirmation
   const handleCloudBackupToggle = async (value) => {
     if (value) {
-      // Show confirmation alert
       Alert.alert(
         Platform.OS === 'ios' ? (t.iCloudBackup || 'iCloud Backup') : (t.googleBackup || 'Google Backup'),
         Platform.OS === 'ios' 
           ? (t.iCloudBackupConfirm || 'Aceitas que os teus dados sejam guardados no iCloud? Isto permite restaurar os dados ao reinstalar a app ou trocar de dispositivo.')
           : (t.googleBackupConfirm || 'Aceitas que os teus dados sejam guardados no Google Backup? Isto permite restaurar os dados ao reinstalar a app ou trocar de dispositivo.'),
         [
-          {
-            text: t.cancel || 'Cancelar',
-            style: 'cancel',
-          },
+          { text: t.cancel || 'Cancelar', style: 'cancel' },
           {
             text: t.accept || 'Aceitar',
             onPress: async () => {
@@ -130,10 +76,7 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
     if (!activationCode.trim()) return;
     setActivating(true);
     try {
-      // Simple local activation - in a real app, you might want to validate against a list of codes
       const code = activationCode.toUpperCase().trim();
-      
-      // For demo purposes, accept any code that follows the pattern XXXX-XXXX-XXXX
       const codePattern = /^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/;
       
       if (codePattern.test(code)) {
@@ -151,173 +94,6 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
     } finally { 
       setActivating(false); 
     }
-  };
-
-  const handleSummaryToggle = async (value) => {
-    if (value) {
-      // Check if we're in Expo Go (notifications don't work there)
-      if (isExpoGo) {
-        Alert.alert(
-          t.notifications || 'Notifications',
-          t.expoGoNotSupported || 'Notifications are not supported in Expo Go. Please use a development build or the published app to enable this feature.',
-          [{ text: 'OK', style: 'default' }]
-        );
-        return;
-      }
-      
-      // Request notification permission when enabling
-      try {
-        const { status: existingStatus } = await Notifications.getPermissionsAsync();
-        let finalStatus = existingStatus;
-        
-        if (existingStatus !== 'granted') {
-          const { status } = await Notifications.requestPermissionsAsync();
-          finalStatus = status;
-        }
-        
-        if (finalStatus !== 'granted') {
-          Alert.alert(
-            t.notifications || 'Notifications',
-            t.notificationPermissionRequired || 'Please enable notifications in your device settings to receive weekly summaries.',
-            [
-              { text: t.cancel || 'Cancel', style: 'cancel' },
-              { text: t.settings || 'Settings', onPress: () => Linking.openSettings() }
-            ]
-          );
-          return;
-        }
-        
-        // Schedule the weekly notification
-        await scheduleWeeklyNotification(summaryDay, summaryHour, summaryMinute);
-        
-      } catch (error) {
-        console.log('Notification permission error:', error);
-        Alert.alert(
-          t.notifications || 'Notifications',
-          t.notificationError || 'Could not enable notifications. Please try again later.',
-          [{ text: 'OK', style: 'default' }]
-        );
-        return;
-      }
-    } else {
-      // Cancel existing weekly notification when disabling
-      await cancelWeeklyNotification();
-    }
-    
-    setSummaryEnabled(value);
-    try {
-      await AsyncStorage.setItem('memoria-weekly-summary', JSON.stringify({ 
-        enabled: value, 
-        dayOfWeek: summaryDay, 
-        hour: summaryHour, 
-        minute: summaryMinute 
-      }));
-      Toast.show({ type: 'success', text1: value ? (t.weeklySummaryEnabled || 'Weekly summary enabled') : (t.weeklySummaryDisabled || 'Weekly summary disabled') });
-    } catch (e) {
-      console.error('Error saving settings:', e);
-    }
-  };
-  
-  // Schedule weekly notification
-  const scheduleWeeklyNotification = async (dayOfWeek, hour, minute) => {
-    try {
-      // Cancel any existing weekly notifications first
-      await cancelWeeklyNotification();
-      
-      // Use weekly trigger format
-      const notificationId = await Notifications.scheduleNotificationAsync({
-        content: {
-          title: t.weeklySummaryTitle || 'Memor.ia - Resumo Semanal',
-          body: t.weeklySummaryBody || 'Tens links e notas guardados para rever!',
-          sound: true,
-        },
-        trigger: {
-          weekday: dayOfWeek + 1, // Notifications uses 1-7 (Sunday = 1), we use 0-6
-          hour: hour,
-          minute: minute,
-          repeats: true,
-        },
-      });
-      
-      // Save the notification ID so we can cancel it later
-      await AsyncStorage.setItem('memoria-weekly-notification-id', notificationId);
-      console.log('Weekly notification scheduled:', notificationId, 'for weekday', dayOfWeek + 1, 'at', hour + ':' + minute);
-      Toast.show({ type: 'success', text1: t.reminderSet || 'Lembrete agendado' });
-      
-    } catch (error) {
-      console.error('Error scheduling weekly notification:', error);
-      throw error;
-    }
-  };
-  
-  // Cancel weekly notification
-  const cancelWeeklyNotification = async () => {
-    try {
-      const notificationId = await AsyncStorage.getItem('memoria-weekly-notification-id');
-      if (notificationId) {
-        await Notifications.cancelScheduledNotificationAsync(notificationId);
-        await AsyncStorage.removeItem('memoria-weekly-notification-id');
-        console.log('Weekly notification cancelled');
-      }
-    } catch (error) {
-      console.error('Error cancelling weekly notification:', error);
-    }
-  };
-
-  const handleDayChange = async (dayValue) => {
-    setSummaryDay(dayValue);
-    setShowDayModal(false);
-    if (summaryEnabled) {
-      try {
-        await AsyncStorage.setItem('memoria-weekly-summary', JSON.stringify({ 
-          enabled: summaryEnabled, 
-          dayOfWeek: dayValue, 
-          hour: summaryHour, 
-          minute: summaryMinute 
-        }));
-        // Reschedule notification with new day
-        await scheduleWeeklyNotification(dayValue, summaryHour, summaryMinute);
-        Toast.show({ type: 'success', text1: t.daySaved || 'Dia guardado' });
-      } catch (e) {
-        console.error('Error saving settings:', e);
-      }
-    }
-  };
-
-  const handleTimeChange = async (event, selectedTime) => {
-    if (Platform.OS !== 'ios') {
-      setShowTimeModal(false);
-    }
-    
-    if (selectedTime) {
-      const hour = selectedTime.getHours();
-      const minute = selectedTime.getMinutes();
-      setSummaryHour(hour);
-      setSummaryMinute(minute);
-      
-      if (summaryEnabled) {
-        try {
-          await AsyncStorage.setItem('memoria-weekly-summary', JSON.stringify({ 
-            enabled: summaryEnabled, 
-            dayOfWeek: summaryDay, 
-            hour: hour, 
-            minute: minute 
-          }));
-          // Reschedule notification with new time
-          await scheduleWeeklyNotification(summaryDay, hour, minute);
-          Toast.show({ type: 'success', text1: t.timeSaved || 'Hora guardada' });
-        } catch (e) {
-          console.error('Error saving settings:', e);
-        }
-      }
-    }
-  };
-  
-  // Get time as Date object for DateTimePicker
-  const getTimeAsDate = () => {
-    const date = new Date();
-    date.setHours(summaryHour, summaryMinute, 0, 0);
-    return date;
   };
 
   const getCurrentLanguage = () => { 
@@ -368,45 +144,6 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
             <Text style={styles.activateButtonText}>{t.enterActivationCode || 'Inserir código de ativação'}</Text>
           </TouchableOpacity>
         )}
-
-        {/* Notifications Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t.notifications || 'Notifications'}</Text>
-          <View style={styles.settingItem}>
-            <View style={styles.settingLeft}>
-              <Ionicons name="calendar-outline" size={24} color="#007AFF" />
-              <View style={styles.settingTextContainer}>
-                <Text style={styles.settingLabel}>{t.weeklySummary || 'Weekly Summary'}</Text>
-                <Text style={styles.settingDescription}>{t.weeklySummaryInfo || 'Receive a reminder to review your saved content'}</Text>
-              </View>
-            </View>
-            <Switch value={summaryEnabled} onValueChange={handleSummaryToggle} trackColor={{ false: '#3A3A3C', true: '#34C759' }} thumbColor="#FFFFFF" />
-          </View>
-          {summaryEnabled && (
-            <>
-              <TouchableOpacity style={styles.settingItem} onPress={() => setShowDayModal(true)}>
-                <View style={styles.settingLeft}>
-                  <View style={styles.iconPlaceholder} />
-                  <Text style={styles.settingLabel}>{t.dayOfWeek || 'Day'}</Text>
-                </View>
-                <View style={styles.settingRight}>
-                  <Text style={styles.settingValue}>{getDayName(summaryDay, language)}</Text>
-                  <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.settingItem} onPress={() => setShowTimeModal(true)}>
-                <View style={styles.settingLeft}>
-                  <View style={styles.iconPlaceholder} />
-                  <Text style={styles.settingLabel}>{t.time || 'Time'}</Text>
-                </View>
-                <View style={styles.settingRight}>
-                  <Text style={styles.settingValue}>{formatTimeForLocale(summaryHour, summaryMinute)}</Text>
-                  <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
-                </View>
-              </TouchableOpacity>
-            </>
-          )}
-        </View>
 
         {/* Cloud Backup Section - Simple Switch */}
         <View style={styles.section}>
@@ -500,59 +237,6 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
           </View>
         </Modal>
 
-        {/* Day Modal */}
-        <Modal visible={showDayModal} animationType="slide" transparent={true} onRequestClose={() => setShowDayModal(false)}>
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>{t.selectDay || 'Select day'}</Text>
-                <TouchableOpacity onPress={() => setShowDayModal(false)}>
-                  <Ionicons name="close" size={28} color="#FFFFFF" />
-                </TouchableOpacity>
-              </View>
-              <ScrollView style={styles.dayList}>
-                {DAYS_OF_WEEK.map((day) => (
-                  <TouchableOpacity key={day.value} style={[styles.dayOption, summaryDay === day.value && styles.dayOptionActive]} onPress={() => handleDayChange(day.value)}>
-                    <Text style={styles.dayName}>{day[language] || day.en}</Text>
-                    {summaryDay === day.value && <Ionicons name="checkmark" size={24} color="#007AFF" />}
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-          </View>
-        </Modal>
-
-        {/* Time Picker - Native DateTimePicker */}
-        {showTimeModal && (
-          <Modal visible={showTimeModal} animationType="slide" transparent={true} onRequestClose={() => setShowTimeModal(false)}>
-            <View style={styles.modalOverlay}>
-              <View style={styles.timePickerModalContent}>
-                <View style={styles.modalHeader}>
-                  <Text style={styles.modalTitle}>{t.selectTime || 'Selecionar hora'}</Text>
-                  <TouchableOpacity onPress={() => setShowTimeModal(false)}>
-                    <Ionicons name="close" size={28} color="#FFFFFF" />
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.timePickerContainer}>
-                  <DateTimePicker
-                    value={getTimeAsDate()}
-                    mode="time"
-                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                    onChange={handleTimeChange}
-                    textColor="#FFFFFF"
-                    themeVariant="dark"
-                  />
-                </View>
-                {Platform.OS === 'ios' && (
-                  <TouchableOpacity style={styles.timePickerDoneButton} onPress={() => setShowTimeModal(false)}>
-                    <Text style={styles.timePickerDoneText}>{t.done || 'Concluído'}</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            </View>
-          </Modal>
-        )}
-
         {/* Activation Modal */}
         <Modal visible={showActivationModal} animationType="slide" transparent={true} onRequestClose={() => setShowActivationModal(false)}>
           <View style={styles.modalOverlay}>
@@ -608,17 +292,6 @@ const styles = StyleSheet.create({
   subscribeButtonText: { color: '#FFFFFF', fontSize: 17, fontWeight: '700' },
   section: { backgroundColor: '#1C1C1E', marginHorizontal: 16, marginBottom: 16, borderRadius: 16, overflow: 'hidden' },
   sectionTitle: { color: '#8E8E93', fontSize: 13, fontWeight: '600', textTransform: 'uppercase', paddingHorizontal: 16, paddingTop: 16, paddingBottom: 8 },
-  cloudBackupCard: { backgroundColor: '#1C1C1E', marginHorizontal: 16, marginBottom: 16, borderRadius: 20, padding: 16 },
-  cloudBackupHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
-  cloudBackupIconContainer: { width: 48, height: 48, borderRadius: 24, backgroundColor: Platform.OS === 'ios' ? '#007AFF' : '#34A853', justifyContent: 'center', alignItems: 'center' },
-  cloudBackupTitleContainer: { flex: 1, marginLeft: 12 },
-  cloudBackupTitle: { color: '#FFFFFF', fontSize: 18, fontWeight: '700' },
-  cloudBackupSubtitle: { color: '#8E8E93', fontSize: 14, marginTop: 2 },
-  cloudBackupDescription: { color: '#CCCCCC', fontSize: 14, lineHeight: 20, marginBottom: 12 },
-  cloudBackupTipContainer: { flexDirection: 'row', alignItems: 'flex-start', backgroundColor: 'rgba(255, 214, 10, 0.1)', padding: 12, borderRadius: 10, gap: 8, marginBottom: 12 },
-  cloudBackupTip: { color: '#FFD60A', fontSize: 12, flex: 1, lineHeight: 16 },
-  openSettingsButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0, 122, 255, 0.15)', paddingVertical: 12, borderRadius: 12, gap: 8 },
-  openSettingsButtonText: { color: '#007AFF', fontSize: 16, fontWeight: '600' },
   settingItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: '#2C2C2E' },
   settingLeft: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
   settingTextContainer: { flex: 1 },
@@ -626,7 +299,6 @@ const styles = StyleSheet.create({
   settingRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   settingLabel: { color: '#FFFFFF', fontSize: 16 },
   settingValue: { color: '#8E8E93', fontSize: 16 },
-  iconPlaceholder: { width: 24 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.8)', justifyContent: 'flex-end' },
   modalContent: { backgroundColor: '#1C1C1E', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingBottom: 40, maxHeight: '80%' },
   modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 20, borderBottomWidth: 1, borderBottomColor: '#2C2C2E' },
@@ -635,24 +307,13 @@ const styles = StyleSheet.create({
   languageOptionActive: { backgroundColor: 'rgba(0, 122, 255, 0.1)' },
   languageFlag: { fontSize: 28, marginRight: 16 },
   languageName: { flex: 1, color: '#FFFFFF', fontSize: 18 },
-  dayList: { maxHeight: 400 },
-  dayOption: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: '#2C2C2E' },
-  dayOptionActive: { backgroundColor: 'rgba(0, 122, 255, 0.1)' },
-  dayName: { color: '#FFFFFF', fontSize: 18 },
   activationIconContainer: { alignItems: 'center', paddingVertical: 24 },
   activationInput: { backgroundColor: '#000000', marginHorizontal: 20, padding: 16, borderRadius: 12, color: '#FFFFFF', fontSize: 20, textAlign: 'center', letterSpacing: 2 },
   activationSubmitButton: { backgroundColor: '#007AFF', marginHorizontal: 20, marginTop: 16, padding: 16, borderRadius: 12, alignItems: 'center' },
   activationSubmitButtonDisabled: { opacity: 0.5 },
   activationSubmitText: { color: '#FFFFFF', fontSize: 18, fontWeight: '600' },
-  // Time picker modal styles
-  timePickerModalContent: { backgroundColor: '#1C1C1E', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingBottom: 40 },
-  timePickerContainer: { alignItems: 'center', paddingVertical: 20 },
-  timePickerDoneButton: { backgroundColor: '#007AFF', marginHorizontal: 20, padding: 16, borderRadius: 12, alignItems: 'center' },
-  timePickerDoneText: { color: '#FFFFFF', fontSize: 18, fontWeight: '600' },
-  // Cloud backup active info
   cloudBackupActiveInfo: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingVertical: 12, backgroundColor: 'rgba(52, 199, 89, 0.1)', marginHorizontal: 16, marginBottom: 8, borderRadius: 8 },
   cloudBackupActiveText: { color: '#34C759', fontSize: 13, flex: 1 },
-  // Legal links - discrete
   legalSection: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingVertical: 16, gap: 8 },
   legalLink: { color: '#6E6E73', fontSize: 12 },
   legalSeparator: { color: '#6E6E73', fontSize: 12 },
