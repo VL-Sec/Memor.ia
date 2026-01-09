@@ -378,7 +378,7 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
               // Restore local notes (support both old 'localNotes' and new 'notes' keys)
               const notesToRestore = backupData.data?.notes || backupData.data?.localNotes;
               if (notesToRestore && Array.isArray(notesToRestore)) {
-                await AsyncStorage.setItem(LOCAL_NOTES_KEY, JSON.stringify(notesToRestore));
+                await AsyncStorage.setItem(getNotesStorageKey(), JSON.stringify(notesToRestore));
                 importedCount += notesToRestore.length;
               }
               
