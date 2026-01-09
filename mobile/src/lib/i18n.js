@@ -163,6 +163,11 @@ export const translations = {
     iCloudBackupActive: 'Your data is being saved to iCloud',
     googleBackupActive: 'Your data is being saved to Google Backup',
     accept: 'Accept',
+    openBackupSettings: 'Enable Backup',
+    openICloudSettings: 'To ensure your data is saved, enable iCloud backup in iPhone Settings.',
+    openGoogleSettings: 'To ensure your data is saved, enable backup in Android Settings.',
+    later: 'Later',
+    openSettings: 'Open Settings',
     general: 'General',
     
     // Notifications
