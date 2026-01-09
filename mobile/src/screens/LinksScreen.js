@@ -363,7 +363,6 @@ export default function LinksScreen({ language, userId, refreshKey }) {
   });
 
   const renderLinkItem = ({ item }) => {
-    const folder = folders.find(f => f.id === item.folderId);
     const hasReminder = item.reminder && item.reminder.date;
     const reminderDateObj = hasReminder ? new Date(item.reminder.date) : null;
     const isReminderPast = reminderDateObj && reminderDateObj < new Date();
