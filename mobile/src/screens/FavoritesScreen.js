@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Image, Linking, RefreshControl, ScrollView, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Image, Linking, RefreshControl, ScrollView, FlatList, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -16,12 +16,25 @@ const formatDateLocale = (dateStr) => {
   return date.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
 };
 
+// FilterChip component defined outside the main component
+const FilterChip = ({ value, currentFilter, label, onPress }) => (
+  <TouchableOpacity 
+    style={[styles.filterChip, currentFilter === value && styles.filterChipActive]} 
+    onPress={() => onPress(value)}
+  >
+    <Text style={[styles.filterChipText, currentFilter === value && styles.filterChipTextActive]}>
+      {label}
+    </Text>
+  </TouchableOpacity>
+);
+
 export default function FavoritesScreen({ language, userId, refreshKey }) {
   const [favorites, setFavorites] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState('all');
+
 
   const t = translations[language] || translations.en;
   
