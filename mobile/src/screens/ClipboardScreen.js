@@ -318,7 +318,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
         onPress={() => handleCopyNote(item.content)}
         activeOpacity={0.7}
       >
-        <Text style={styles.noteText} numberOfLines={2}>{item.content || ''}</Text>
+        <Text style={styles.noteText} numberOfLines={4} ellipsizeMode="tail">{item.content || ''}</Text>
       </TouchableOpacity>
       
       <View style={styles.noteActions}>
