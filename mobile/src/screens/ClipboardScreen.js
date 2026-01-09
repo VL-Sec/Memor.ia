@@ -365,7 +365,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <CustomHeader title={t.tabClipboard || 'Clipboard'} />
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingBottom: insets.bottom + 16 }]}>
         {/* Search */}
         <View style={styles.searchContainer}>
           <Ionicons name="search" size={20} color="#8E8E93" />
