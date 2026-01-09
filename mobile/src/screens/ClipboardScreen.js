@@ -278,9 +278,8 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
       setNotes([newNote, ...notes]);
       setNewContent('');
       
-      // IMPORTANT: Mark as saved to prevent Smart Clipboard from duplicating
+      // Update lastClipboardContent to avoid Smart Clipboard re-capturing this
       lastClipboardContent.current = trimmedContent;
-      savedClipboardContents.current.add(trimmedContent);
       
       Toast.show({ type: 'success', text1: t.saved });
       if (triggerRefresh) triggerRefresh();
@@ -295,9 +294,8 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
     const trimmedContent = content?.trim() || '';
     await Clipboard.setStringAsync(trimmedContent);
     
-    // IMPORTANT: Mark as saved to prevent Smart Clipboard from re-saving
+    // Update lastClipboardContent so Smart Clipboard doesn't re-capture this
     lastClipboardContent.current = trimmedContent;
-    savedClipboardContents.current.add(trimmedContent);
     
     Toast.show({ type: 'success', text1: t.copied });
   };
