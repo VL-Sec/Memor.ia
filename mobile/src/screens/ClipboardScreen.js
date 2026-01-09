@@ -671,50 +671,54 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
           transparent={true}
           onRequestClose={() => setShowFolderPicker(false)}
         >
-          <View style={styles.folderPickerOverlay}>
-            <View style={styles.folderPickerContent}>
-              <View style={styles.folderPickerHeader}>
-                <Text style={styles.folderPickerTitle}>{t.selectFolder || 'Escolher pasta'}</Text>
-                <TouchableOpacity onPress={() => setShowFolderPicker(false)}>
-                  <Ionicons name="close" size={28} color="#FFFFFF" />
-                </TouchableOpacity>
-              </View>
-              <ScrollView>
-                {/* Create New Folder Option */}
-                <TouchableOpacity 
-                  style={styles.createFolderOption} 
-                  onPress={() => { setShowFolderPicker(false); openFolderModal(null, true); }}
-                >
-                  <View style={styles.createFolderIcon}>
-                    <Ionicons name="add" size={24} color="#007AFF" />
+          <TouchableWithoutFeedback onPress={() => setShowFolderPicker(false)}>
+            <View style={styles.folderPickerOverlay}>
+              <TouchableWithoutFeedback onPress={() => {}}>
+                <View style={styles.folderPickerContent}>
+                  <View style={styles.folderPickerHeader}>
+                    <Text style={styles.folderPickerTitle}>{t.selectFolder || 'Escolher pasta'}</Text>
+                    <TouchableOpacity onPress={() => setShowFolderPicker(false)}>
+                      <Ionicons name="close" size={28} color="#FFFFFF" />
+                    </TouchableOpacity>
                   </View>
-                  <Text style={styles.createFolderText}>{t.createNewFolder || 'Criar nova pasta'}</Text>
-                </TouchableOpacity>
-                
-                <View style={styles.folderDivider} />
-                
-                <TouchableOpacity 
-                  style={[styles.folderOption, !editFolderId && styles.folderOptionActive]} 
-                  onPress={() => { setEditFolderId(null); setShowFolderPicker(false); }}
-                >
-                  <Text style={styles.folderOptionIcon}>📋</Text>
-                  <Text style={styles.folderOptionName}>{t.allClipboards || 'Todos'}</Text>
-                  {!editFolderId && <Ionicons name="checkmark" size={24} color="#007AFF" />}
-                </TouchableOpacity>
-                {folders.filter(f => !f.isDefault).map((folder) => (
-                  <TouchableOpacity 
-                    key={folder.id} 
-                    style={[styles.folderOption, editFolderId === folder.id && styles.folderOptionActive]} 
-                    onPress={() => { setEditFolderId(folder.id); setShowFolderPicker(false); }}
-                  >
-                    <Text style={styles.folderOptionIcon}>{folder.icon || '📁'}</Text>
-                    <Text style={styles.folderOptionName}>{folder.name}</Text>
-                    {editFolderId === folder.id && <Ionicons name="checkmark" size={24} color="#007AFF" />}
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
+                  <ScrollView keyboardShouldPersistTaps="handled">
+                    {/* Create New Folder Option */}
+                    <TouchableOpacity 
+                      style={styles.createFolderOption} 
+                      onPress={() => { setShowFolderPicker(false); openFolderModal(null, true); }}
+                    >
+                      <View style={styles.createFolderIcon}>
+                        <Ionicons name="add" size={24} color="#007AFF" />
+                      </View>
+                      <Text style={styles.createFolderText}>{t.createNewFolder || 'Criar nova pasta'}</Text>
+                    </TouchableOpacity>
+                    
+                    <View style={styles.folderDivider} />
+                    
+                    <TouchableOpacity 
+                      style={[styles.folderOption, !editFolderId && styles.folderOptionActive]} 
+                      onPress={() => { setEditFolderId(null); setShowFolderPicker(false); }}
+                    >
+                      <Text style={styles.folderOptionIcon}>📋</Text>
+                      <Text style={styles.folderOptionName}>{t.allClipboards || 'Todos'}</Text>
+                      {!editFolderId && <Ionicons name="checkmark" size={24} color="#007AFF" />}
+                    </TouchableOpacity>
+                    {folders.filter(f => !f.isDefault).map((folder) => (
+                      <TouchableOpacity 
+                        key={folder.id} 
+                        style={[styles.folderOption, editFolderId === folder.id && styles.folderOptionActive]} 
+                        onPress={() => { setEditFolderId(folder.id); setShowFolderPicker(false); }}
+                      >
+                        <Text style={styles.folderOptionIcon}>{folder.icon || '📁'}</Text>
+                        <Text style={styles.folderOptionName}>{folder.name}</Text>
+                        {editFolderId === folder.id && <Ionicons name="checkmark" size={24} color="#007AFF" />}
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              </TouchableWithoutFeedback>
             </View>
-          </View>
+          </TouchableWithoutFeedback>
         </Modal>
 
         {/* Folder Management Modal */}
