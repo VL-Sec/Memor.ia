@@ -287,47 +287,11 @@ eas build --platform ios --profile preview
 
 # 📝 NOTAS TÉCNICAS
 
-## Smart Clipboard (Captura Inteligente) - ANTI-SPAM FINAL
-- **Lógica:** Captura quando o VALOR do clipboard MUDA
-- **Anti-spam:** `lastCapturedValueRef` rastreia último valor capturado
-- **Intervalo:** Verifica a cada 3 segundos
-- **Reset:** `lastCapturedValueRef = null` ao ATIVAR e ao DESATIVAR (estado limpo entre sessões)
-- **Código Final:**
-  ```javascript
-  const lastCapturedValueRef = useRef(null);
-  
-  const captureClipboardEntry = async () => {
-    if (!smartClipboardActiveRef.current) return;
-    
-    const value = await Clipboard.getStringAsync();
-    if (!value || value.trim() === '') return;
-    
-    // ANTI-SPAM: Skip if same as last captured
-    if (value === lastCapturedValueRef.current) return;
-    
-    lastCapturedValueRef.current = value;
-    await saveClipboardEntry(value);
-  };
-  
-  const activateSmartClipboard = () => {
-    lastCapturedValueRef.current = null; // Reset
-    setSmartClipboardActive(true);
-    setTimeLeft(120);
-  };
-  
-  const deactivateSmartClipboard = () => {
-    lastCapturedValueRef.current = null; // Reset entre sessões
-    setSmartClipboardActive(false);
-    setTimeLeft(0);
-    stopClipboardMonitoring();
-  };
-  ```
-- **Comportamento:**
-  - Copiar "ABC" → entrada 1 (lastCaptured = "ABC")
-  - Intervalo passa → clipboard ainda "ABC" → ignorado (anti-spam)
-  - Copiar "XYZ" → entrada 2 (lastCaptured = "XYZ")
-  - Copiar "ABC" → entrada 3 (diferente de "XYZ", logo nova entrada)
-- **Nota:** Lock `isSavingRef` apenas em `saveClipboardEntry()`, não em `captureClipboardEntry()` (evita perder cópias rápidas)
+## Smart Clipboard (Captura Inteligente)
+- ❌ **REMOVIDO COMPLETAMENTE**
+- **Razão:** Limitação técnica - JavaScript/React Native não tem eventos de cópia (`onCopy`)
+- Só é possível ler o valor atual do clipboard, não detetar eventos de cópia
+- Impossível distinguir entre "mesmo valor" e "nova cópia do mesmo texto"
 
 ## Modais
 - Todos têm `TouchableWithoutFeedback` no overlay
