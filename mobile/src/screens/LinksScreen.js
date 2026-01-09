@@ -114,7 +114,17 @@ export default function LinksScreen({ language, userId, refreshKey }) {
       const { data: foldersData } = await supabase.from('folders').select('*').eq('userId', userId).eq('folderType', 'link').order('createdAt', { ascending: false });
       const { data: linksData } = await supabase.from('links').select('*').eq('userId', userId).eq('contentType', 'link').order('createdAt', { ascending: false });
       setFolders(foldersData || []);
-      setLinks(linksData || []);
+      
+      // Transform reminderAt to reminder object for compatibility
+      const linksWithReminder = await Promise.all((linksData || []).map(async (link) => {
+        if (link.reminderAt) {
+          const notificationId = await getNotificationId(link.id);
+          return { ...link, reminder: { date: link.reminderAt, notificationId } };
+        }
+        return { ...link, reminder: null };
+      }));
+      
+      setLinks(linksWithReminder);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
