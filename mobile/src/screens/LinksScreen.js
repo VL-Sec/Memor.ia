@@ -635,7 +635,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
               {/* Create New Folder Option */}
               <TouchableOpacity 
                 style={styles.createFolderOption} 
-                onPress={() => { setShowFolderPicker(false); openFolderModal(); }}
+                onPress={() => { setShowFolderPicker(false); openFolderModal(null, true); }}
               >
                 <View style={styles.createFolderIcon}>
                   <Ionicons name="add" size={24} color="#007AFF" />
