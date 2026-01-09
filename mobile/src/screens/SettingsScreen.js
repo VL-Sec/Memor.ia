@@ -428,79 +428,38 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
           )}
         </View>
 
-        {/* Native System Backup Card - Platform specific */}
-        <View style={styles.cloudBackupCard}>
-          <View style={styles.cloudBackupHeader}>
-            <View style={styles.cloudBackupIconContainer}>
-              <Ionicons name={backupInfo.icon} size={28} color="#FFFFFF" />
-            </View>
-            <View style={styles.cloudBackupTitleContainer}>
-              <Text style={styles.cloudBackupTitle}>
-                {Platform.OS === 'ios' 
-                  ? (t.iCloudBackup || 'iCloud Backup') 
-                  : (t.googleBackup || 'Google Backup')}
-              </Text>
-              <Text style={styles.cloudBackupSubtitle}>{t.systemBackupSubtitle || 'Backup automático do sistema'}</Text>
-            </View>
-          </View>
-          <Text style={styles.cloudBackupDescription}>
-            {Platform.OS === 'ios'
-              ? (t.iCloudBackupDescription || 'Os dados da app são automaticamente incluídos no backup do iCloud. Ao reinstalar a app ou trocar de iPhone, os seus dados serão restaurados.')
-              : (t.googleBackupDescription || 'Os dados da app são automaticamente incluídos no backup do Google. Ao reinstalar a app ou trocar de telemóvel, os seus dados serão restaurados.')}
-          </Text>
-          <View style={styles.cloudBackupTipContainer}>
-            <Ionicons name="information-circle" size={16} color="#FFD60A" />
-            <Text style={styles.cloudBackupTip}>
-              {Platform.OS === 'ios'
-                ? (t.iCloudBackupTip || 'Certifique-se que o backup do iCloud está ativado em Definições > [Seu Nome] > iCloud > Backup')
-                : (t.googleBackupTip || 'Certifique-se que o backup está ativado em Definições > Google > Backup')}
-            </Text>
-          </View>
-          <TouchableOpacity style={styles.openSettingsButton} onPress={handleOpenBackupSettings}>
-            <Text style={styles.openSettingsButtonText}>{t.openSettings || 'Abrir Definições'}</Text>
-            <Ionicons name="open-outline" size={18} color="#007AFF" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Manual Backup Section (Additional) */}
+        {/* Cloud Backup Section - Simple Switch */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t.manualBackup || 'Backup Manual'}</Text>
-          <TouchableOpacity 
-            style={styles.settingItem} 
-            onPress={handleExportBackup}
-            disabled={isExporting}
-          >
+          <Text style={styles.sectionTitle}>{t.backup || 'Cópia de Segurança'}</Text>
+          <View style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Ionicons name="download-outline" size={24} color="#34C759" />
+              <Ionicons name={Platform.OS === 'ios' ? 'logo-apple' : 'logo-google'} size={24} color="#007AFF" />
               <View style={styles.settingTextContainer}>
-                <Text style={styles.settingLabel}>{t.exportBackup || 'Exportar Backup'}</Text>
-                <Text style={styles.settingDescription}>{t.exportBackupInfo || 'Guardar dados num ficheiro JSON'}</Text>
+                <Text style={styles.settingLabel}>
+                  {Platform.OS === 'ios' ? (t.iCloudBackup || 'iCloud Backup') : (t.googleBackup || 'Google Backup')}
+                </Text>
+                <Text style={styles.settingDescription}>
+                  {t.cloudBackupInfo || 'Guarda automaticamente os teus dados na cloud'}
+                </Text>
               </View>
             </View>
-            {isExporting ? (
-              <Text style={styles.settingValue}>...</Text>
-            ) : (
-              <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
-            )}
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={[styles.settingItem, { borderBottomWidth: 0 }]} 
-            onPress={handleImportBackup}
-            disabled={isImporting}
-          >
-            <View style={styles.settingLeft}>
-              <Ionicons name="push-outline" size={24} color="#007AFF" />
-              <View style={styles.settingTextContainer}>
-                <Text style={styles.settingLabel}>{t.importBackup || 'Importar Backup'}</Text>
-                <Text style={styles.settingDescription}>{t.importBackupInfo || 'Restaurar de um ficheiro'}</Text>
-              </View>
+            <Switch 
+              value={cloudBackupEnabled} 
+              onValueChange={handleCloudBackupToggle} 
+              trackColor={{ false: '#3A3A3C', true: '#34C759' }} 
+              thumbColor="#FFFFFF" 
+            />
+          </View>
+          {cloudBackupEnabled && (
+            <View style={styles.cloudBackupActiveInfo}>
+              <Ionicons name="checkmark-circle" size={16} color="#34C759" />
+              <Text style={styles.cloudBackupActiveText}>
+                {Platform.OS === 'ios' 
+                  ? (t.iCloudBackupActive || 'Os teus dados estão a ser guardados no iCloud')
+                  : (t.googleBackupActive || 'Os teus dados estão a ser guardados no Google Backup')}
+              </Text>
             </View>
-            {isImporting ? (
-              <Text style={styles.settingValue}>...</Text>
-            ) : (
-              <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
-            )}
-          </TouchableOpacity>
+          )}
         </View>
 
         {/* General Settings Section */}
