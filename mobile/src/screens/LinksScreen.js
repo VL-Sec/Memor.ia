@@ -254,16 +254,14 @@ export default function LinksScreen({ language, userId, refreshKey }) {
 
   const handleSaveEdit = async () => {
     try {
-      let reminderData = null;
+      let reminderAt = null;
+      let notificationId = null;
       
       // Schedule notification if reminder is enabled
       if (reminderEnabled && reminderDate > new Date()) {
-        const notificationId = await scheduleNotification(editTitle || editUrl, reminderDate);
+        notificationId = await scheduleNotification(editTitle || editUrl, reminderDate);
         if (notificationId) {
-          reminderData = { 
-            date: reminderDate.toISOString(), 
-            notificationId 
-          };
+          reminderAt = reminderDate.toISOString();
         }
       }
       
@@ -274,8 +272,9 @@ export default function LinksScreen({ language, userId, refreshKey }) {
           return;
         }
         
+        const linkId = generateId();
         const newLink = { 
-          id: generateId(), 
+          id: linkId, 
           userId: userId, 
           url: editUrl, 
           title: editTitle || editUrl, 
@@ -284,33 +283,58 @@ export default function LinksScreen({ language, userId, refreshKey }) {
           isFavorite: false, 
           isPinned: isPinnedEdit,
           folderId: editFolderId || null,
-          reminder: reminderData,
+          reminderAt: reminderAt,
           createdAt: new Date().toISOString() 
         };
         
         const { error } = await supabase.from('links').insert([newLink]);
         if (error) throw error;
         
-        setLinks([newLink, ...links]);
+        // Save notification ID locally
+        if (notificationId) {
+          await saveNotificationId(linkId, notificationId);
+        }
+        
+        // Add reminder object for local state
+        const linkWithReminder = { 
+          ...newLink, 
+          reminder: reminderAt ? { date: reminderAt, notificationId } : null 
+        };
+        setLinks([linkWithReminder, ...links]);
         Toast.show({ type: 'success', text1: t.saved });
       } else {
         // Editing existing link
         if (!editingItem) return;
         
         // Cancel existing notification if any
-        if (editingItem.reminder?.notificationId) {
-          await cancelNotification(editingItem.reminder.notificationId);
+        const existingNotificationId = await getNotificationId(editingItem.id);
+        if (existingNotificationId) {
+          await cancelNotification(existingNotificationId);
+          await removeNotificationId(editingItem.id);
         }
         
         const updateData = { 
           title: editTitle, 
           folderId: editFolderId || null, 
-          reminder: reminderData, 
+          reminderAt: reminderAt, 
           isPinned: isPinnedEdit 
         };
         
-        await supabase.from('links').update(updateData).eq('id', editingItem.id);
-        setLinks(links.map(l => l.id === editingItem.id ? { ...l, ...updateData } : l));
+        const { error } = await supabase.from('links').update(updateData).eq('id', editingItem.id);
+        if (error) throw error;
+        
+        // Save new notification ID locally
+        if (notificationId) {
+          await saveNotificationId(editingItem.id, notificationId);
+        }
+        
+        // Update local state with reminder object
+        const updatedLink = { 
+          ...editingItem, 
+          ...updateData, 
+          reminder: reminderAt ? { date: reminderAt, notificationId } : null 
+        };
+        setLinks(links.map(l => l.id === editingItem.id ? updatedLink : l));
         Toast.show({ type: 'success', text1: t.saved });
       }
       
