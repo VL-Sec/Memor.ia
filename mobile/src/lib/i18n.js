@@ -1083,6 +1083,7 @@ export const translations = {
     selectFolder: 'Scegli una cartella',
     manageFolders: 'Gestisci Cartelle',
     folderCreated: 'Cartella creata',
+    folderCreatedAndSelected: 'Cartella creata e selezionata',
     deleteFolder: 'Elimina cartella',
     deleteFolderConfirm: 'Sei sicuro? Gli elementi verranno spostati nella cartella Generale.',
     cannotDeleteDefault: 'Impossibile eliminare la cartella predefinita',
