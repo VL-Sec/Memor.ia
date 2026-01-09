@@ -679,9 +679,9 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
           transparent={true}
           onRequestClose={() => setShowFolderPicker(false)}
         >
-          <TouchableWithoutFeedback onPress={() => setShowFolderPicker(false)}>
+          <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); setShowFolderPicker(false); }}>
             <View style={styles.folderPickerOverlay}>
-              <TouchableWithoutFeedback onPress={() => {}}>
+              <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <View style={styles.folderPickerContent}>
                   <View style={styles.folderPickerHeader}>
                     <Text style={styles.folderPickerTitle}>{t.selectFolder || 'Escolher pasta'}</Text>
