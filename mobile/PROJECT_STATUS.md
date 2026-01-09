@@ -289,11 +289,17 @@ eas build --platform ios --profile preview
 
 # 📝 NOTAS TÉCNICAS
 
-## Smart Clipboard
+## Smart Clipboard (Captura Inteligente)
 - Usa `useRef` para `lastClipboardContent` e `savedClipboardContents` (Set)
 - Verifica a cada 1 segundo se há novo conteúdo
 - Ignora conteúdo que já estava no clipboard ao ativar
 - Timer de 2 minutos (120 segundos)
+- **Lógica de acumulação:**
+  1. Marca conteúdo como "guardado" ANTES de inserir (evita duplicados)
+  2. Gera ID único (`generateId()`) + timestamp para cada entrada
+  3. Insere no Supabase
+  4. Adiciona ao estado local com verificação de ID existente
+  5. Se falhar, remove do Set para poder tentar novamente
 
 ## Modais
 - Todos têm `TouchableWithoutFeedback` no overlay
