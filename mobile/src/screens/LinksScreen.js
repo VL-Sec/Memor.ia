@@ -725,9 +725,9 @@ export default function LinksScreen({ language, userId, refreshKey }) {
       )}
 
       <Modal visible={showFolderPicker} animationType="slide" transparent={true} onRequestClose={() => setShowFolderPicker(false)}>
-        <TouchableWithoutFeedback onPress={() => setShowFolderPicker(false)}>
+        <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); setShowFolderPicker(false); }}>
           <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback onPress={() => {}}>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
               <View style={styles.folderPickerContent}>
                 <View style={styles.modalHeader}>
                   <Text style={styles.modalTitle}>{t.selectFolder}</Text>
