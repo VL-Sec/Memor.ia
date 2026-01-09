@@ -80,18 +80,15 @@ Stack.Navigator (raiz)
 - ❌ REMOVIDO: Lembretes (causava erro Supabase "reminderAt column not found")
 
 ## 3. ClipboardScreen.js
-- ✅ Colar texto manual
-- ✅ **Captura Inteligente** (2 min) - guarda CADA texto como entrada separada
-- ✅ Usa Set para evitar duplicados (por conteúdo)
-- ✅ Cada entrada tem ID único e timestamp próprio
-- ✅ Entradas são ACUMULADAS, não substituídas
-- ✅ Verificação de duplicados antes de adicionar ao estado local
+- ✅ Colar texto manual (botão paste do clipboard do sistema)
+- ✅ Adicionar texto escrito manualmente
+- ✅ Copiar, editar, eliminar itens
 - ✅ Favoritos e Pin
-- ✅ Pastas (criar, mover)
+- ✅ Pastas (criar, mover, eliminar)
 - ✅ Criar pasta no modal "Mover para" (auto-seleciona)
 - ✅ Pesquisa (limpa ao perder foco)
 - ✅ Cards compactos (sem data)
-- ✅ numberOfLines={2}
+- ❌ **REMOVIDO:** Smart Clipboard / Captura Inteligente (limitação técnica JS)
 
 ## 4. NotesScreen.js
 - ✅ Criar, editar, eliminar notas
