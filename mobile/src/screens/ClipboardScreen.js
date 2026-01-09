@@ -456,14 +456,6 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
   };
 
   const activateSmartClipboard = async () => {
-    try {
-      // Read current clipboard content to avoid saving it immediately
-      const currentContent = await Clipboard.getStringAsync();
-      lastClipboardContent.current = currentContent?.trim() || '';
-    } catch (e) {
-      lastClipboardContent.current = '';
-    }
-    
     setSmartClipboardActive(true);
     setTimeLeft(120);
     Toast.show({ 
@@ -471,6 +463,10 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
       text1: t.smartClipboardActivated || 'Captura Inteligente Ativada',
       text2: t.smartClipboardInfo2 || 'A capturar tudo o que copias durante 2 minutos'
     });
+    
+    // Immediately capture current clipboard as first entry
+    console.log('[Smart Clipboard] Activated - capturing initial entry');
+    await captureClipboardEntry();
   };
 
   const deactivateSmartClipboard = () => {
