@@ -297,7 +297,7 @@ export const translations = {
     start: 'Iniciar',
     stop: 'Parar',
     autoSaved: 'Guardado automaticamente',
-    smartClipboardDeactivated: 'Área Inteligente desativada',
+    smartClipboardDeactivated: 'Captura inteligente desativada',
     deleteFolderConfirmSimple: 'Tens a certeza que queres eliminar esta pasta?',
     
     // Links
