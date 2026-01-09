@@ -736,7 +736,7 @@ export const translations = {
     start: 'Démarrer',
     stop: 'Arrêter',
     autoSaved: 'Sauvegardé automatiquement',
-    smartClipboardDeactivated: 'Presse-papiers intelligent désactivé',
+    smartClipboardDeactivated: 'Capture intelligente désactivée',
     deleteFolderConfirmSimple: 'Êtes-vous sûr de vouloir supprimer ce dossier ?',
     
     // Links
@@ -750,11 +750,11 @@ export const translations = {
     clipboardPlaceholder: 'Collez votre texte ici...',
     noClipboardItems: 'Rien ici pour le moment',
     chars: 'caractères',
-    smartClipboard: 'Presse-papiers Intelligent',
-    smartClipboardInfo: 'Enregistre automatiquement tout ce que vous copiez tant qu\'il est actif.',
-    smartClipboardActivated: 'Presse-papiers intelligent activé',
-    activate: 'Démarrer',
-    deactivate: 'Arrêter',
+    smartClipboard: 'Capture Intelligente',
+    smartClipboardInfo: 'Enregistre automatiquement tout ce que vous copiez pendant 2 minutes.',
+    smartClipboardActivated: 'Capture intelligente activée',
+    activate: 'Activer',
+    deactivate: 'Désactiver',
     timeRemaining: 'restant',
     
     // Links
