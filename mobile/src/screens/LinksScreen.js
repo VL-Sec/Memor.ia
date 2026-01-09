@@ -349,7 +349,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
       <View style={styles.container}>
         <View style={styles.searchContainer}>
           <Ionicons name="search" size={20} color="#8E8E93" />
-          <TextInput style={styles.searchInput} placeholder={t.search} placeholderTextColor="#8E8E93" value={searchQuery} onChangeText={setSearchQuery} />
+          <TextInput style={styles.searchInput} placeholder={t.search} placeholderTextColor="#8E8E93" value={searchQuery} onChangeText={setSearchQuery} onBlur={() => setSearchQuery('')} />
         </View>
         
         <View style={styles.addContainer}>
