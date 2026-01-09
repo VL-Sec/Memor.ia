@@ -154,7 +154,7 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
           sound: true,
         },
         trigger: {
-          type: 'timeInterval',
+          type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
           seconds: seconds,
           repeats: false,
         },
