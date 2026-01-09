@@ -26,15 +26,14 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
   const [smartClipboardActive, setSmartClipboardActive] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
   
-  // Smart Clipboard refs - using refs to avoid stale closures
-  const lastClipboardContent = useRef('');
-  const savedClipboardContents = useRef(new Set()); // Track all saved contents by content
+  // Smart Clipboard refs - simplified, event-driven approach
+  const lastClipboardContent = useRef(''); // Only tracks LAST clipboard value to detect CHANGES
   const appState = useRef(AppState.currentState);
   const clipboardCheckInterval = useRef(null);
   const smartClipboardActiveRef = useRef(false);
   const foldersRef = useRef([]);
   const userIdRef = useRef(userId);
-  const isSavingRef = useRef(false); // Prevent concurrent saves
+  const isSavingRef = useRef(false);
   
   // Keep refs in sync with state
   useEffect(() => {
