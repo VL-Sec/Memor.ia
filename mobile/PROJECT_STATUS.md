@@ -289,29 +289,19 @@ eas build --platform ios --profile preview
 
 # 📝 NOTAS TÉCNICAS
 
-## Smart Clipboard (Captura Inteligente) - REFATORADO
-- Usa `useRef` para evitar stale closures:
-  - `lastClipboardContent` - último conteúdo verificado
-  - `savedClipboardContents` (Set) - todos os conteúdos já guardados
-  - `isSavingRef` - previne saves concorrentes
-  - `userIdRef` - userId actualizado
-- Verifica a cada **1.5 segundos** (era 1s - evita race conditions)
-- Ignora conteúdo que já estava no clipboard ao ativar
-- Timer de 2 minutos (120 segundos)
-- **Lógica de acumulação robusta:**
-  1. Guard clauses: verifica se está activo e não está a guardar
-  2. Valida conteúdo (não vazio, diferente do último, não no Set)
-  3. Actualiza `lastClipboardContent` ANTES de guardar
-  4. Adiciona ao Set ANTES de inserir no Supabase
-  5. Gera ID único + timestamp
-  6. Insere no Supabase com `.select()` para confirmar
-  7. Verifica duplicados no estado local antes de adicionar
-  8. Se falhar, remove do Set para retry
-  9. `isSavingRef = false` no finally
-- **Prevenção de duplicados:**
-  - `handleAddNote()` adiciona conteúdo ao Set
-  - `handleCopyNote()` adiciona conteúdo ao Set
-  - `fetchData()` adiciona todos os conteúdos existentes ao Set
+## Smart Clipboard (Captura Inteligente) - LÓGICA SIMPLIFICADA
+- **Abordagem:** Event-driven, NÃO content-driven
+- **Sem Set de deduplicação** - cada mudança no clipboard = nova entrada
+- Verifica a cada **1 segundo** se o valor do clipboard MUDOU
+- Se mudou → guarda como nova entrada (com ID e timestamp únicos)
+- Se não mudou → ignora (mesmo valor = nenhum novo evento de cópia)
+- **Limitação técnica:** Se o utilizador copiar o mesmo texto 2x seguidas, só a primeira é detetada (o clipboard do sistema não dispara eventos, só podemos ler o valor atual)
+- **Fluxo:**
+  1. Ativar → lê clipboard atual como `lastClipboardContent`
+  2. A cada 1s: lê clipboard
+  3. Se diferente de `lastClipboardContent` → nova entrada
+  4. Atualiza `lastClipboardContent`
+  5. Toast de confirmação
 
 ## Modais
 - Todos têm `TouchableWithoutFeedback` no overlay
