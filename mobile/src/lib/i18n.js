@@ -991,14 +991,24 @@ export const translations = {
     termsOfService: 'Nutzungsbedingungen',
     privacyPolicy: 'Datenschutzrichtlinie',
     
-    // Cloud Backup Card
-    cloudBackupTitle: 'Automatisches Backup',
-    cloudBackupSubtitle: 'Deine Daten sind geschützt',
-    cloudBackupDescription: 'Alle deine Links, Notizen und Einstellungen werden automatisch zwischen Geräten synchronisiert.',
-    cloudBackupIOS: 'iCloud',
-    cloudBackupAndroid: 'Google Backup',
-    cloudBackupEnabled: 'Aktiviert',
-    cloudBackupTip: 'Stelle sicher, dass Cloud-Backup in deinen Geräteeinstellungen aktiviert ist.',
+    // Cloud Backup - Simple
+    backup: 'Sicherung',
+    cloudBackupInfo: 'Speichert deine Daten automatisch in der Cloud',
+    cloudBackupActivated: 'Cloud-Backup aktiviert',
+    cloudBackupDeactivated: 'Cloud-Backup deaktiviert',
+    iCloudBackup: 'iCloud Backup',
+    googleBackup: 'Google Backup',
+    iCloudBackupConfirm: 'Akzeptierst du, dass deine Daten in iCloud gespeichert werden? Dies ermöglicht die Wiederherstellung deiner Daten bei Neuinstallation der App oder Gerätewechsel.',
+    googleBackupConfirm: 'Akzeptierst du, dass deine Daten in Google Backup gespeichert werden? Dies ermöglicht die Wiederherstellung deiner Daten bei Neuinstallation der App oder Gerätewechsel.',
+    iCloudBackupActive: 'Deine Daten werden in iCloud gespeichert',
+    googleBackupActive: 'Deine Daten werden in Google Backup gespeichert',
+    accept: 'Akzeptieren',
+    openBackupSettings: 'Backup aktivieren',
+    openICloudSettings: 'Um sicherzustellen, dass deine Daten gespeichert werden, aktiviere iCloud-Backup in den iPhone-Einstellungen.',
+    openGoogleSettings: 'Um sicherzustellen, dass deine Daten gespeichert werden, aktiviere Backup in den Android-Einstellungen.',
+    later: 'Später',
+    openSettings: 'Einstellungen öffnen',
+    general: 'Allgemein',
     
     // Notifications
     notifications: 'Benachrichtigungen',
