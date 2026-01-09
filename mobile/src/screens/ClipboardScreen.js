@@ -862,15 +862,15 @@ const styles = StyleSheet.create({
   folderChipTextActive: { color: '#FFFFFF' },
   addFolderChip: { backgroundColor: '#2C2C2E', width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#3A3A3C' },
   listContent: { padding: 16, paddingTop: 8, paddingBottom: 100 },
-  // Note card with separate touch zones
-  noteCard: { backgroundColor: '#1C1C1E', borderRadius: 16, marginBottom: 12, flexDirection: 'row', overflow: 'hidden' },
-  noteMainContent: { flex: 1, padding: 12 },
-  noteText: { color: '#FFFFFF', fontSize: 15, lineHeight: 22, marginBottom: 8 },
+  // Note card with separate touch zones - compact
+  noteCard: { backgroundColor: '#1C1C1E', borderRadius: 12, marginBottom: 8, flexDirection: 'row', overflow: 'hidden' },
+  noteMainContent: { flex: 1, padding: 10 },
+  noteText: { color: '#FFFFFF', fontSize: 14, lineHeight: 20 },
   noteMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' },
   dateText: { color: '#8E8E93', fontSize: 11 },
   // Actions column - separate touch zone
-  actionButtons: { justifyContent: 'center', alignItems: 'center', gap: 8, paddingHorizontal: 8, backgroundColor: '#1C1C1E', borderLeftWidth: 1, borderLeftColor: '#2C2C2E' },
-  actionBtn: { padding: 6 },
+  actionButtons: { justifyContent: 'center', alignItems: 'center', gap: 4, paddingHorizontal: 6, backgroundColor: '#1C1C1E', borderLeftWidth: 1, borderLeftColor: '#2C2C2E' },
+  actionBtn: { padding: 4 },
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
   emptyText: { color: '#8E8E93', fontSize: 16, marginTop: 16 },
   // Modal styles
