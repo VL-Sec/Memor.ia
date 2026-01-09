@@ -113,11 +113,14 @@ Ficheiro: `/app/mobile/src/lib/i18n.js`
 
 ### Supabase (Cloud)
 - `links` - Links E itens de Clipboard (campo `contentType`)
+  - **IMPORTANTE:** Campo `reminderAt` (string ISO date) para lembretes
+  - NÃO usar campo `reminder` (objeto) - não existe na tabela
 - `folders` - Pastas
 
 ### AsyncStorage (Local)
 - `@memoria_user_id` - ID único do dispositivo
 - `memoria-notes-{userId}` - Notas do utilizador
+- `memoria-link-notifications` - IDs de notificações de links (JSON)
 - `memoria-weekly-summary` - Config do resumo semanal
 - `memoria-cloud-backup-enabled` - Preferência de backup
 - `memoria-premium` - Status premium
