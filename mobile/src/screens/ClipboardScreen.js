@@ -515,6 +515,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
   };
 
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <CustomHeader 
         title={t.tabClipboard || 'Área de Transferência'} 
