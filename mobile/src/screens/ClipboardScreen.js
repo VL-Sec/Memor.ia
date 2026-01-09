@@ -447,7 +447,6 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
   });
 
   const renderNoteItem = ({ item }) => {
-    const folder = folders.find(f => f.id === item.folderId);
     return (
       <View style={styles.noteCard}>
         {/* Main content area - opens edit modal */}
@@ -458,11 +457,6 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
         >
           <Text style={styles.noteText} numberOfLines={3}>{item.content || ''}</Text>
           <View style={styles.noteMeta}>
-            <View style={styles.folderBadge}>
-              <Text style={styles.folderBadgeText}>
-                {folder?.isDefault ? t.generalFolder : folder?.name || t.generalFolder}
-              </Text>
-            </View>
             <Text style={styles.dateText}>{formatDateLocale(item.createdAt)}</Text>
           </View>
         </TouchableOpacity>
