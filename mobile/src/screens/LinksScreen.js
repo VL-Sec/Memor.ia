@@ -382,19 +382,16 @@ export default function LinksScreen({ language, userId, refreshKey }) {
               <Text style={styles.linkTitle} numberOfLines={2}>{item.title || item.url || ''}</Text>
             </View>
             <Text style={styles.linkUrl} numberOfLines={1}>{item.url || ''}</Text>
-            <View style={styles.linkMeta}>
-              <View style={styles.folderBadge}>
-                <Text style={styles.folderBadgeText}>{folder?.isDefault ? t.generalFolder : folder?.name || t.generalFolder}</Text>
-              </View>
-              {hasReminder && !isReminderPast && (
+            {hasReminder && !isReminderPast && (
+              <View style={styles.linkMeta}>
                 <View style={styles.reminderBadge}>
                   <Ionicons name="notifications" size={12} color="#34C759" />
                   <Text style={styles.reminderBadgeText}>
                     {formatDateLocale(item.reminder.date)}
                   </Text>
                 </View>
-              )}
-            </View>
+              </View>
+            )}
           </View>
         </TouchableOpacity>
         
