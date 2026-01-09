@@ -42,6 +42,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
   const [showFolderModal, setShowFolderModal] = useState(false);
   const [editingFolder, setEditingFolder] = useState(null);
   const [folderName, setFolderName] = useState('');
+  const [creatingFolderFromPicker, setCreatingFolderFromPicker] = useState(false);
 
   const t = translations[language] || translations.en;
 
