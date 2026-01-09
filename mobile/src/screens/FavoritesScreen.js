@@ -263,6 +263,7 @@ export default function FavoritesScreen({ language, userId, refreshKey }) {
         )}
       </View>
     </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 }
 
