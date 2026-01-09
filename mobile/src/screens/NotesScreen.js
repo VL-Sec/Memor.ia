@@ -554,32 +554,36 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
       {/* Date Picker */}
       {showDatePicker && (
         Platform.OS === 'ios' ? (
-          <Modal visible={showDatePicker} animationType="slide" transparent={true}>
-            <View style={styles.pickerModalOverlay}>
-              <View style={styles.pickerModalContent}>
-                <View style={styles.pickerModalHeader}>
-                  <Text style={styles.pickerModalTitle}>{t.reminderDate || 'Data'}</Text>
-                  <TouchableOpacity onPress={() => setShowDatePicker(false)}>
-                    <Text style={styles.pickerDoneText}>{t.done || 'Concluído'}</Text>
-                  </TouchableOpacity>
-                </View>
-                <DateTimePicker
-                  value={reminderDate}
-                  mode="date"
-                  display="spinner"
-                  onChange={(event, selectedDate) => {
-                    if (selectedDate) {
-                      const newDate = new Date(reminderDate);
-                      newDate.setFullYear(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
-                      setReminderDate(newDate);
-                    }
-                  }}
-                  minimumDate={new Date()}
-                  textColor="#FFFFFF"
-                  themeVariant="dark"
-                />
+          <Modal visible={showDatePicker} animationType="slide" transparent={true} onRequestClose={() => setShowDatePicker(false)}>
+            <TouchableWithoutFeedback onPress={() => setShowDatePicker(false)}>
+              <View style={styles.pickerModalOverlay}>
+                <TouchableWithoutFeedback onPress={() => {}}>
+                  <View style={styles.pickerModalContent}>
+                    <View style={styles.pickerModalHeader}>
+                      <Text style={styles.pickerModalTitle}>{t.reminderDate || 'Data'}</Text>
+                      <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                        <Text style={styles.pickerDoneText}>{t.done || 'Concluído'}</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <DateTimePicker
+                      value={reminderDate}
+                      mode="date"
+                      display="spinner"
+                      onChange={(event, selectedDate) => {
+                        if (selectedDate) {
+                          const newDate = new Date(reminderDate);
+                          newDate.setFullYear(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+                          setReminderDate(newDate);
+                        }
+                      }}
+                      minimumDate={new Date()}
+                      textColor="#FFFFFF"
+                      themeVariant="dark"
+                    />
+                  </View>
+                </TouchableWithoutFeedback>
               </View>
-            </View>
+            </TouchableWithoutFeedback>
           </Modal>
         ) : (
           <DateTimePicker
