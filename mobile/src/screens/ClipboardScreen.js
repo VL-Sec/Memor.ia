@@ -468,16 +468,11 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
 
   const activateSmartClipboard = async () => {
     try {
+      // Read current clipboard content to avoid saving it immediately
       const currentContent = await Clipboard.getStringAsync();
-      lastClipboardContent.current = currentContent || '';
-      // Initialize saved contents with current clipboard (don't save what's already there)
-      savedClipboardContents.current = new Set();
-      if (currentContent?.trim()) {
-        savedClipboardContents.current.add(currentContent.trim());
-      }
+      lastClipboardContent.current = currentContent?.trim() || '';
     } catch (e) {
       lastClipboardContent.current = '';
-      savedClipboardContents.current = new Set();
     }
     
     setSmartClipboardActive(true);
@@ -495,7 +490,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
     stopClipboardMonitoring();
     Toast.show({ 
       type: 'info', 
-      text1: t.smartClipboardDeactivated || 'Área Inteligente Desativada'
+      text1: t.smartClipboardDeactivated || 'Captura Inteligente Desativada'
     });
   };
 
