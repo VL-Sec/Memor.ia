@@ -276,9 +276,9 @@ export default function LinksScreen({ language, userId, refreshKey }) {
       }
       
       if (isAddingNew) {
-        // Creating new link
-        if (!editUrl.trim()) {
-          Toast.show({ type: 'error', text1: t.urlRequired || 'URL é obrigatório' });
+        // Creating new link - allow with just title OR url
+        if (!editUrl.trim() && !editTitle.trim()) {
+          Toast.show({ type: 'error', text1: t.titleOrUrlRequired || 'Título ou URL é obrigatório' });
           return;
         }
         
@@ -286,8 +286,8 @@ export default function LinksScreen({ language, userId, refreshKey }) {
         const newLink = { 
           id: linkId, 
           userId: userId, 
-          url: editUrl, 
-          title: editTitle || editUrl, 
+          url: editUrl || '', 
+          title: editTitle || editUrl || 'Sem título', 
           contentType: 'link', 
           tags: [], 
           isFavorite: false, 
