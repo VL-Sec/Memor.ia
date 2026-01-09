@@ -144,7 +144,6 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
   // This prevents infinite duplication while still capturing all unique copies
   const captureClipboardEntry = async () => {
     if (!smartClipboardActiveRef.current) return;
-    if (isSavingRef.current) return;
     
     try {
       const value = await Clipboard.getStringAsync();
