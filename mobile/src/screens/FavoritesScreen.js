@@ -218,11 +218,12 @@ export default function FavoritesScreen({ language, userId, refreshKey }) {
             horizontal 
             showsHorizontalScrollIndicator={false} 
             contentContainerStyle={styles.filterContainer}
+            keyboardShouldPersistTaps="handled"
           >
-            <FilterChip value="all" label={t.all || 'Todos'} />
-            <FilterChip value="links" label="Links" />
-            <FilterChip value="notes" label={t.tabNotes || 'Notas'} />
-            <FilterChip value="clipboard" label="Clipboard" />
+            <FilterChip value="all" currentFilter={filter} label={t.all || 'Todos'} onPress={setFilter} />
+            <FilterChip value="links" currentFilter={filter} label="Links" onPress={setFilter} />
+            <FilterChip value="notes" currentFilter={filter} label={t.tabNotes || 'Notas'} onPress={setFilter} />
+            <FilterChip value="clipboard" currentFilter={filter} label="Clipboard" onPress={setFilter} />
           </ScrollView>
         </View>
 
