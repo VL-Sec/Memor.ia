@@ -6,10 +6,50 @@ import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import * as Clipboard from 'expo-clipboard';
 import * as Notifications from 'expo-notifications';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { supabase, generateId } from '../lib/supabase';
 import { translations } from '../lib/i18n';
 import CustomHeader from '../components/CustomHeader';
+
+// Key for storing notification IDs locally
+const NOTIFICATION_IDS_KEY = 'memoria-link-notifications';
+
+// Helper to save notification ID locally
+const saveNotificationId = async (linkId, notificationId) => {
+  try {
+    const stored = await AsyncStorage.getItem(NOTIFICATION_IDS_KEY);
+    const ids = stored ? JSON.parse(stored) : {};
+    ids[linkId] = notificationId;
+    await AsyncStorage.setItem(NOTIFICATION_IDS_KEY, JSON.stringify(ids));
+  } catch (e) {
+    console.error('Error saving notification ID:', e);
+  }
+};
+
+// Helper to get notification ID
+const getNotificationId = async (linkId) => {
+  try {
+    const stored = await AsyncStorage.getItem(NOTIFICATION_IDS_KEY);
+    const ids = stored ? JSON.parse(stored) : {};
+    return ids[linkId] || null;
+  } catch (e) {
+    console.error('Error getting notification ID:', e);
+    return null;
+  }
+};
+
+// Helper to remove notification ID
+const removeNotificationId = async (linkId) => {
+  try {
+    const stored = await AsyncStorage.getItem(NOTIFICATION_IDS_KEY);
+    const ids = stored ? JSON.parse(stored) : {};
+    delete ids[linkId];
+    await AsyncStorage.setItem(NOTIFICATION_IDS_KEY, JSON.stringify(ids));
+  } catch (e) {
+    console.error('Error removing notification ID:', e);
+  }
+};
 
 // Dismiss keyboard when tapping outside
 const DismissKeyboard = ({ children }) => (
@@ -17,6 +57,7 @@ const DismissKeyboard = ({ children }) => (
     {children}
   </TouchableWithoutFeedback>
 );
+
 
 // Helper function to format date according to user's system locale (with year)
 const formatDateLocale = (dateStr) => {
