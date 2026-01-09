@@ -451,6 +451,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
   };
 
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <CustomHeader title="Memor.ia" />
       <View style={styles.container}>
@@ -468,7 +469,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
 
         <View style={styles.folderSection}>
           <Text style={styles.folderSectionTitle}>{t.folders || 'Pastas'}</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.folderList} contentContainerStyle={styles.folderListContent}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.folderList} contentContainerStyle={styles.folderListContent} keyboardShouldPersistTaps="handled">
             <TouchableOpacity style={[styles.folderChip, selectedFolder === 'all' && styles.folderChipActive]} onPress={() => setSelectedFolder('all')}>
               <Text style={[styles.folderChipText, selectedFolder === 'all' && styles.folderChipTextActive]}>{t.allLinks || 'Todos'}</Text>
             </TouchableOpacity>
