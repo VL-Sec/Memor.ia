@@ -240,7 +240,7 @@ function AppContent({ language, setLanguage, premiumStatus, setPremiumStatus, re
           )}
         </Stack.Screen>
       </Stack.Navigator>
-      <Toast config={toastConfig} visibilityTime={3000} autoHide={true} />
+      <Toast config={toastConfig} visibilityTime={1500} autoHide={true} />
     </NavigationContainer>
   );
 }
