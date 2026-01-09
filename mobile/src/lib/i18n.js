@@ -794,14 +794,24 @@ export const translations = {
     termsOfService: 'Conditions d\'Utilisation',
     privacyPolicy: 'Politique de Confidentialité',
     
-    // Cloud Backup Card
-    cloudBackupTitle: 'Sauvegarde Automatique',
-    cloudBackupSubtitle: 'Vos données sont protégées',
-    cloudBackupDescription: 'Tous vos liens, notes et réglages sont synchronisés automatiquement entre vos appareils.',
-    cloudBackupIOS: 'iCloud',
-    cloudBackupAndroid: 'Google Backup',
-    cloudBackupEnabled: 'Activé',
-    cloudBackupTip: 'Assurez-vous que la sauvegarde cloud est activée dans les réglages de votre appareil.',
+    // Cloud Backup - Simple
+    backup: 'Sauvegarde',
+    cloudBackupInfo: 'Sauvegarde automatique de vos données dans le cloud',
+    cloudBackupActivated: 'Sauvegarde cloud activée',
+    cloudBackupDeactivated: 'Sauvegarde cloud désactivée',
+    iCloudBackup: 'Sauvegarde iCloud',
+    googleBackup: 'Sauvegarde Google',
+    iCloudBackupConfirm: 'Acceptez-vous que vos données soient sauvegardées sur iCloud ? Cela permet de restaurer vos données lors de la réinstallation de l\'app ou du changement d\'appareil.',
+    googleBackupConfirm: 'Acceptez-vous que vos données soient sauvegardées sur Google Backup ? Cela permet de restaurer vos données lors de la réinstallation de l\'app ou du changement d\'appareil.',
+    iCloudBackupActive: 'Vos données sont sauvegardées sur iCloud',
+    googleBackupActive: 'Vos données sont sauvegardées sur Google Backup',
+    accept: 'Accepter',
+    openBackupSettings: 'Activer la Sauvegarde',
+    openICloudSettings: 'Pour garantir la sauvegarde de vos données, activez la sauvegarde iCloud dans les Réglages de l\'iPhone.',
+    openGoogleSettings: 'Pour garantir la sauvegarde de vos données, activez la sauvegarde dans les Paramètres Android.',
+    later: 'Plus tard',
+    openSettings: 'Ouvrir les Réglages',
+    general: 'Général',
     
     // Notifications
     notifications: 'Notifications',
