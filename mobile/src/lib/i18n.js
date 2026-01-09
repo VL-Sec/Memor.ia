@@ -287,6 +287,7 @@ export const translations = {
     selectFolder: 'Escolher pasta',
     manageFolders: 'Gerir Pastas',
     folderCreated: 'Pasta criada',
+    folderCreatedAndSelected: 'Pasta criada e selecionada',
     deleteFolder: 'Eliminar pasta',
     deleteFolderConfirm: 'Tens a certeza? Os itens serão movidos para a pasta Geral.',
     cannotDeleteDefault: 'Não podes eliminar a pasta padrão',
