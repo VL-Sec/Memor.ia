@@ -382,7 +382,6 @@ export const translations = {
     termsOfService: 'Termos de Serviço',
     privacyPolicy: 'Política de Privacidade',
     
-    // Cloud Backup Card
     // Cloud Backup - Simple
     backup: 'Cópia de Segurança',
     cloudBackupInfo: 'Guarda automaticamente os teus dados na cloud',
@@ -395,6 +394,11 @@ export const translations = {
     iCloudBackupActive: 'Os teus dados estão a ser guardados no iCloud',
     googleBackupActive: 'Os teus dados estão a ser guardados no Google Backup',
     accept: 'Aceitar',
+    openBackupSettings: 'Ativar Backup',
+    openICloudSettings: 'Para garantir que os teus dados são guardados, ativa o backup do iCloud nas Definições do iPhone.',
+    openGoogleSettings: 'Para garantir que os teus dados são guardados, ativa o backup nas Definições do Android.',
+    later: 'Mais tarde',
+    openSettings: 'Abrir Definições',
     general: 'Geral',
     
     // Notifications
