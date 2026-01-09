@@ -5,17 +5,12 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as FileSystem from 'expo-file-system';
-import * as Sharing from 'expo-sharing';
-import * as DocumentPicker from 'expo-document-picker';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { translations, languages, setLanguage as saveLanguage } from '../lib/i18n';
 import { activatePremium, getPremiumStatus } from '../lib/premium';
-import { supabase } from '../lib/supabase';
 
-const API_URL = 'https://memofix.preview.emergentagent.com';
 const TERMS_URL = 'https://memofix.preview.emergentagent.com/terms';
 const PRIVACY_URL = 'https://memofix.preview.emergentagent.com/privacy';
 
