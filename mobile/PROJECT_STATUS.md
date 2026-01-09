@@ -327,6 +327,12 @@ eas build --platform ios --profile preview
 5. ✅ **REMOVIDO resumo semanal** - causava problemas
 6. ✅ Teclado desaparece ao tocar fora em LinksScreen
 7. ✅ Toast notifications mais rápidas (1.5s em vez de 3s)
+8. ✅ **Search bar limpa automaticamente ao perder foco** (todas as telas)
+9. ✅ **Smart Clipboard corrigido** - agora ACUMULA entradas em vez de sobrescrever
+   - Cada cópia cria entrada independente
+   - ID único + timestamp para cada entrada
+   - Set previne duplicados por conteúdo
+   - Estado local verifica duplicados antes de adicionar
 
 ---
 
