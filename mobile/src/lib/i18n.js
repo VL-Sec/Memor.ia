@@ -896,6 +896,7 @@ export const translations = {
     selectFolder: 'Ordner wählen',
     manageFolders: 'Ordner verwalten',
     folderCreated: 'Ordner erstellt',
+    folderCreatedAndSelected: 'Ordner erstellt und ausgewählt',
     deleteFolder: 'Ordner löschen',
     deleteFolderConfirm: 'Bist du sicher? Elemente werden in den Ordner Allgemein verschoben.',
     cannotDeleteDefault: 'Standardordner kann nicht gelöscht werden',
