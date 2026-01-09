@@ -209,7 +209,8 @@ export default function FavoritesScreen({ language, userId, refreshKey }) {
             placeholder={t.search} 
             placeholderTextColor="#8E8E93" 
             value={searchQuery} 
-            onChangeText={setSearchQuery} 
+            onChangeText={setSearchQuery}
+            onBlur={() => setSearchQuery('')}
           />
         </View>
 
