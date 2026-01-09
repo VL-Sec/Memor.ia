@@ -281,9 +281,10 @@ export default function LinksScreen({ language, userId, refreshKey }) {
   };
 
   // Folder management functions
-  const openFolderModal = (folder = null) => {
+  const openFolderModal = (folder = null, fromPicker = false) => {
     setEditingFolder(folder);
     setFolderName(folder ? folder.name : '');
+    setCreatingFolderFromPicker(fromPicker);
     setShowFolderModal(true);
   };
 
@@ -291,6 +292,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
     setShowFolderModal(false);
     setEditingFolder(null);
     setFolderName('');
+    setCreatingFolderFromPicker(false);
   };
 
   const handleSaveFolder = async () => {
@@ -316,7 +318,14 @@ export default function LinksScreen({ language, userId, refreshKey }) {
         const { error } = await supabase.from('folders').insert([newFolder]);
         if (error) throw error;
         setFolders([...folders, newFolder]);
-        Toast.show({ type: 'success', text1: t.folderCreated || 'Pasta criada' });
+        
+        // Se estamos a criar pasta a partir do picker, seleciona automaticamente
+        if (creatingFolderFromPicker) {
+          setEditFolderId(newFolder.id);
+          Toast.show({ type: 'success', text1: t.folderCreatedAndSelected || 'Pasta criada e selecionada' });
+        } else {
+          Toast.show({ type: 'success', text1: t.folderCreated || 'Pasta criada' });
+        }
       }
       closeFolderModal();
     } catch (error) {
