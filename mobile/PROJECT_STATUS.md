@@ -326,12 +326,7 @@ eas build --platform ios --profile preview
 6. ✅ Teclado desaparece ao tocar fora em LinksScreen
 7. ✅ Toast notifications mais rápidas (1.5s em vez de 3s)
 8. ✅ **Search bar limpa automaticamente ao perder foco** (todas as telas)
-9. ✅ **Smart Clipboard ANTI-SPAM FINAL:**
-   - `lastCapturedValueRef` rastreia último valor capturado
-   - Só cria entrada quando valor MUDA
-   - Previne duplicação infinita
-   - Reset `lastCapturedValueRef = null` ao ATIVAR e DESATIVAR
-   - Lock `isSavingRef` apenas em `saveClipboardEntry()` (não perde cópias rápidas)
+9. ❌ **REMOVIDO Smart Clipboard** - limitação técnica JS (sem eventos de cópia)
 10. ✅ **Favoritos:** Datas só aparecem para Notas (Links e Clipboard sem data)
 
 ---
