@@ -121,7 +121,9 @@ export default function LinksScreen({ language, userId, refreshKey }) {
       await supabase.from('links').update({ isFavorite: newValue }).eq('id', item.id);
       setLinks(links.map(l => l.id === item.id ? { ...l, isFavorite: newValue } : l));
       Toast.show({ type: 'success', text1: newValue ? (t.addedToFavorites || 'Adicionado aos favoritos') : (t.removedFromFavorites || 'Removido dos favoritos') });
-    } catch (error) {}
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+    }
   };
 
   const openEditModal = (item, e) => {
