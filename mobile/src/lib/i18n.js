@@ -539,7 +539,7 @@ export const translations = {
     start: 'Iniciar',
     stop: 'Detener',
     autoSaved: 'Guardado automáticamente',
-    smartClipboardDeactivated: 'Portapapeles inteligente desactivado',
+    smartClipboardDeactivated: 'Captura inteligente desactivada',
     deleteFolderConfirmSimple: '¿Estás seguro de que quieres eliminar esta carpeta?',
     
     // Links
@@ -553,11 +553,11 @@ export const translations = {
     clipboardPlaceholder: 'Pega tu texto aquí...',
     noClipboardItems: 'Todavía no hay nada aquí',
     chars: 'caracteres',
-    smartClipboard: 'Portapapeles Inteligente',
-    smartClipboardInfo: 'Guarda automáticamente todo lo que copies mientras esté activo.',
-    smartClipboardActivated: 'Portapapeles inteligente activado',
-    activate: 'Iniciar',
-    deactivate: 'Detener',
+    smartClipboard: 'Captura Inteligente',
+    smartClipboardInfo: 'Guarda automáticamente todo lo que copies durante 2 minutos.',
+    smartClipboardActivated: 'Captura inteligente activada',
+    activate: 'Activar',
+    deactivate: 'Desactivar',
     timeRemaining: 'restante',
     
     // Links
