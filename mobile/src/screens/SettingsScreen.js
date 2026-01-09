@@ -76,8 +76,7 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
   const [summaryDay, setSummaryDay] = useState(0);
   const [summaryHour, setSummaryHour] = useState(19);
   const [summaryMinute, setSummaryMinute] = useState(0);
-  const [isExporting, setIsExporting] = useState(false);
-  const [isImporting, setIsImporting] = useState(false);
+  const [cloudBackupEnabled, setCloudBackupEnabled] = useState(false);
   
   // Dynamic storage key based on userId
   const getNotesStorageKey = () => `memoria-notes-${userId || 'default'}`;
