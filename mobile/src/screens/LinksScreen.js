@@ -776,9 +776,9 @@ export default function LinksScreen({ language, userId, refreshKey }) {
       </Modal>
 
       <Modal visible={showFolderModal} animationType="slide" transparent={true} onRequestClose={closeFolderModal}>
-        <TouchableWithoutFeedback onPress={closeFolderModal}>
+        <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); closeFolderModal(); }}>
           <View style={styles.folderModalOverlay}>
-            <TouchableWithoutFeedback onPress={() => {}}>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
               <View style={styles.folderModalContent}>
                 <View style={styles.folderModalHeader}>
                   <Text style={styles.folderModalTitle}>
