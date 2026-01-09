@@ -284,6 +284,7 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
             placeholderTextColor="#8E8E93"
             value={searchQuery}
             onChangeText={setSearchQuery}
+            onBlur={() => setSearchQuery('')}
           />
         </View>
 
