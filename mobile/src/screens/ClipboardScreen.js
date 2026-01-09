@@ -468,9 +468,13 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
   };
 
   const deactivateSmartClipboard = () => {
+    // RESET DO ESTADO ENTRE SESSÕES
+    lastCapturedValueRef.current = null;
+    
     setSmartClipboardActive(false);
     setTimeLeft(0);
     stopClipboardMonitoring();
+    
     Toast.show({ 
       type: 'info', 
       text1: t.smartClipboardDeactivated || 'Captura Inteligente Desativada'
