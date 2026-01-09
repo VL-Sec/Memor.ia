@@ -589,9 +589,9 @@ export default function LinksScreen({ language, userId, refreshKey }) {
       )}
       
       <Modal visible={showEditModal} animationType="slide" transparent={true} onRequestClose={closeEditModal}>
-        <TouchableWithoutFeedback onPress={closeEditModal}>
+        <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); closeEditModal(); }}>
           <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback onPress={() => {}}>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
               <View style={styles.modalContent}>
                 <View style={styles.modalHeader}>
                   <Text style={styles.modalTitle}>{isAddingNew ? (t.addLink || 'Adicionar Link') : t.editItem}</Text>
