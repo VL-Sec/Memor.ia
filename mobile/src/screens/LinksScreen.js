@@ -107,7 +107,9 @@ export default function LinksScreen({ language, userId, refreshKey }) {
           await supabase.from('links').delete().eq('id', id);
           setLinks(links.filter(l => l.id !== id));
           Toast.show({ type: 'success', text1: t.deleted });
-        } catch (error) {}
+        } catch (error) {
+          console.error('Error deleting link:', error);
+        }
       }},
     ]);
   };
