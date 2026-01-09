@@ -63,7 +63,6 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
   const getNotesStorageKey = () => `memoria-notes-${userId || 'default'}`;
 
   const t = translations[language] || translations.en;
-  const backupInfo = getBackupInfo();
 
   useEffect(() => {
     const loadSettings = async () => {
