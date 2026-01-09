@@ -336,15 +336,11 @@ eas build --platform ios --profile preview
 6. ✅ Teclado desaparece ao tocar fora em LinksScreen
 7. ✅ Toast notifications mais rápidas (1.5s em vez de 3s)
 8. ✅ **Search bar limpa automaticamente ao perder foco** (todas as telas)
-9. ✅ **Smart Clipboard COMPLETAMENTE REFATORADO:**
-   - Intervalo aumentado para 1.5s (evita race conditions)
-   - `isSavingRef` previne saves concorrentes
-   - `userIdRef` mantém userId actualizado
-   - Guard clauses múltiplas para validação
-   - `fetchData()` carrega conteúdos existentes no Set
-   - `handleAddNote()` e `handleCopyNote()` adicionam ao Set
-   - Verificação de duplicados por conteúdo E por ID
-   - Logs detalhados com prefixo `[Smart Clipboard]`
+9. ✅ **Smart Clipboard SIMPLIFICADO - Event-driven:**
+   - REMOVIDO Set de deduplicação
+   - Cada MUDANÇA no clipboard = nova entrada
+   - Sem bloqueio por conteúdo repetido
+   - ID único + timestamp para cada entrada
 
 ---
 
