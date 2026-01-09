@@ -290,16 +290,17 @@ eas build --platform ios --profile preview
 # 📝 NOTAS TÉCNICAS
 
 ## Smart Clipboard (Captura Inteligente) - EVENT-BASED
-- **Abordagem:** Cada leitura = nova entrada (sem comparação de valores)
+- **Abordagem:** Cada leitura = potencial nova entrada
 - **Intervalo:** 3 segundos
-- **Sem deduplicação:** Conteúdo igual NÃO bloqueia captura
+- **Debounce:** Mínimo 2 segundos entre capturas (baseado em tempo, NÃO em conteúdo)
+- **Sem captura imediata:** Ao ativar, NÃO captura o clipboard atual
 - **Fluxo:**
-  1. Ativar → captura imediatamente o clipboard atual
-  2. A cada 3s: lê clipboard → se tiver conteúdo → nova entrada
-  3. AppState: quando app volta ao foreground → captura
+  1. Ativar → NÃO captura imediatamente (evita capturar conteúdo antigo)
+  2. A cada 3s: lê clipboard → se tiver conteúdo E passou 2s desde última captura → nova entrada
+  3. AppState: quando app volta ao foreground → captura (respeitando debounce)
   4. Cada entrada: ID único + timestamp
-- **Limitação técnica:** React Native não tem eventos de cópia (`onCopy`), apenas leitura do valor atual
-- **Trade-off:** Pode criar entradas duplicadas se o utilizador não copiar nada novo durante 3s
+- **Limitação técnica:** React Native não tem eventos de cópia (`onCopy`)
+- **Trade-off controlado:** Debounce de 2s reduz spam sem bloquear por conteúdo
 
 ## Modais
 - Todos têm `TouchableWithoutFeedback` no overlay
