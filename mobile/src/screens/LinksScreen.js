@@ -716,6 +716,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
       </Modal>
       </View>
     </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 }
 
