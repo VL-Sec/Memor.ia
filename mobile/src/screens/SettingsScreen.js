@@ -87,6 +87,7 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
   useEffect(() => {
     const loadSettings = async () => {
       try {
+        // Load weekly summary settings
         const data = await AsyncStorage.getItem('memoria-weekly-summary');
         if (data) {
           const settings = JSON.parse(data);
@@ -95,12 +96,49 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
           setSummaryHour(settings.hour || 19);
           setSummaryMinute(settings.minute || 0);
         }
+        
+        // Load cloud backup preference
+        const backupEnabled = await AsyncStorage.getItem('memoria-cloud-backup-enabled');
+        if (backupEnabled !== null) {
+          setCloudBackupEnabled(backupEnabled === 'true');
+        }
       } catch (e) {
         console.error('Error loading settings:', e);
       }
     };
     loadSettings();
   }, []);
+
+  // Handle cloud backup toggle with confirmation
+  const handleCloudBackupToggle = async (value) => {
+    if (value) {
+      // Show confirmation alert
+      Alert.alert(
+        Platform.OS === 'ios' ? (t.iCloudBackup || 'iCloud Backup') : (t.googleBackup || 'Google Backup'),
+        Platform.OS === 'ios' 
+          ? (t.iCloudBackupConfirm || 'Aceitas que os teus dados sejam guardados no iCloud? Isto permite restaurar os dados ao reinstalar a app ou trocar de dispositivo.')
+          : (t.googleBackupConfirm || 'Aceitas que os teus dados sejam guardados no Google Backup? Isto permite restaurar os dados ao reinstalar a app ou trocar de dispositivo.'),
+        [
+          {
+            text: t.cancel || 'Cancelar',
+            style: 'cancel',
+          },
+          {
+            text: t.accept || 'Aceitar',
+            onPress: async () => {
+              setCloudBackupEnabled(true);
+              await AsyncStorage.setItem('memoria-cloud-backup-enabled', 'true');
+              Toast.show({ type: 'success', text1: t.cloudBackupActivated || 'Backup cloud ativado' });
+            },
+          },
+        ]
+      );
+    } else {
+      setCloudBackupEnabled(false);
+      await AsyncStorage.setItem('memoria-cloud-backup-enabled', 'false');
+      Toast.show({ type: 'info', text1: t.cloudBackupDeactivated || 'Backup cloud desativado' });
+    }
+  };
 
   const handleLanguageChange = async (langCode) => { 
     setLanguage(langCode); 
