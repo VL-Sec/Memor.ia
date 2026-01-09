@@ -253,7 +253,7 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
       Toast.show({ type: 'info', text1: t.exportingBackup || 'A exportar backup...' });
       
       // Collect all local data from AsyncStorage
-      const localNotes = await AsyncStorage.getItem(LOCAL_NOTES_KEY);
+      const localNotes = await AsyncStorage.getItem(getNotesStorageKey());
       const settings = await AsyncStorage.getItem('memoria-weekly-summary');
       const premiumData = await AsyncStorage.getItem('memoria-premium');
       const languageData = await AsyncStorage.getItem('memoria-language');
