@@ -390,24 +390,18 @@ export const translations = {
     privacyPolicy: 'Política de Privacidade',
     
     // Cloud Backup Card
-    cloudBackupTitle: 'Cópia de Segurança Automática',
-    cloudBackupSubtitle: 'Os teus dados estão protegidos',
-    cloudBackupDescription: 'Todos os teus links, notas e definições são sincronizados automaticamente entre dispositivos.',
-    cloudBackupIOS: 'iCloud',
-    cloudBackupAndroid: 'Google Backup',
-    cloudBackupEnabled: 'Ativado',
-    cloudBackupTip: 'Certifica-te de que a cópia de segurança está ativada nas definições do dispositivo.',
-    
-    // Platform-specific backup
+    // Cloud Backup - Simple
+    backup: 'Cópia de Segurança',
+    cloudBackupInfo: 'Guarda automaticamente os teus dados na cloud',
+    cloudBackupActivated: 'Backup cloud ativado',
+    cloudBackupDeactivated: 'Backup cloud desativado',
     iCloudBackup: 'Backup iCloud',
     googleBackup: 'Backup Google',
-    systemBackupSubtitle: 'Backup automático do sistema',
-    iCloudBackupDescription: 'Os dados da app são automaticamente incluídos no backup do iCloud. Ao reinstalar a app ou trocar de iPhone, os teus dados serão restaurados.',
-    googleBackupDescription: 'Os dados da app são automaticamente incluídos no backup do Google. Ao reinstalar a app ou trocar de telemóvel, os teus dados serão restaurados.',
-    iCloudBackupTip: 'Certifica-te de que o backup do iCloud está ativado em Definições > [O Teu Nome] > iCloud > Backup',
-    googleBackupTip: 'Certifica-te de que o backup está ativado em Definições > Google > Backup',
-    openSettings: 'Abrir Definições',
-    manualBackup: 'Backup Manual',
+    iCloudBackupConfirm: 'Aceitas que os teus dados sejam guardados no iCloud? Isto permite restaurar os dados ao reinstalar a app ou trocar de dispositivo.',
+    googleBackupConfirm: 'Aceitas que os teus dados sejam guardados no Google Backup? Isto permite restaurar os dados ao reinstalar a app ou trocar de dispositivo.',
+    iCloudBackupActive: 'Os teus dados estão a ser guardados no iCloud',
+    googleBackupActive: 'Os teus dados estão a ser guardados no Google Backup',
+    accept: 'Aceitar',
     general: 'Geral',
     
     // Notifications
