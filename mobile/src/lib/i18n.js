@@ -73,11 +73,11 @@ export const translations = {
     clipboardPlaceholder: 'Paste your text here...',
     noClipboardItems: 'Nothing here yet',
     chars: 'characters',
-    smartClipboard: 'Smart Clipboard',
-    smartClipboardInfo: 'Automatically saves everything you copy while active.',
-    smartClipboardActivated: 'Smart Clipboard is now active',
-    activate: 'Start',
-    deactivate: 'Stop',
+    smartClipboard: 'Smart Capture',
+    smartClipboardInfo: 'Automatically saves everything you copy for 2 minutes.',
+    smartClipboardActivated: 'Smart Capture is now active',
+    activate: 'Activate',
+    deactivate: 'Deactivate',
     timeRemaining: 'left',
     
     // Links
