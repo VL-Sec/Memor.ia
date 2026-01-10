@@ -210,12 +210,31 @@ export default function AdminDashboard() {
   // Save note
   const handleSaveNote = async (codeId) => {
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        toast({
+          title: 'Erro',
+          description: 'Sessão expirada. Faça login novamente.',
+          variant: 'destructive'
+        })
+        router.push('/admin')
+        return
+      }
+
       const { error } = await supabase
         .from('activation_codes')
         .update({ notes: editNote })
         .eq('id', codeId)
 
-      if (error) throw error
+      if (error) {
+        console.error('Save note error details:', error)
+        throw error
+      }
+
+      // Update local state immediately
+      setCodes(prevCodes => prevCodes.map(c => 
+        c.id === codeId ? { ...c, notes: editNote } : c
+      ))
 
       toast({
         title: 'Sucesso',
@@ -224,12 +243,11 @@ export default function AdminDashboard() {
       
       setEditingCodeId(null)
       setEditNote('')
-      fetchData()
     } catch (error) {
       console.error('Error saving note:', error)
       toast({
         title: 'Erro',
-        description: 'Falha ao guardar nota',
+        description: error.message || 'Falha ao guardar nota',
         variant: 'destructive'
       })
     }
