@@ -318,20 +318,23 @@ eas build --platform ios --profile preview
 
 # 🎯 CORREÇÕES APLICADAS (Junho 2025)
 
-## ✅ MANTIDO - Pesquisa Melhorada
-- Função `normalize()` em todas as telas (Links, Clipboard, Notes, Favorites)
-- Pesquisa ignora acentos (café = cafe)
-- Pesquisa ignora maiúsculas/minúsculas
-- Pesquisa limitada à tela atual (sem cruzamento)
-- Botão ❌ para limpar pesquisa em todas as telas
+## ✅ MANTIDO 
+
+**Pesquisa Melhorada (todas as telas):**
+- Função `normalize()` - ignora acentos e maiúsculas
+- Botão ❌ para limpar pesquisa
+- Pesquisa limitada à tela atual
+
+**i18n - Termos Fixos:**
+- "Links" e "Clipboard" iguais em todos os 6 idiomas
+
+**KeyboardAvoidingView:**
+- Implementado em todos os modais (Links, Clipboard, Notes)
 
 ## ❌ REVERTIDO (após testes)
 - Seleção múltipla no Clipboard
 - Ordenação customizável no Clipboard
 - Highlight de texto na pesquisa
-- KeyboardAvoidingView no NotesScreen
-- i18n: termos fixos (Links/Clipboard) - voltou ao original traduzido
-- i18n: limpeza de strings mortas
 
 ## Sessão Anterior - Correções Estáveis
 
