@@ -91,16 +91,19 @@ export default function FavoritesScreen({ language, userId, refreshKey }) {
     }
   };
 
-  const handleOpenLink = (url) => { 
+  const handleOpenLink = (url) => {
+    Keyboard.dismiss();
     Linking.openURL(url); 
   };
 
   const handleCopyContent = async (content) => {
+    Keyboard.dismiss();
     await Clipboard.setStringAsync(content);
     Toast.show({ type: 'success', text1: t.copied });
   };
 
   const handleRemoveFavorite = async (item) => {
+    Keyboard.dismiss();
     try {
       if (item.source === 'local') {
         // Update local notes
