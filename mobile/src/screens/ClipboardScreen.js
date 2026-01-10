@@ -384,7 +384,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <CustomHeader title={t.tabClipboard || 'Clipboard'} />
-      <View style={[styles.container, { paddingBottom: insets.bottom + 16 }]}>
+      <View style={styles.container}>
 
         {/* ✅ MANTER: Search com botão ❌ */}
         <View style={styles.searchContainer}>

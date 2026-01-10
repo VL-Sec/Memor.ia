@@ -367,7 +367,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <CustomHeader title="Memor.ia" />
-      <View style={[styles.container, { paddingBottom: insets.bottom + 16 }]}>
+      <View style={styles.container}>
         <View style={styles.searchContainer}>
           <Ionicons name="search" size={20} color="#8E8E93" />
           <TextInput style={styles.searchInput} placeholder={t.search} placeholderTextColor="#8E8E93" value={searchQuery} onChangeText={setSearchQuery} />
