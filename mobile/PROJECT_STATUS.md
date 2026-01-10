@@ -136,16 +136,10 @@ Stack.Navigator (raiz)
 |--------|--------|------|
 | 🇬🇧 English | en | Links, Clipboard, Notes, Favorites |
 | 🇵🇹 Português | pt | Links, Clipboard, Notas, Favoritos |
-| 🇪🇸 Español | es | Links, Clipboard, Notas, Favoritos |
-| 🇫🇷 Français | fr | Links, Clipboard, Notes, Favoris |
-| 🇩🇪 Deutsch | de | Links, Clipboard, Notizen, Favoriten |
-| 🇮🇹 Italiano | it | Links, Clipboard, Note, Preferiti |
-
-**🔒 Termos FIXOS (NUNCA traduzir):**
-- `Links` - igual em todos os idiomas
-- `Clipboard` - igual em todos os idiomas
-
-**🌍 Termos adaptáveis:** Notes, Favorites, ações, mensagens
+| 🇪🇸 Español | es | Enlaces, Portapapeles, Notas, Favoritos |
+| 🇫🇷 Français | fr | Liens, Presse-papiers, Notes, Favoris |
+| 🇩🇪 Deutsch | de | Links, Zwischenablage, Notizen, Favoriten |
+| 🇮🇹 Italiano | it | Link, Appunti, Note, Preferiti |
 
 ---
 
