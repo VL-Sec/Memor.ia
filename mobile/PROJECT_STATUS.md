@@ -362,6 +362,7 @@ eas build --platform ios --profile preview
 - ✅ Edit Modal (LinksScreen)
 - ✅ Folder Modal (LinksScreen)
 - ✅ `behavior={Platform.OS === 'ios' ? 'padding' : 'height'}`
+- ✅ `keyboardVerticalOffset={insets.top + 24}` (mais robusto em Android)
 
 **6. Toque fora do modal = comportamento limpo:**
 - ✅ `TouchableWithoutFeedback onPress={closeModal}`
