@@ -344,6 +344,11 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
         transparent={false}
         onRequestClose={() => setShowModal(false)}
       >
+        <KeyboardAvoidingView 
+          style={{ flex: 1, backgroundColor: '#000000' }} 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={0}
+        >
         <View style={[styles.modalContainer, { paddingTop: insets.top }]}>
           <View style={styles.modalHeader}>
             <TouchableOpacity onPress={() => setShowModal(false)} style={styles.modalHeaderButton}>
@@ -357,7 +362,7 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
             </TouchableOpacity>
           </View>
 
-          <ScrollView style={styles.modalBody}>
+          <ScrollView style={styles.modalBody} keyboardShouldPersistTaps="handled">
             <TextInput
               style={styles.titleInput}
               placeholder={t.noteTitlePlaceholder}
@@ -396,6 +401,7 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
             </View>
           </ScrollView>
         </View>
+        </KeyboardAvoidingView>
       </Modal>
       </View>
     </SafeAreaView>
