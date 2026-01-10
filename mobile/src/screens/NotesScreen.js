@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
   searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1C1C1E', margin: 16, marginBottom: 8, paddingHorizontal: 12, borderRadius: 12, height: 44 },
   searchInput: { flex: 1, marginLeft: 8, color: '#FFFFFF', fontSize: 16 },
   scrollView: { flex: 1, paddingHorizontal: 16 },
-  listContent: { paddingHorizontal: 16, paddingBottom: 100 },
+  listContent: { paddingHorizontal: 16, paddingBottom: 20 },
   // Note card with separate touch zones
   noteCard: { backgroundColor: '#1C1C1E', borderRadius: 12, marginBottom: 10, flexDirection: 'row', overflow: 'hidden' },
   noteMainContent: { flex: 1, padding: 16 },
