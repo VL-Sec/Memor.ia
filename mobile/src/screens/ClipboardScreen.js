@@ -394,6 +394,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
             value={newContent} 
             onChangeText={setNewContent}
             multiline
+            scrollEnabled
           />
           <TouchableOpacity style={styles.pasteButton} onPress={handlePasteFromClipboard}>
             <Ionicons name="clipboard-outline" size={20} color="#007AFF" />
@@ -618,7 +619,7 @@ const styles = StyleSheet.create({
   searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1C1C1E', margin: 16, marginBottom: 8, paddingHorizontal: 12, borderRadius: 12, height: 44 },
   searchInput: { flex: 1, marginLeft: 8, color: '#FFFFFF', fontSize: 16 },
   addContainer: { flexDirection: 'row', marginHorizontal: 16, marginBottom: 8, gap: 8, alignItems: 'flex-end' },
-  addInput: { flex: 1, backgroundColor: '#1C1C1E', paddingHorizontal: 16, paddingVertical: 12, borderRadius: 12, color: '#FFFFFF', fontSize: 16, maxHeight: 80 },
+  addInput: { flex: 1, backgroundColor: '#1C1C1E', paddingHorizontal: 16, paddingVertical: 12, borderRadius: 12, color: '#FFFFFF', fontSize: 16, minHeight: 44, maxHeight: 120 },
   pasteButton: { backgroundColor: '#1C1C1E', width: 44, height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
   addButton: { backgroundColor: '#007AFF', width: 44, height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
   folderSection: { marginHorizontal: 16, marginBottom: 12 },
