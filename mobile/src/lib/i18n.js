@@ -479,9 +479,9 @@ export const translations = {
   // ============================================
   es: {
     // Tabs
-    tabLinks: 'Links',
+    tabLinks: 'Enlaces',
     tabNotes: 'Notas',
-    tabClipboard: 'Clipboard',
+    tabClipboard: 'Portapapeles',
     tabFavorites: 'Favoritos',
     tabSettings: 'Ajustes',
     
@@ -668,9 +668,9 @@ export const translations = {
   // ============================================
   fr: {
     // Tabs
-    tabLinks: 'Links',
+    tabLinks: 'Liens',
     tabNotes: 'Notes',
-    tabClipboard: 'Clipboard',
+    tabClipboard: 'Presse-papiers',
     tabFavorites: 'Favoris',
     tabSettings: 'Réglages',
     
@@ -859,7 +859,7 @@ export const translations = {
     // Tabs
     tabLinks: 'Links',
     tabNotes: 'Notizen',
-    tabClipboard: 'Clipboard',
+    tabClipboard: 'Zwischenablage',
     tabFavorites: 'Favoriten',
     tabSettings: 'Einstellungen',
     
@@ -1046,9 +1046,9 @@ export const translations = {
   // ============================================
   it: {
     // Tabs
-    tabLinks: 'Links',
+    tabLinks: 'Link',
     tabNotes: 'Note',
-    tabClipboard: 'Clipboard',
+    tabClipboard: 'Appunti',
     tabFavorites: 'Preferiti',
     tabSettings: 'Impostazioni',
     
