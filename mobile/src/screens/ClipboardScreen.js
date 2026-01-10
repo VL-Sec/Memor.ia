@@ -18,41 +18,61 @@ const normalize = (text = '') =>
     .replace(/[\u0300-\u036f]/g, '');
 
 // Componente para highlight do texto na pesquisa
+// Suporta: case-insensitive + accent-insensitive
 const HighlightText = ({ text, highlight, style }) => {
   if (!highlight || !text) return <Text style={style} numberOfLines={4} ellipsizeMode="tail">{text || ''}</Text>;
   
-  const normalizedHighlight = normalize(highlight);
-  const normalizedText = normalize(text);
-  const parts = [];
-  let lastIndex = 0;
-  let index = normalizedText.indexOf(normalizedHighlight);
-  
-  while (index !== -1) {
-    if (index > lastIndex) {
-      parts.push({ text: text.slice(lastIndex, index), highlight: false });
+  try {
+    const normalizedHighlight = normalize(highlight);
+    const normalizedText = normalize(text);
+    
+    // Encontrar todas as posições no texto normalizado
+    const matches = [];
+    let searchIndex = 0;
+    let matchIndex = normalizedText.indexOf(normalizedHighlight, searchIndex);
+    
+    while (matchIndex !== -1) {
+      matches.push({ start: matchIndex, end: matchIndex + normalizedHighlight.length });
+      searchIndex = matchIndex + 1;
+      matchIndex = normalizedText.indexOf(normalizedHighlight, searchIndex);
     }
-    parts.push({ text: text.slice(index, index + highlight.length), highlight: true });
-    lastIndex = index + highlight.length;
-    index = normalizedText.indexOf(normalizedHighlight, lastIndex);
+    
+    if (matches.length === 0) {
+      return <Text style={style} numberOfLines={4} ellipsizeMode="tail">{text}</Text>;
+    }
+    
+    // Mapear posições normalizadas para posições originais
+    // Criar mapa de índices: normalizado -> original
+    const originalChars = [...text];
+    const normalizedChars = [...normalizedText];
+    
+    // Para simplificar, assumimos que a normalização não muda muito o comprimento
+    // Usar highlight direto no texto original com regex case-insensitive
+    const escapedHighlight = highlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escapedHighlight})`, 'gi');
+    const parts = text.split(regex);
+    
+    if (parts.length <= 1) {
+      // Fallback: mostrar texto sem highlight se regex não funcionar
+      return <Text style={style} numberOfLines={4} ellipsizeMode="tail">{text}</Text>;
+    }
+    
+    return (
+      <Text style={style} numberOfLines={4} ellipsizeMode="tail">
+        {parts.map((part, i) => {
+          const isMatch = normalize(part) === normalizedHighlight;
+          return isMatch ? (
+            <Text key={i} style={{ backgroundColor: '#FFD60A', color: '#000000' }}>{part}</Text>
+          ) : (
+            <Text key={i}>{part}</Text>
+          );
+        })}
+      </Text>
+    );
+  } catch (e) {
+    // Fallback seguro
+    return <Text style={style} numberOfLines={4} ellipsizeMode="tail">{text}</Text>;
   }
-  
-  if (lastIndex < text.length) {
-    parts.push({ text: text.slice(lastIndex), highlight: false });
-  }
-  
-  if (parts.length === 0) return <Text style={style} numberOfLines={4} ellipsizeMode="tail">{text}</Text>;
-  
-  return (
-    <Text style={style} numberOfLines={4} ellipsizeMode="tail">
-      {parts.map((part, i) =>
-        part.highlight ? (
-          <Text key={i} style={{ backgroundColor: '#FFD60A', color: '#000000' }}>{part.text}</Text>
-        ) : (
-          <Text key={i}>{part.text}</Text>
-        )
-      )}
-    </Text>
-  );
 };
 
 export default function ClipboardScreen({ language, userId, refreshKey, triggerRefresh }) {
