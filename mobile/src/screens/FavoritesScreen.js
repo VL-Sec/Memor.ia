@@ -35,7 +35,7 @@ export default function FavoritesScreen({ language, userId, refreshKey }) {
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState('all');
 
-
+  const insets = useSafeAreaInsets();
   const t = translations[language] || translations.en;
   
   // Dynamic storage key based on userId
