@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Image, Linking, Alert, RefreshControl, Modal, ScrollView, Switch, FlatList, Keyboard, TouchableWithoutFeedback } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Image, Linking, Alert, RefreshControl, Modal, ScrollView, Switch, FlatList, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
@@ -32,6 +32,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
   const [folderName, setFolderName] = useState('');
   const [creatingFolderFromPicker, setCreatingFolderFromPicker] = useState(false);
 
+  const insets = useSafeAreaInsets();
   const t = translations[language] || translations.en;
 
   // Reload when screen is focused
@@ -66,6 +67,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
 
   const handleAddLink = async () => {
     if (!newUrl.trim()) return;
+    Keyboard.dismiss();
     let url = newUrl.trim();
     if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
     
@@ -80,10 +82,14 @@ export default function LinksScreen({ language, userId, refreshKey }) {
     setShowEditModal(true);
   };
 
-  const handleOpenLink = (url) => { Linking.openURL(url); };
+  const handleOpenLink = (url) => { 
+    Keyboard.dismiss();
+    Linking.openURL(url); 
+  };
 
   const handleDeleteLink = (id, e) => {
     if (e) e.stopPropagation();
+    Keyboard.dismiss();
     Alert.alert(t.delete, '', [
       { text: t.cancel, style: 'cancel' },
       { text: t.delete, style: 'destructive', onPress: async () => {
@@ -100,6 +106,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
 
   const handleToggleFavorite = async (item, e) => {
     if (e) e.stopPropagation();
+    Keyboard.dismiss();
     try {
       const newValue = !item.isFavorite;
       await supabase.from('links').update({ isFavorite: newValue }).eq('id', item.id);
@@ -112,6 +119,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
 
   const openEditModal = (item, e) => {
     if (e) e.stopPropagation();
+    Keyboard.dismiss();
     setIsAddingNew(false);
     setEditingItem(item);
     setEditUrl(item.url || '');
@@ -122,12 +130,14 @@ export default function LinksScreen({ language, userId, refreshKey }) {
   };
 
   const closeEditModal = () => {
+    Keyboard.dismiss();
     setShowEditModal(false);
     setEditingItem(null);
     setIsAddingNew(false);
   };
 
   const handleSaveEdit = async () => {
+    Keyboard.dismiss();
     try {
       if (isAddingNew) {
         // Creating new link - allow with just title OR url
@@ -180,6 +190,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
 
   const handleTogglePin = async (item, e) => {
     if (e) e.stopPropagation();
+    Keyboard.dismiss();
     try {
       const newValue = !item.isPinned;
       await supabase.from('links').update({ isPinned: newValue }).eq('id', item.id);
@@ -192,6 +203,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
 
   // Folder management functions
   const openFolderModal = (folder = null, fromPicker = false) => {
+    Keyboard.dismiss();
     setEditingFolder(folder);
     setFolderName(folder ? folder.name : '');
     setCreatingFolderFromPicker(fromPicker);
@@ -199,6 +211,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
   };
 
   const closeFolderModal = () => {
+    Keyboard.dismiss();
     setShowFolderModal(false);
     setEditingFolder(null);
     setFolderName('');
@@ -210,6 +223,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
       Toast.show({ type: 'error', text1: t.error || 'Nome obrigatório' });
       return;
     }
+    Keyboard.dismiss();
     
     const shouldSelectFolder = creatingFolderFromPicker;
     
@@ -233,10 +247,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
         if (error) throw error;
         setFolders([...folders, newFolder]);
         
-        setShowFolderModal(false);
-        setEditingFolder(null);
-        setFolderName('');
-        setCreatingFolderFromPicker(false);
+        closeFolderModal();
         
         if (shouldSelectFolder) {
           setEditFolderId(newFolder.id);
@@ -252,6 +263,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
   };
 
   const handleDeleteFolder = (folder) => {
+    Keyboard.dismiss();
     Alert.alert(
       t.deleteFolder || 'Eliminar pasta',
       t.deleteFolderConfirmSimple || 'Tens a certeza que queres eliminar esta pasta?',
@@ -346,7 +358,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <CustomHeader title="Memor.ia" />
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingBottom: insets.bottom + 16 }]}>
         <View style={styles.searchContainer}>
           <Ionicons name="search" size={20} color="#8E8E93" />
           <TextInput style={styles.searchInput} placeholder={t.search} placeholderTextColor="#8E8E93" value={searchQuery} onChangeText={setSearchQuery} onBlur={() => setSearchQuery('')} />
@@ -362,14 +374,14 @@ export default function LinksScreen({ language, userId, refreshKey }) {
         <View style={styles.folderSection}>
           <Text style={styles.folderSectionTitle}>{t.folders || 'Pastas'}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.folderList} contentContainerStyle={styles.folderListContent} keyboardShouldPersistTaps="handled">
-            <TouchableOpacity style={[styles.folderChip, selectedFolder === 'all' && styles.folderChipActive]} onPress={() => setSelectedFolder('all')}>
+            <TouchableOpacity style={[styles.folderChip, selectedFolder === 'all' && styles.folderChipActive]} onPress={() => { Keyboard.dismiss(); setSelectedFolder('all'); }}>
               <Text style={[styles.folderChipText, selectedFolder === 'all' && styles.folderChipTextActive]}>{t.allLinks || 'Todos'}</Text>
             </TouchableOpacity>
             {folders.filter(folder => !folder.isDefault).map(folder => (
               <TouchableOpacity 
                 key={folder.id} 
                 style={[styles.folderChip, selectedFolder === folder.id && styles.folderChipActive]} 
-                onPress={() => setSelectedFolder(folder.id)}
+                onPress={() => { Keyboard.dismiss(); setSelectedFolder(folder.id); }}
                 onLongPress={() => openFolderModal(folder)}
               >
                 <Text style={[styles.folderChipText, selectedFolder === folder.id && styles.folderChipTextActive]}>
@@ -394,86 +406,93 @@ export default function LinksScreen({ language, userId, refreshKey }) {
         <FlatList data={sortedLinks} keyExtractor={(item) => item.id} renderItem={renderLinkItem} contentContainerStyle={styles.listContent} keyboardShouldPersistTaps="handled" refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchData(); }} tintColor="#007AFF" />} />
       )}
       
+      {/* Edit Modal com KeyboardAvoidingView */}
       <Modal visible={showEditModal} animationType="slide" transparent={true} onRequestClose={closeEditModal}>
-        <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); closeEditModal(); }}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-              <View style={styles.modalContent}>
-                <View style={styles.modalHeader}>
-                  <Text style={styles.modalTitle}>{isAddingNew ? (t.addLink || 'Adicionar Link') : t.editItem}</Text>
-                  <TouchableOpacity onPress={closeEditModal}>
-                    <Ionicons name="close" size={28} color="#FFFFFF" />
-                  </TouchableOpacity>
-                </View>
-                <ScrollView style={styles.modalBody} contentContainerStyle={styles.modalBodyContent} keyboardShouldPersistTaps="handled">
-                  <Text style={styles.inputLabel}>URL</Text>
-                  {isAddingNew ? (
-                    <TextInput 
-                      style={styles.textInput} 
-                      value={editUrl} 
-                      onChangeText={setEditUrl} 
-                      placeholder="https://..." 
-                      placeholderTextColor="#8E8E93"
-                      autoCapitalize="none"
-                      keyboardType="url"
-                    />
-                  ) : (
-                    <View style={styles.urlContainer}>
-                      <Text style={styles.urlText} numberOfLines={2}>{editingItem?.url}</Text>
-                      <TouchableOpacity 
-                        style={styles.copyUrlButton} 
-                        onPress={() => {
-                          Clipboard.setStringAsync(editingItem?.url || '');
-                          Toast.show({ type: 'success', text1: t.copied || 'Copiado!' });
-                        }}
-                      >
-                        <Ionicons name="copy-outline" size={20} color="#007AFF" />
-                      </TouchableOpacity>
-                    </View>
-                  )}
-              
-                  <Text style={styles.inputLabel}>{t.linkTitle || t.title || 'Título'}</Text>
-                  <TextInput style={styles.textInput} value={editTitle} onChangeText={setEditTitle} placeholder={t.linkTitlePlaceholder || 'Nome do link'} placeholderTextColor="#8E8E93" />
-              
-                  <Text style={styles.inputLabel}>{t.moveToFolder || 'Pasta:'}</Text>
-                  <TouchableOpacity style={styles.pickerButton} onPress={() => setShowFolderPicker(true)}>
-                    <Ionicons name="folder-outline" size={20} color="#007AFF" />
-                    <Text style={styles.pickerButtonText}>
-                      {editFolderId 
-                        ? (folders.find(f => f.id === editFolderId)?.name || t.allLinks || 'Todos')
-                        : (t.allLinks || 'Todos')}
-                    </Text>
-                    <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
-                  </TouchableOpacity>
-              
-                  <View style={styles.reminderSection}>
-                    <View style={styles.reminderHeader}>
-                      <View style={styles.reminderHeaderLeft}>
-                        <Ionicons name="pin-outline" size={24} color="#FFD60A" />
-                        <Text style={styles.reminderTitle}>{t.pinToTop || 'Fixar no topo'}</Text>
-                      </View>
-                      <Switch value={isPinnedEdit} onValueChange={setIsPinnedEdit} trackColor={{ false: '#3A3A3C', true: '#FFD60A' }} thumbColor="#FFFFFF" />
-                    </View>
+        <KeyboardAvoidingView 
+          style={{ flex: 1 }} 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          <TouchableWithoutFeedback onPress={closeEditModal}>
+            <View style={styles.modalOverlay}>
+              <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <View style={[styles.modalContent, { paddingBottom: insets.bottom + 20 }]}>
+                  <View style={styles.modalHeader}>
+                    <Text style={styles.modalTitle}>{isAddingNew ? (t.addLink || 'Adicionar Link') : t.editItem}</Text>
+                    <TouchableOpacity onPress={closeEditModal}>
+                      <Ionicons name="close" size={28} color="#FFFFFF" />
+                    </TouchableOpacity>
                   </View>
-              
-                  <TouchableOpacity style={styles.saveButton} onPress={handleSaveEdit}>
-                    <Text style={styles.saveButtonText}>{t.save}</Text>
-                  </TouchableOpacity>
-                </ScrollView>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
+                  <ScrollView style={styles.modalBody} contentContainerStyle={styles.modalBodyContent} keyboardShouldPersistTaps="handled">
+                    <Text style={styles.inputLabel}>URL</Text>
+                    {isAddingNew ? (
+                      <TextInput 
+                        style={styles.textInput} 
+                        value={editUrl} 
+                        onChangeText={setEditUrl} 
+                        placeholder="https://..." 
+                        placeholderTextColor="#8E8E93"
+                        autoCapitalize="none"
+                        keyboardType="url"
+                      />
+                    ) : (
+                      <View style={styles.urlContainer}>
+                        <Text style={styles.urlText} numberOfLines={2}>{editingItem?.url}</Text>
+                        <TouchableOpacity 
+                          style={styles.copyUrlButton} 
+                          onPress={() => {
+                            Clipboard.setStringAsync(editingItem?.url || '');
+                            Toast.show({ type: 'success', text1: t.copied || 'Copiado!' });
+                          }}
+                        >
+                          <Ionicons name="copy-outline" size={20} color="#007AFF" />
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                
+                    <Text style={styles.inputLabel}>{t.linkTitle || t.title || 'Título'}</Text>
+                    <TextInput style={styles.textInput} value={editTitle} onChangeText={setEditTitle} placeholder={t.linkTitlePlaceholder || 'Nome do link'} placeholderTextColor="#8E8E93" />
+                
+                    <Text style={styles.inputLabel}>{t.moveToFolder || 'Pasta:'}</Text>
+                    <TouchableOpacity style={styles.pickerButton} onPress={() => setShowFolderPicker(true)}>
+                      <Ionicons name="folder-outline" size={20} color="#007AFF" />
+                      <Text style={styles.pickerButtonText}>
+                        {editFolderId 
+                          ? (folders.find(f => f.id === editFolderId)?.name || t.allLinks || 'Todos')
+                          : (t.allLinks || 'Todos')}
+                      </Text>
+                      <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
+                    </TouchableOpacity>
+                
+                    <View style={styles.reminderSection}>
+                      <View style={styles.reminderHeader}>
+                        <View style={styles.reminderHeaderLeft}>
+                          <Ionicons name="pin-outline" size={24} color="#FFD60A" />
+                          <Text style={styles.reminderTitle}>{t.pinToTop || 'Fixar no topo'}</Text>
+                        </View>
+                        <Switch value={isPinnedEdit} onValueChange={setIsPinnedEdit} trackColor={{ false: '#3A3A3C', true: '#FFD60A' }} thumbColor="#FFFFFF" />
+                      </View>
+                    </View>
+                
+                    <TouchableOpacity style={styles.saveButton} onPress={handleSaveEdit}>
+                      <Text style={styles.saveButtonText}>{t.save}</Text>
+                    </TouchableOpacity>
+                  </ScrollView>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
       </Modal>
 
-      <Modal visible={showFolderPicker} animationType="slide" transparent={true} onRequestClose={() => setShowFolderPicker(false)}>
+      {/* Folder Picker Modal */}
+      <Modal visible={showFolderPicker} animationType="slide" transparent={true} onRequestClose={() => { Keyboard.dismiss(); setShowFolderPicker(false); }}>
         <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); setShowFolderPicker(false); }}>
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-              <View style={styles.folderPickerContent}>
+              <View style={[styles.folderPickerContent, { paddingBottom: insets.bottom + 20 }]}>
                 <View style={styles.modalHeader}>
                   <Text style={styles.modalTitle}>{t.selectFolder}</Text>
-                  <TouchableOpacity onPress={() => setShowFolderPicker(false)}>
+                  <TouchableOpacity onPress={() => { Keyboard.dismiss(); setShowFolderPicker(false); }}>
                     <Ionicons name="close" size={28} color="#FFFFFF" />
                   </TouchableOpacity>
                 </View>
@@ -517,42 +536,48 @@ export default function LinksScreen({ language, userId, refreshKey }) {
         </TouchableWithoutFeedback>
       </Modal>
 
+      {/* Folder Management Modal com KeyboardAvoidingView */}
       <Modal visible={showFolderModal} animationType="slide" transparent={true} onRequestClose={closeFolderModal}>
-        <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); closeFolderModal(); }}>
-          <View style={styles.folderModalOverlay}>
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-              <View style={styles.folderModalContent}>
-                <View style={styles.folderModalHeader}>
-                  <Text style={styles.folderModalTitle}>
-                    {editingFolder ? (t.editFolder || 'Editar Pasta') : (t.newFolder || 'Nova Pasta')}
-                  </Text>
-                  <TouchableOpacity onPress={closeFolderModal}>
-                    <Ionicons name="close" size={28} color="#FFFFFF" />
-                  </TouchableOpacity>
-                </View>
-                <TextInput
-                  style={styles.folderNameInput}
-                  placeholder={t.folderNamePlaceholder || 'Nome da pasta'}
-                  placeholderTextColor="#8E8E93"
-                  value={folderName}
-                  onChangeText={setFolderName}
-                  autoFocus
-                />
-                <View style={styles.folderModalActions}>
-                  {editingFolder && !editingFolder.isDefault && (
-                    <TouchableOpacity style={styles.deleteFolderBtn} onPress={() => { closeFolderModal(); handleDeleteFolder(editingFolder); }}>
-                      <Ionicons name="trash-outline" size={20} color="#FF3B30" />
-                      <Text style={styles.deleteFolderText}>{t.delete || 'Eliminar'}</Text>
+        <KeyboardAvoidingView 
+          style={{ flex: 1 }} 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          <TouchableWithoutFeedback onPress={closeFolderModal}>
+            <View style={styles.folderModalOverlay}>
+              <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <View style={[styles.folderModalContent, { paddingBottom: insets.bottom + 20 }]}>
+                  <View style={styles.folderModalHeader}>
+                    <Text style={styles.folderModalTitle}>
+                      {editingFolder ? (t.editFolder || 'Editar Pasta') : (t.newFolder || 'Nova Pasta')}
+                    </Text>
+                    <TouchableOpacity onPress={closeFolderModal}>
+                      <Ionicons name="close" size={28} color="#FFFFFF" />
                     </TouchableOpacity>
-                  )}
-                  <TouchableOpacity style={styles.saveFolderBtn} onPress={handleSaveFolder}>
-                    <Text style={styles.saveFolderText}>{t.save || 'Guardar'}</Text>
-                  </TouchableOpacity>
+                  </View>
+                  <TextInput
+                    style={styles.folderNameInput}
+                    placeholder={t.folderNamePlaceholder || 'Nome da pasta'}
+                    placeholderTextColor="#8E8E93"
+                    value={folderName}
+                    onChangeText={setFolderName}
+                    autoFocus
+                  />
+                  <View style={styles.folderModalActions}>
+                    {editingFolder && !editingFolder.isDefault && (
+                      <TouchableOpacity style={styles.deleteFolderBtn} onPress={() => { closeFolderModal(); handleDeleteFolder(editingFolder); }}>
+                        <Ionicons name="trash-outline" size={20} color="#FF3B30" />
+                        <Text style={styles.deleteFolderText}>{t.delete || 'Eliminar'}</Text>
+                      </TouchableOpacity>
+                    )}
+                    <TouchableOpacity style={styles.saveFolderBtn} onPress={handleSaveFolder}>
+                      <Text style={styles.saveFolderText}>{t.save || 'Guardar'}</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
       </Modal>
       </View>
     </SafeAreaView>
@@ -577,7 +602,7 @@ const styles = StyleSheet.create({
   folderChipText: { color: '#FFFFFF', fontSize: 14, fontWeight: '500' },
   folderChipTextActive: { color: '#FFFFFF' },
   addFolderChip: { backgroundColor: '#2C2C2E', width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#3A3A3C' },
-  listContent: { padding: 16, paddingTop: 8, paddingBottom: 100 },
+  listContent: { padding: 16, paddingTop: 8, paddingBottom: 20 },
   linkCard: { backgroundColor: '#1C1C1E', borderRadius: 16, marginBottom: 12, flexDirection: 'row', overflow: 'hidden' },
   linkTouchable: { flex: 1, flexDirection: 'row' },
   linkImage: { width: 80, height: 80 },
@@ -606,9 +631,9 @@ const styles = StyleSheet.create({
   reminderHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   reminderHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   reminderTitle: { color: '#FFFFFF', fontSize: 18, fontWeight: '600' },
-  saveButton: { backgroundColor: '#007AFF', marginHorizontal: 20, marginTop: 20, marginBottom: 30, padding: 16, borderRadius: 12, alignItems: 'center' },
+  saveButton: { backgroundColor: '#007AFF', marginTop: 10, padding: 16, borderRadius: 12, alignItems: 'center' },
   saveButtonText: { color: '#FFFFFF', fontSize: 18, fontWeight: '600' },
-  folderPickerContent: { backgroundColor: '#1C1C1E', borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '60%', paddingBottom: 40 },
+  folderPickerContent: { backgroundColor: '#1C1C1E', borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '60%' },
   createFolderOption: { flexDirection: 'row', alignItems: 'center', padding: 16, backgroundColor: 'rgba(0, 122, 255, 0.1)' },
   createFolderIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0, 122, 255, 0.2)', justifyContent: 'center', alignItems: 'center', marginRight: 12 },
   createFolderText: { color: '#007AFF', fontSize: 16, fontWeight: '600' },
