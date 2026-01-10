@@ -5,38 +5,55 @@
 
 # 📊 RELATÓRIO DE TESTES (Junho 2025)
 
-## Resultado dos Testes por Tela
+## ✅ Checklist Completa - Safe Area / Responsividade
 
-| Tela | Safe Area | Modais | Teclado | Responsivo | Status |
-|------|-----------|--------|---------|------------|--------|
-| **LinksScreen** | ✅ | ✅ | ✅ | ✅ | ✅ OK |
-| **ClipboardScreen** | ✅ | ✅ | ✅ | ✅ | ✅ OK |
-| **NotesScreen** | ✅ | ✅ | ✅ | ✅ | ✅ OK |
-| **FavoritesScreen** | ✅ | N/A | ✅ | ✅ | ✅ OK |
-| **SettingsScreen** | ✅ | ✅ | N/A | ✅ | ✅ OK |
+### 1️⃣ Safe Area
+| Tela | `edges={['top', 'bottom']}` | Status |
+|------|----------------------------|--------|
+| LinksScreen | ✅ | OK |
+| ClipboardScreen | ✅ | OK |
+| NotesScreen | ✅ | OK |
+| FavoritesScreen | ✅ | OK |
+| SettingsScreen | ✅ | OK |
 
-## Implementação de Safe Area (todas as telas)
+### 2️⃣ Scroll & Conteúdo
+| Tela | `paddingBottom` | `keyboardShouldPersistTaps` | Status |
+|------|-----------------|----------------------------|--------|
+| LinksScreen | 32 | ✅ | OK |
+| ClipboardScreen | 32 | ✅ | OK |
+| NotesScreen | 32 | ✅ | OK |
+| FavoritesScreen | 32 | ✅ | OK |
 
-| Componente | Implementação |
-|------------|---------------|
-| `useSafeAreaInsets()` | ✅ Todas as telas |
-| Container principal | `paddingBottom: insets.bottom + 16` |
-| Modais de edição | `paddingBottom: insets.bottom + 20` |
-| Modais de pasta | Centrado com `justifyContent: 'center'` |
-| ScrollView/FlatList | `keyboardShouldPersistTaps="handled"` |
-| KeyboardAvoidingView | ✅ Links, Clipboard, Notes |
+### 3️⃣ Botões Críticos (Guardar)
+| Tela | Dentro SafeArea | Com teclado | Status |
+|------|-----------------|-------------|--------|
+| LinksScreen | ✅ | ✅ KeyboardAvoidingView | OK |
+| ClipboardScreen | ✅ | ✅ KeyboardAvoidingView | OK |
+| NotesScreen | ✅ | ✅ KeyboardAvoidingView | OK |
 
-## Consistência Visual
+### 4️⃣ Teclado (Keyboard Handling)
+| Tela | KeyboardAvoidingView | behavior iOS/Android | Status |
+|------|---------------------|---------------------|--------|
+| LinksScreen | ✅ 7x | padding/height | OK |
+| ClipboardScreen | ✅ 7x | padding/height | OK |
+| NotesScreen | ✅ 3x | padding/height | OK |
+| FavoritesScreen | N/A (sem inputs) | - | OK |
+| SettingsScreen | N/A (modais simples) | - | OK |
 
-| Elemento | Valor | Consistente |
-|----------|-------|-------------|
-| Background | `#000000` | ✅ |
-| Cards | `#1C1C1E` | ✅ |
-| Primary color | `#007AFF` | ✅ |
-| Border radius modais | `24` (topo) | ✅ |
-| Border radius cards | `12` | ✅ |
-| Search height | `44` | ✅ |
-| Modal maxHeight | `80-85%` | ✅ |
+### 5️⃣ Modais
+| Tela | maxHeight | Scroll interno | Status |
+|------|-----------|----------------|--------|
+| LinksScreen | 85% | ✅ ScrollView | OK |
+| ClipboardScreen | 85% | ✅ ScrollView | OK |
+| NotesScreen | fullscreen | ✅ ScrollView | OK |
+| SettingsScreen | 80% | ✅ ScrollView | OK |
+
+### 📱 Compatibilidade Testada
+- ✅ Android pequeno (~5.5")
+- ✅ Android médio (~6.1–6.4")
+- ✅ Android grande (6.7"+)
+- ✅ Dispositivos com notch
+- ✅ Navegação por gestos
 
 ---
 
