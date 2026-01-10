@@ -322,18 +322,39 @@ eas build --platform ios --profile preview
 
 # 🎯 CORREÇÕES APLICADAS (Junho 2025 - Sessão Atual)
 
-1. ✅ Tab Bar com traduções dinâmicas (`t.tabLinks`, `t.tabNotes`, etc.)
-2. ✅ Tab Bar com `tabBarItemStyle: { flex: 1 }` para distribuição uniforme
-3. ✅ Novo splash.png atualizado
-4. ✅ **REMOVIDO todos os lembretes** (Links e Notas) - erro Supabase
-5. ✅ **REMOVIDO resumo semanal** - causava problemas
-6. ✅ Teclado desaparece ao tocar fora em LinksScreen
-7. ✅ Toast notifications mais rápidas (1.5s em vez de 3s)
-8. ✅ **Search bar limpa automaticamente ao perder foco** (todas as telas)
-9. ❌ **REMOVIDO Smart Clipboard** - limitação técnica JS (sem eventos de cópia)
-10. ✅ **Favoritos:** Datas só aparecem para Notas (Links e Clipboard sem data)
+## Auditoria Completa + Correções (Sessão 2)
 
-## 🔧 CORREÇÕES UX COMPLETAS (Junho 2025)
+**1. ✅ i18n - Termos fixos corrigidos:**
+- "Links" e "Clipboard" agora são FIXOS em todos os 6 idiomas
+- Corrigido ES (era: Enlaces, Portapapeles)
+- Corrigido FR (era: Liens, Presse-papiers)
+- Corrigido DE (era: Zwischenablage)
+- Corrigido IT (era: Link, Appunti)
+
+**2. ✅ i18n - Limpeza de código morto:**
+- Removidas 52 linhas de strings não utilizadas
+- Removido: `smartClipboard*` (funcionalidade eliminada)
+- Removido: `weeklySummary*` (funcionalidade eliminada)
+
+**3. ✅ NotesScreen - KeyboardAvoidingView:**
+- Adicionado `KeyboardAvoidingView` ao modal de edição
+- Adicionado `keyboardShouldPersistTaps="handled"` ao ScrollView
+- Alinhado com comportamento de ClipboardScreen e LinksScreen
+
+**4. ✅ Pesquisa melhorada (todas as telas):**
+- Função `normalize()` adicionada a todas as telas
+- Ignora maiúsculas/minúsculas
+- Ignora acentos (café = cafe = CAFÉ)
+- Cada tela pesquisa apenas nos seus próprios dados
+- Implementado: LinksScreen, ClipboardScreen, NotesScreen, FavoritesScreen
+
+**5. ✅ ClipboardScreen - Funcionalidades novas (em teste):**
+- Seleção múltipla (long press para ativar)
+- Ordenação customizável (data, título, favoritos)
+- Highlight de texto na pesquisa
+- Persistência de preferência de ordenação
+
+## Sessão 1 - Correções UX
 
 ### Aplicado em ClipboardScreen e LinksScreen:
 
