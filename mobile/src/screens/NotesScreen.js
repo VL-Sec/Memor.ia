@@ -8,6 +8,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { translations } from '../lib/i18n';
 import CustomHeader from '../components/CustomHeader';
 
+// Normalizar texto (remover acentos + minúsculas) para pesquisa
+const normalize = (text = '') =>
+  text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
 const NOTE_COLORS = [
   { id: 'default', color: '#1C1C1E', name: 'Default' },
   { id: 'red', color: '#FF3B30', name: 'Red' },
@@ -203,9 +210,8 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
 
   const filteredNotes = notes.filter(note => {
     if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    return note.title?.toLowerCase().includes(query) || 
-           note.content?.toLowerCase().includes(query);
+    const q = normalize(searchQuery);
+    return normalize(note.title).includes(q) || normalize(note.content).includes(q);
   });
 
   // Sort: pinned items first, then by date
