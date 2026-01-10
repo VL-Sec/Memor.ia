@@ -329,6 +329,50 @@ eas build --platform ios --profile preview
 9. ❌ **REMOVIDO Smart Clipboard** - limitação técnica JS (sem eventos de cópia)
 10. ✅ **Favoritos:** Datas só aparecem para Notas (Links e Clipboard sem data)
 
+## 🔧 CORREÇÕES UX COMPLETAS (Janeiro 2025)
+
+### Aplicado em ClipboardScreen e LinksScreen:
+
+**1. Fechar teclado após ações:**
+- ✅ `Keyboard.dismiss()` ao adicionar item (+)
+- ✅ `Keyboard.dismiss()` ao guardar clipboard/link
+- ✅ `Keyboard.dismiss()` ao criar/editar pasta
+- ✅ `Keyboard.dismiss()` ao guardar alterações em modal
+- ✅ `Keyboard.dismiss()` ao fechar qualquer modal
+- ✅ `Keyboard.dismiss()` ao selecionar pasta
+- ✅ `Keyboard.dismiss()` ao copiar/favoritar/pin/apagar
+
+**2. Edição direta no Clipboard (como Notas):**
+- ✅ Toque no conteúdo do cartão → abre Edit Modal
+- ✅ Removido botão "Editar" separado
+- ✅ Ações laterais: Copiar, Favorito, Pin, Apagar
+
+**3. Preview de texto melhorado (Clipboard):**
+- ✅ `numberOfLines={4}`
+- ✅ `ellipsizeMode="tail"`
+- ✅ `fontSize: 13, lineHeight: 18`
+
+**4. Safe Area no fundo:**
+- ✅ `paddingBottom: insets.bottom + 16` no container principal
+- ✅ `paddingBottom: insets.bottom + 20` em todos os modais
+
+**5. KeyboardAvoidingView em modais:**
+- ✅ Edit Modal (ClipboardScreen)
+- ✅ Folder Modal (ClipboardScreen)
+- ✅ Edit Modal (LinksScreen)
+- ✅ Folder Modal (LinksScreen)
+- ✅ `behavior={Platform.OS === 'ios' ? 'padding' : 'height'}`
+
+**6. Toque fora do modal = comportamento limpo:**
+- ✅ `TouchableWithoutFeedback onPress={closeModal}`
+- ✅ Teclado fecha
+- ✅ Modal fecha
+- ✅ Sem conteúdo "vazado"
+
+### Pendente:
+- ⏳ FavoritesScreen - aplicar mesmas correções
+- ⏳ NotesScreen - verificar consistência
+
 ---
 
 # 📋 PRÓXIMOS PASSOS
