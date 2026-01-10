@@ -354,7 +354,20 @@ eas build --platform ios --profile preview
 - Highlight de texto na pesquisa
 - Persistência de preferência de ordenação
 
-## Sessão 1 - Correções UX
+## Sessão 1 - Correções UX Anteriores
+
+1. ✅ Tab Bar com traduções dinâmicas (`t.tabLinks`, `t.tabNotes`, etc.)
+2. ✅ Tab Bar com `tabBarItemStyle: { flex: 1 }` para distribuição uniforme
+3. ✅ Novo splash.png atualizado
+4. ✅ **REMOVIDO todos os lembretes** (Links e Notas) - erro Supabase
+5. ✅ **REMOVIDO resumo semanal** - causava problemas
+6. ✅ Teclado desaparece ao tocar fora em LinksScreen
+7. ✅ Toast notifications mais rápidas (1.5s em vez de 3s)
+8. ✅ Search bar com botão ❌ para limpar (em vez de limpar no blur)
+9. ❌ **REMOVIDO Smart Clipboard** - limitação técnica JS
+10. ✅ **Favoritos:** Datas só aparecem para Notas
+
+## 🔧 CORREÇÕES UX DETALHADAS
 
 ### Aplicado em ClipboardScreen e LinksScreen:
 
