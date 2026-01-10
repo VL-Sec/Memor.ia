@@ -348,11 +348,12 @@ eas build --platform ios --profile preview
 - Cada tela pesquisa apenas nos seus próprios dados
 - Implementado: LinksScreen, ClipboardScreen, NotesScreen, FavoritesScreen
 
-**5. ✅ ClipboardScreen - Funcionalidades novas (em teste):**
-- Seleção múltipla (long press para ativar)
-- Ordenação customizável (data, título, favoritos)
-- Highlight de texto na pesquisa
-- Persistência de preferência de ordenação
+**5. ⚠️ ClipboardScreen - Funcionalidades REVERTIDAS:**
+- ❌ Seleção múltipla (revertida após testes)
+- ❌ Ordenação customizável (revertida após testes)
+- ❌ Highlight de texto na pesquisa (revertido)
+- ✅ Mantida: pesquisa com normalize() (acentos + maiúsculas)
+- ✅ Mantido: botão ❌ para limpar pesquisa
 
 ## Sessão 1 - Correções UX Anteriores
 
