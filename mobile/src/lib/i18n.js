@@ -1090,9 +1090,9 @@ export const translations = {
   // ============================================
   it: {
     // Tabs
-    tabLinks: 'Link',
+    tabLinks: 'Links',
     tabNotes: 'Note',
-    tabClipboard: 'Appunti',
+    tabClipboard: 'Clipboard',
     tabFavorites: 'Preferiti',
     tabSettings: 'Impostazioni',
     
