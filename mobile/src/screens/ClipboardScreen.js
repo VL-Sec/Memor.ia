@@ -4,10 +4,56 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
 import { supabase, generateId } from '../lib/supabase';
 import { translations } from '../lib/i18n';
 import CustomHeader from '../components/CustomHeader';
+
+// Normalizar texto (remover acentos) para pesquisa
+const normalize = (text = '') =>
+  text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
+// Componente para highlight do texto na pesquisa
+const HighlightText = ({ text, highlight, style }) => {
+  if (!highlight || !text) return <Text style={style} numberOfLines={4} ellipsizeMode="tail">{text || ''}</Text>;
+  
+  const normalizedHighlight = normalize(highlight);
+  const normalizedText = normalize(text);
+  const parts = [];
+  let lastIndex = 0;
+  let index = normalizedText.indexOf(normalizedHighlight);
+  
+  while (index !== -1) {
+    if (index > lastIndex) {
+      parts.push({ text: text.slice(lastIndex, index), highlight: false });
+    }
+    parts.push({ text: text.slice(index, index + highlight.length), highlight: true });
+    lastIndex = index + highlight.length;
+    index = normalizedText.indexOf(normalizedHighlight, lastIndex);
+  }
+  
+  if (lastIndex < text.length) {
+    parts.push({ text: text.slice(lastIndex), highlight: false });
+  }
+  
+  if (parts.length === 0) return <Text style={style} numberOfLines={4} ellipsizeMode="tail">{text}</Text>;
+  
+  return (
+    <Text style={style} numberOfLines={4} ellipsizeMode="tail">
+      {parts.map((part, i) =>
+        part.highlight ? (
+          <Text key={i} style={{ backgroundColor: '#FFD60A', color: '#000000' }}>{part.text}</Text>
+        ) : (
+          <Text key={i}>{part.text}</Text>
+        )
+      )}
+    </Text>
+  );
+};
 
 export default function ClipboardScreen({ language, userId, refreshKey, triggerRefresh }) {
   const [notes, setNotes] = useState([]);
@@ -31,13 +77,33 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
   const [folderName, setFolderName] = useState('');
   const [creatingFolderFromPicker, setCreatingFolderFromPicker] = useState(false);
 
+  // ✅ NOVO: Seleção múltipla
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  
+  // ✅ NOVO: Ordenação customizável
+  const [sortBy, setSortBy] = useState('date_desc');
+  const [showSortModal, setShowSortModal] = useState(false);
+
   const insets = useSafeAreaInsets();
   const t = translations[language] || translations.en;
+
+  // Carregar preferência de ordenação
+  useEffect(() => {
+    AsyncStorage.getItem('clipboard-sortBy').then(v => v && setSortBy(v));
+  }, []);
+
+  // Guardar preferência de ordenação
+  useEffect(() => {
+    AsyncStorage.setItem('clipboard-sortBy', sortBy);
+  }, [sortBy]);
 
   // Reload when screen is focused
   useFocusEffect(
     useCallback(() => {
       fetchData();
+      // Sair do modo seleção ao mudar de tab
+      exitSelectionMode();
     }, [userId])
   );
 
@@ -75,6 +141,97 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
     }
   };
 
+  // ✅ NOVO: Funções de seleção múltipla
+  const onLongPressItem = (id) => {
+    Keyboard.dismiss();
+    setSelectionMode(true);
+    setSelectedIds(prev => new Set(prev).add(id));
+  };
+
+  const toggleSelect = (id) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      // Se não houver mais selecionados, sair do modo
+      if (next.size === 0) {
+        setSelectionMode(false);
+      }
+      return next;
+    });
+  };
+
+  const exitSelectionMode = () => {
+    setSelectionMode(false);
+    setSelectedIds(new Set());
+  };
+
+  const selectAll = () => {
+    const allIds = new Set(sortedNotes.map(n => n.id));
+    setSelectedIds(allIds);
+  };
+
+  // ✅ NOVO: Ações em bulk
+  const deleteSelected = () => {
+    if (selectedIds.size === 0) return;
+    Alert.alert(
+      t.delete || 'Eliminar',
+      `${t.deleteConfirm || 'Eliminar'} ${selectedIds.size} ${selectedIds.size === 1 ? 'item' : 'itens'}?`,
+      [
+        { text: t.cancel || 'Cancelar', style: 'cancel' },
+        {
+          text: t.delete || 'Eliminar',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const idsArray = Array.from(selectedIds);
+              for (const id of idsArray) {
+                await supabase.from('links').delete().eq('id', id);
+              }
+              setNotes(notes.filter(n => !selectedIds.has(n.id)));
+              Toast.show({ type: 'success', text1: `${selectedIds.size} ${t.deleted || 'eliminados'}` });
+              exitSelectionMode();
+              if (triggerRefresh) triggerRefresh();
+            } catch (error) {
+              console.error('Error deleting:', error);
+              Toast.show({ type: 'error', text1: t.error || 'Erro' });
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const favoriteSelected = async () => {
+    if (selectedIds.size === 0) return;
+    try {
+      const idsArray = Array.from(selectedIds);
+      for (const id of idsArray) {
+        await supabase.from('links').update({ isFavorite: true }).eq('id', id);
+      }
+      setNotes(notes.map(n => selectedIds.has(n.id) ? { ...n, isFavorite: true } : n));
+      Toast.show({ type: 'success', text1: `${selectedIds.size} ${t.addedToFavorites || 'adicionados aos favoritos'}` });
+      exitSelectionMode();
+      if (triggerRefresh) triggerRefresh();
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const pinSelected = async () => {
+    if (selectedIds.size === 0) return;
+    try {
+      const idsArray = Array.from(selectedIds);
+      for (const id of idsArray) {
+        await supabase.from('links').update({ isPinned: true }).eq('id', id);
+      }
+      setNotes(notes.map(n => selectedIds.has(n.id) ? { ...n, isPinned: true } : n));
+      Toast.show({ type: 'success', text1: `${selectedIds.size} ${t.pinned || 'fixados'}` });
+      exitSelectionMode();
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
   // Paste from clipboard
   const handlePasteFromClipboard = async () => {
     Keyboard.dismiss();
@@ -93,7 +250,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
 
   const handleAddNote = async () => {
     if (!newContent.trim()) return;
-    Keyboard.dismiss(); // Fechar teclado após adicionar
+    Keyboard.dismiss();
     try {
       const defaultFolder = folders.find(f => f.isDefault);
       const trimmedContent = newContent.trim();
@@ -184,7 +341,6 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
     ]);
   };
 
-  // Tocar no conteúdo abre o modal de edição (como nas Notas)
   const openEditModal = (item) => {
     Keyboard.dismiss();
     setEditingItem(item);
@@ -203,7 +359,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
 
   const handleSaveEdit = async () => {
     if (!editingItem) return;
-    Keyboard.dismiss(); // Fechar teclado ao guardar
+    Keyboard.dismiss();
     try {
       const updateData = {
         content: editContent,
@@ -243,7 +399,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
       Toast.show({ type: 'error', text1: t.error || 'Nome obrigatório' });
       return;
     }
-    Keyboard.dismiss(); // Fechar teclado ao guardar pasta
+    Keyboard.dismiss();
     
     const shouldSelectFolder = creatingFolderFromPicker;
     
@@ -309,84 +465,178 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
     );
   };
 
+  // ✅ NOVO: Filtro com normalização de acentos
   const filteredNotes = notes.filter(note => {
     const matchesFolder = selectedFolder === 'all' || note.folderId === selectedFolder;
-    const matchesSearch = !searchQuery || note.content?.toLowerCase().includes(searchQuery.toLowerCase());
+    if (!searchQuery) return matchesFolder;
+    
+    const q = normalize(searchQuery);
+    const matchesSearch = normalize(note.content).includes(q) || normalize(note.title).includes(q);
     return matchesFolder && matchesSearch;
   });
 
-  const sortedNotes = [...filteredNotes].sort((a, b) => {
-    if (a.isPinned && !b.isPinned) return -1;
-    if (!a.isPinned && b.isPinned) return 1;
-    return new Date(b.createdAt) - new Date(a.createdAt);
-  });
+  // ✅ NOVO: Ordenação centralizada
+  const sortNotes = (notesToSort) => {
+    const sorted = [...notesToSort];
+    
+    // Primeiro, sempre manter pinned no topo
+    sorted.sort((a, b) => {
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
+      return 0;
+    });
+    
+    // Depois, aplicar ordenação secundária dentro de cada grupo
+    const pinned = sorted.filter(n => n.isPinned);
+    const unpinned = sorted.filter(n => !n.isPinned);
+    
+    const sortGroup = (group) => {
+      switch (sortBy) {
+        case 'title':
+          return group.sort((a, b) => (a.title || a.content || '').localeCompare(b.title || b.content || ''));
+        case 'favorites':
+          return group.sort((a, b) => Number(b.isFavorite) - Number(a.isFavorite));
+        case 'date_asc':
+          return group.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+        case 'date_desc':
+        default:
+          return group.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      }
+    };
+    
+    return [...sortGroup(pinned), ...sortGroup(unpinned)];
+  };
 
-  // Render item: toque no conteúdo abre edit modal (sem botão editar separado)
-  const renderNoteItem = ({ item }) => (
-    <View style={styles.noteCard}>
-      {/* Toque no conteúdo = abrir modal de edição (como nas Notas) */}
-      <TouchableOpacity 
-        style={styles.noteContent}
-        onPress={() => openEditModal(item)}
-        activeOpacity={0.7}
-      >
-        <Text style={styles.noteText} numberOfLines={4} ellipsizeMode="tail">{item.content || ''}</Text>
-      </TouchableOpacity>
-      
-      {/* Ações: Copiar, Favorito, Pin, Apagar (sem Editar) */}
-      <View style={styles.noteActions}>
+  const sortedNotes = sortNotes(filteredNotes);
+
+  const getSortLabel = () => {
+    switch (sortBy) {
+      case 'title': return t.sortByTitle || 'Título';
+      case 'favorites': return t.sortByFavorites || 'Favoritos';
+      case 'date_asc': return t.sortByDateAsc || 'Mais antigos';
+      case 'date_desc': 
+      default: return t.sortByDateDesc || 'Mais recentes';
+    }
+  };
+
+  // Render item com suporte a seleção
+  const renderNoteItem = ({ item }) => {
+    const isSelected = selectedIds.has(item.id);
+    
+    return (
+      <View style={[styles.noteCard, isSelected && styles.noteCardSelected]}>
         <TouchableOpacity 
-          style={styles.actionBtn} 
-          onPress={(e) => handleCopyNote(item.content, e)}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          style={styles.noteContent}
+          onPress={() => selectionMode ? toggleSelect(item.id) : openEditModal(item)}
+          onLongPress={() => onLongPressItem(item.id)}
+          activeOpacity={0.7}
         >
-          <Ionicons name="copy-outline" size={18} color="#8E8E93" />
+          <View style={styles.noteContentRow}>
+            {selectionMode && (
+              <Ionicons 
+                name={isSelected ? 'checkbox' : 'square-outline'} 
+                size={22} 
+                color="#007AFF" 
+                style={styles.checkbox}
+              />
+            )}
+            <View style={styles.noteTextContainer}>
+              <HighlightText 
+                text={item.content || ''} 
+                highlight={searchQuery}
+                style={styles.noteText}
+              />
+            </View>
+          </View>
         </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.actionBtn} 
-          onPress={(e) => handleToggleFavorite(item, e)}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <Ionicons name={item.isFavorite ? 'heart' : 'heart-outline'} size={18} color={item.isFavorite ? '#FF3B30' : '#8E8E93'} />
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.actionBtn} 
-          onPress={(e) => handleTogglePin(item, e)}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <Ionicons name="pin" size={18} color={item.isPinned ? '#FFD60A' : '#8E8E93'} />
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.actionBtn} 
-          onPress={(e) => handleDeleteNote(item.id, e)}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <Ionicons name="trash-outline" size={18} color="#FF3B30" />
-        </TouchableOpacity>
+        
+        {!selectionMode && (
+          <View style={styles.noteActions}>
+            <TouchableOpacity 
+              style={styles.actionBtn} 
+              onPress={(e) => handleCopyNote(item.content, e)}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Ionicons name="copy-outline" size={18} color="#8E8E93" />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.actionBtn} 
+              onPress={(e) => handleToggleFavorite(item, e)}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Ionicons name={item.isFavorite ? 'heart' : 'heart-outline'} size={18} color={item.isFavorite ? '#FF3B30' : '#8E8E93'} />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.actionBtn} 
+              onPress={(e) => handleTogglePin(item, e)}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Ionicons name="pin" size={18} color={item.isPinned ? '#FFD60A' : '#8E8E93'} />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.actionBtn} 
+              onPress={(e) => handleDeleteNote(item.id, e)}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Ionicons name="trash-outline" size={18} color="#FF3B30" />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <CustomHeader title={t.tabClipboard || 'Clipboard'} />
       <View style={[styles.container, { paddingBottom: insets.bottom + 16 }]}>
-        {/* Search */}
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color="#8E8E93" />
-          <TextInput 
-            style={styles.searchInput} 
-            placeholder={t.search || 'Pesquisar...'} 
-            placeholderTextColor="#8E8E93" 
-            value={searchQuery} 
-            onChangeText={setSearchQuery}
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => { Keyboard.dismiss(); setSearchQuery(''); }}>
-              <Ionicons name="close-circle" size={18} color="#8E8E93" />
+        
+        {/* ✅ NOVO: Barra de seleção múltipla */}
+        {selectionMode && (
+          <View style={styles.selectionBar}>
+            <TouchableOpacity onPress={exitSelectionMode} style={styles.selectionBarBtn}>
+              <Ionicons name="close" size={24} color="#FFFFFF" />
             </TouchableOpacity>
-          )}
+            <Text style={styles.selectionBarText}>{selectedIds.size} {t.selected || 'selecionados'}</Text>
+            <View style={styles.selectionBarActions}>
+              <TouchableOpacity onPress={selectAll} style={styles.selectionBarBtn}>
+                <Ionicons name="checkmark-done" size={22} color="#007AFF" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={favoriteSelected} style={styles.selectionBarBtn}>
+                <Ionicons name="heart" size={22} color="#FF3B30" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={pinSelected} style={styles.selectionBarBtn}>
+                <Ionicons name="pin" size={22} color="#FFD60A" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={deleteSelected} style={styles.selectionBarBtn}>
+                <Ionicons name="trash" size={22} color="#FF3B30" />
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
+        {/* Search + Sort */}
+        <View style={styles.searchRow}>
+          <View style={styles.searchContainer}>
+            <Ionicons name="search" size={20} color="#8E8E93" />
+            <TextInput 
+              style={styles.searchInput} 
+              placeholder={t.search || 'Pesquisar...'} 
+              placeholderTextColor="#8E8E93" 
+              value={searchQuery} 
+              onChangeText={setSearchQuery}
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => { Keyboard.dismiss(); setSearchQuery(''); }}>
+                <Ionicons name="close-circle" size={18} color="#8E8E93" />
+              </TouchableOpacity>
+            )}
+          </View>
+          {/* ✅ NOVO: Botão de ordenação */}
+          <TouchableOpacity style={styles.sortButton} onPress={() => setShowSortModal(true)}>
+            <Ionicons name="swap-vertical" size={20} color="#007AFF" />
+          </TouchableOpacity>
         </View>
 
         {/* Add new content */}
@@ -458,8 +708,66 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
             contentContainerStyle={styles.listContent} 
             keyboardShouldPersistTaps="handled"
             refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchData(); }} tintColor="#007AFF" />}
+            extraData={[selectionMode, selectedIds, searchQuery]}
           />
         )}
+
+        {/* ✅ NOVO: Sort Modal */}
+        <Modal visible={showSortModal} animationType="fade" transparent={true} onRequestClose={() => setShowSortModal(false)}>
+          <TouchableWithoutFeedback onPress={() => setShowSortModal(false)}>
+            <View style={styles.sortModalOverlay}>
+              <TouchableWithoutFeedback>
+                <View style={[styles.sortModalContent, { paddingBottom: insets.bottom + 20 }]}>
+                  <Text style={styles.sortModalTitle}>{t.sortBy || 'Ordenar por'}</Text>
+                  
+                  <TouchableOpacity 
+                    style={[styles.sortOption, sortBy === 'date_desc' && styles.sortOptionActive]} 
+                    onPress={() => { setSortBy('date_desc'); setShowSortModal(false); }}
+                  >
+                    <Ionicons name="time-outline" size={22} color={sortBy === 'date_desc' ? '#007AFF' : '#FFFFFF'} />
+                    <Text style={[styles.sortOptionText, sortBy === 'date_desc' && styles.sortOptionTextActive]}>
+                      {t.sortByDateDesc || 'Mais recentes'}
+                    </Text>
+                    {sortBy === 'date_desc' && <Ionicons name="checkmark" size={22} color="#007AFF" />}
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity 
+                    style={[styles.sortOption, sortBy === 'date_asc' && styles.sortOptionActive]} 
+                    onPress={() => { setSortBy('date_asc'); setShowSortModal(false); }}
+                  >
+                    <Ionicons name="time-outline" size={22} color={sortBy === 'date_asc' ? '#007AFF' : '#FFFFFF'} />
+                    <Text style={[styles.sortOptionText, sortBy === 'date_asc' && styles.sortOptionTextActive]}>
+                      {t.sortByDateAsc || 'Mais antigos'}
+                    </Text>
+                    {sortBy === 'date_asc' && <Ionicons name="checkmark" size={22} color="#007AFF" />}
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity 
+                    style={[styles.sortOption, sortBy === 'title' && styles.sortOptionActive]} 
+                    onPress={() => { setSortBy('title'); setShowSortModal(false); }}
+                  >
+                    <Ionicons name="text-outline" size={22} color={sortBy === 'title' ? '#007AFF' : '#FFFFFF'} />
+                    <Text style={[styles.sortOptionText, sortBy === 'title' && styles.sortOptionTextActive]}>
+                      {t.sortByTitle || 'Título (A-Z)'}
+                    </Text>
+                    {sortBy === 'title' && <Ionicons name="checkmark" size={22} color="#007AFF" />}
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity 
+                    style={[styles.sortOption, sortBy === 'favorites' && styles.sortOptionActive]} 
+                    onPress={() => { setSortBy('favorites'); setShowSortModal(false); }}
+                  >
+                    <Ionicons name="heart-outline" size={22} color={sortBy === 'favorites' ? '#007AFF' : '#FFFFFF'} />
+                    <Text style={[styles.sortOptionText, sortBy === 'favorites' && styles.sortOptionTextActive]}>
+                      {t.sortByFavorites || 'Favoritos primeiro'}
+                    </Text>
+                    {sortBy === 'favorites' && <Ionicons name="checkmark" size={22} color="#007AFF" />}
+                  </TouchableOpacity>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
 
         {/* Edit Modal com KeyboardAvoidingView */}
         <Modal visible={showEditModal} animationType="slide" transparent={true} onRequestClose={closeEditModal}>
@@ -620,8 +928,28 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#000000' },
   container: { flex: 1, backgroundColor: '#000000' },
-  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1C1C1E', margin: 16, marginBottom: 8, paddingHorizontal: 12, borderRadius: 12, height: 44 },
+  
+  // ✅ NOVO: Barra de seleção
+  selectionBar: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    backgroundColor: '#1C1C1E', 
+    paddingHorizontal: 12, 
+    paddingVertical: 10,
+    marginHorizontal: 16,
+    marginTop: 8,
+    borderRadius: 12,
+  },
+  selectionBarBtn: { padding: 8 },
+  selectionBarText: { flex: 1, color: '#FFFFFF', fontSize: 16, fontWeight: '600', marginLeft: 8 },
+  selectionBarActions: { flexDirection: 'row', gap: 4 },
+  
+  // Search + Sort row
+  searchRow: { flexDirection: 'row', alignItems: 'center', marginHorizontal: 16, marginTop: 16, marginBottom: 8, gap: 8 },
+  searchContainer: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: '#1C1C1E', paddingHorizontal: 12, borderRadius: 12, height: 44 },
   searchInput: { flex: 1, marginLeft: 8, color: '#FFFFFF', fontSize: 16 },
+  sortButton: { backgroundColor: '#1C1C1E', width: 44, height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
+  
   addContainer: { flexDirection: 'row', marginHorizontal: 16, marginBottom: 8, gap: 8, alignItems: 'flex-end' },
   addInput: { flex: 1, backgroundColor: '#1C1C1E', paddingHorizontal: 16, paddingVertical: 12, borderRadius: 12, color: '#FFFFFF', fontSize: 16, minHeight: 44, maxHeight: 120 },
   pasteButton: { backgroundColor: '#1C1C1E', width: 44, height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
@@ -636,13 +964,30 @@ const styles = StyleSheet.create({
   folderChipTextActive: { color: '#FFFFFF' },
   addFolderChip: { backgroundColor: '#2C2C2E', width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#3A3A3C' },
   listContent: { padding: 16, paddingTop: 8, paddingBottom: 20 },
+  
+  // Note cards
   noteCard: { backgroundColor: '#1C1C1E', borderRadius: 12, marginBottom: 10, flexDirection: 'row', overflow: 'hidden' },
+  noteCardSelected: { backgroundColor: '#2C2C2E', borderWidth: 2, borderColor: '#007AFF' },
   noteContent: { flex: 1, padding: 14 },
+  noteContentRow: { flexDirection: 'row', alignItems: 'flex-start' },
+  checkbox: { marginRight: 12, marginTop: 2 },
+  noteTextContainer: { flex: 1 },
   noteText: { color: '#FFFFFF', fontSize: 13, lineHeight: 18 },
   noteActions: { justifyContent: 'center', alignItems: 'center', paddingHorizontal: 6, gap: 2, backgroundColor: '#1C1C1E', borderLeftWidth: 1, borderLeftColor: '#2C2C2E' },
   actionBtn: { padding: 6 },
+  
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 100 },
   emptyText: { color: '#8E8E93', fontSize: 16, marginTop: 16 },
+  
+  // ✅ NOVO: Sort Modal
+  sortModalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.8)', justifyContent: 'flex-end' },
+  sortModalContent: { backgroundColor: '#1C1C1E', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20 },
+  sortModalTitle: { color: '#FFFFFF', fontSize: 20, fontWeight: '700', marginBottom: 20, textAlign: 'center' },
+  sortOption: { flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 12, marginBottom: 8, gap: 12 },
+  sortOptionActive: { backgroundColor: 'rgba(0, 122, 255, 0.15)' },
+  sortOptionText: { flex: 1, color: '#FFFFFF', fontSize: 16 },
+  sortOptionTextActive: { color: '#007AFF', fontWeight: '600' },
+  
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.8)', justifyContent: 'flex-end' },
   modalContent: { backgroundColor: '#1C1C1E', borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '85%' },
   modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 20, borderBottomWidth: 1, borderBottomColor: '#2C2C2E' },
