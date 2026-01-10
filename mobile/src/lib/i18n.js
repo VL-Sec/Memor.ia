@@ -696,9 +696,9 @@ export const translations = {
   // ============================================
   fr: {
     // Tabs
-    tabLinks: 'Liens',
+    tabLinks: 'Links',
     tabNotes: 'Notes',
-    tabClipboard: 'Presse-papiers',
+    tabClipboard: 'Clipboard',
     tabFavorites: 'Favoris',
     tabSettings: 'Réglages',
     
