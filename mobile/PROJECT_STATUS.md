@@ -314,42 +314,24 @@ eas build --platform ios --profile preview
 
 ---
 
-# 🎯 CORREÇÕES APLICADAS (Junho 2025 - Sessão Atual)
+# 🎯 CORREÇÕES APLICADAS (Junho 2025)
 
-## Auditoria Completa + Correções (Sessão 2)
+## ✅ MANTIDO - Pesquisa Melhorada
+- Função `normalize()` em todas as telas (Links, Clipboard, Notes, Favorites)
+- Pesquisa ignora acentos (café = cafe)
+- Pesquisa ignora maiúsculas/minúsculas
+- Pesquisa limitada à tela atual (sem cruzamento)
+- Botão ❌ para limpar pesquisa em todas as telas
 
-**1. ✅ i18n - Termos fixos corrigidos:**
-- "Links" e "Clipboard" agora são FIXOS em todos os 6 idiomas
-- Corrigido ES (era: Enlaces, Portapapeles)
-- Corrigido FR (era: Liens, Presse-papiers)
-- Corrigido DE (era: Zwischenablage)
-- Corrigido IT (era: Link, Appunti)
+## ❌ REVERTIDO (após testes)
+- Seleção múltipla no Clipboard
+- Ordenação customizável no Clipboard
+- Highlight de texto na pesquisa
+- KeyboardAvoidingView no NotesScreen
+- i18n: termos fixos (Links/Clipboard) - voltou ao original traduzido
+- i18n: limpeza de strings mortas
 
-**2. ✅ i18n - Limpeza de código morto:**
-- Removidas 52 linhas de strings não utilizadas
-- Removido: `smartClipboard*` (funcionalidade eliminada)
-- Removido: `weeklySummary*` (funcionalidade eliminada)
-
-**3. ✅ NotesScreen - KeyboardAvoidingView:**
-- Adicionado `KeyboardAvoidingView` ao modal de edição
-- Adicionado `keyboardShouldPersistTaps="handled"` ao ScrollView
-- Alinhado com comportamento de ClipboardScreen e LinksScreen
-
-**4. ✅ Pesquisa melhorada (todas as telas):**
-- Função `normalize()` adicionada a todas as telas
-- Ignora maiúsculas/minúsculas
-- Ignora acentos (café = cafe = CAFÉ)
-- Cada tela pesquisa apenas nos seus próprios dados
-- Implementado: LinksScreen, ClipboardScreen, NotesScreen, FavoritesScreen
-
-**5. ⚠️ ClipboardScreen - Funcionalidades REVERTIDAS:**
-- ❌ Seleção múltipla (revertida após testes)
-- ❌ Ordenação customizável (revertida após testes)
-- ❌ Highlight de texto na pesquisa (revertido)
-- ✅ Mantida: pesquisa com normalize() (acentos + maiúsculas)
-- ✅ Mantido: botão ❌ para limpar pesquisa
-
-## Sessão 1 - Correções UX Anteriores
+## Sessão Anterior - Correções Estáveis
 
 1. ✅ Tab Bar com traduções dinâmicas (`t.tabLinks`, `t.tabNotes`, etc.)
 2. ✅ Tab Bar com `tabBarItemStyle: { flex: 1 }` para distribuição uniforme
