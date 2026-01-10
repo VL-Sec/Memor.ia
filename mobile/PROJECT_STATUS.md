@@ -368,6 +368,12 @@ eas build --platform ios --profile preview
 **KeyboardAvoidingView:**
 - Implementado em todos os modais (Links, Clipboard, Notes)
 
+**Safe Area / Responsividade:**
+- `useSafeAreaInsets()` em todas as telas
+- Padding dinâmico no container principal
+- Modais adaptam-se a diferentes tamanhos de ecrã
+- Modal de criar pasta centrado (funciona em ecrãs pequenos e grandes)
+
 ## ❌ REVERTIDO (após testes)
 - Seleção múltipla no Clipboard
 - Ordenação customizável no Clipboard
