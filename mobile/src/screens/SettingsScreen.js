@@ -218,7 +218,7 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
         {/* Language Modal */}
         <Modal visible={showLanguageModal} animationType="slide" transparent={true} onRequestClose={() => setShowLanguageModal(false)}>
           <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
+            <View style={[styles.modalContent, { paddingBottom: insets.bottom + 20 }]}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>{t.language || 'Language'}</Text>
                 <TouchableOpacity onPress={() => setShowLanguageModal(false)}>
@@ -241,7 +241,7 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
         {/* Activation Modal */}
         <Modal visible={showActivationModal} animationType="slide" transparent={true} onRequestClose={() => setShowActivationModal(false)}>
           <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
+            <View style={[styles.modalContent, { paddingBottom: insets.bottom + 20 }]}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>{t.activationCode || 'Activation Code'}</Text>
                 <TouchableOpacity onPress={() => setShowActivationModal(false)}>
