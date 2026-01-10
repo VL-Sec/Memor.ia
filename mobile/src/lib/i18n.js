@@ -895,7 +895,7 @@ export const translations = {
     // Tabs
     tabLinks: 'Links',
     tabNotes: 'Notizen',
-    tabClipboard: 'Zwischenablage',
+    tabClipboard: 'Clipboard',
     tabFavorites: 'Favoriten',
     tabSettings: 'Einstellungen',
     
