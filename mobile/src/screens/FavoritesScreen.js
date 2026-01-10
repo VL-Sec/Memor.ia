@@ -10,6 +10,13 @@ import { supabase } from '../lib/supabase';
 import { translations } from '../lib/i18n';
 import CustomHeader from '../components/CustomHeader';
 
+// Normalizar texto (remover acentos + minúsculas) para pesquisa
+const normalize = (text = '') =>
+  text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
 // Helper function to format date according to user's system locale
 const formatDateLocale = (dateStr) => {
   const date = new Date(dateStr);
@@ -158,10 +165,10 @@ export default function FavoritesScreen({ language, userId, refreshKey }) {
       if (filter === 'clipboard' && itemType !== 'clipboard') return false;
     }
     if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    return item.title?.toLowerCase().includes(query) || 
-           item.url?.toLowerCase().includes(query) || 
-           item.content?.toLowerCase().includes(query);
+    const q = normalize(searchQuery);
+    return normalize(item.title).includes(q) || 
+           normalize(item.url).includes(q) || 
+           normalize(item.content).includes(q);
   });
 
   const renderItem = ({ item }) => {
