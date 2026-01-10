@@ -365,7 +365,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <CustomHeader title="Memor.ia" />
       <View style={[styles.container, { paddingBottom: insets.bottom + 16 }]}>
         <View style={styles.searchContainer}>

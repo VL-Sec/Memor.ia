@@ -382,7 +382,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <CustomHeader title={t.tabClipboard || 'Clipboard'} />
       <View style={[styles.container, { paddingBottom: insets.bottom + 16 }]}>
 

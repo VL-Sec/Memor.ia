@@ -105,7 +105,7 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
   const navigation = useNavigation();
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <View style={styles.headerContainer}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="#007AFF" />

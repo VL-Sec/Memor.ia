@@ -278,7 +278,7 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <CustomHeader title={t.tabNotes || 'Notas'} />
       <View style={[styles.container, { paddingBottom: insets.bottom + 16 }]}>
         {/* Search */}
