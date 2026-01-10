@@ -166,26 +166,44 @@ export default function AdminDashboard() {
   // Deactivate code (mark as used without actual use)
   const handleDeactivateCode = async (codeId) => {
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        toast({
+          title: 'Erro',
+          description: 'Sessão expirada. Faça login novamente.',
+          variant: 'destructive'
+        })
+        router.push('/admin')
+        return
+      }
+
       const { error } = await supabase
         .from('activation_codes')
         .update({ is_used: true, used_at: new Date().toISOString() })
         .eq('id', codeId)
 
-      if (error) throw error
+      if (error) {
+        console.error('Deactivate error details:', error)
+        throw error
+      }
+
+      // Update local state immediately
+      setCodes(prevCodes => prevCodes.map(c => 
+        c.id === codeId ? { ...c, is_used: true, used_at: new Date().toISOString() } : c
+      ))
 
       toast({
         title: 'Sucesso',
         description: 'Código desativado'
       })
-      
-      fetchData()
     } catch (error) {
       console.error('Error deactivating code:', error)
       toast({
         title: 'Erro',
-        description: 'Falha ao desativar código',
+        description: error.message || 'Falha ao desativar código',
         variant: 'destructive'
       })
+      fetchData()
     }
   }
 
