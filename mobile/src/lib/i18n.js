@@ -59,7 +59,6 @@ export const translations = {
     start: 'Start',
     stop: 'Stop',
     autoSaved: 'Auto-saved',
-    smartClipboardDeactivated: 'Smart Capture deactivated',
     deleteFolderConfirmSimple: 'Are you sure you want to delete this folder?',
     
     // Links
@@ -73,9 +72,6 @@ export const translations = {
     clipboardPlaceholder: 'Paste your text here...',
     noClipboardItems: 'Nothing here yet',
     chars: 'characters',
-    smartClipboard: 'Smart Capture',
-    smartClipboardInfo: 'Automatically saves everything you copy for 2 minutes.',
-    smartClipboardActivated: 'Smart Capture is now active',
     activate: 'Activate',
     deactivate: 'Deactivate',
     timeRemaining: 'left',
@@ -176,16 +172,10 @@ export const translations = {
     
     // Notifications
     notifications: 'Notifications',
-    weeklySummary: 'Weekly Digest',
-    weeklySummaryInfo: 'Get a weekly reminder to review your saved content',
     dayOfWeek: 'Day',
     time: 'Time',
     selectDay: 'Select day',
     selectTime: 'Select time',
-    weeklySummaryEnabled: 'Weekly digest enabled',
-    weeklySummaryDisabled: 'Weekly digest disabled',
-    weeklySummaryTitle: 'Memor.ia - Weekly Summary',
-    weeklySummaryBody: 'You have saved links and notes to review!',
     daySaved: 'Day saved',
     notificationPermissionRequired: 'Please enable notifications in your device settings to receive weekly summaries.',
     expoGoNotSupported: 'Notifications are not supported in Expo Go. Please use the published app to enable this feature.',
@@ -299,7 +289,6 @@ export const translations = {
     start: 'Iniciar',
     stop: 'Parar',
     autoSaved: 'Guardado automaticamente',
-    smartClipboardDeactivated: 'Captura inteligente desativada',
     deleteFolderConfirmSimple: 'Tens a certeza que queres eliminar esta pasta?',
     
     // Links
@@ -313,9 +302,6 @@ export const translations = {
     clipboardPlaceholder: 'Cola o texto aqui...',
     noClipboardItems: 'Ainda não há nada aqui',
     chars: 'caracteres',
-    smartClipboard: 'Captura Inteligente',
-    smartClipboardInfo: 'Guarda automaticamente tudo o que copiares durante 2 minutos.',
-    smartClipboardActivated: 'Captura inteligente ativada',
     activate: 'Ativar',
     deactivate: 'Desativar',
     timeRemaining: 'restante',
@@ -416,16 +402,10 @@ export const translations = {
     
     // Notifications
     notifications: 'Notificações',
-    weeklySummary: 'Resumo Semanal',
-    weeklySummaryInfo: 'Recebe um lembrete semanal para rever o que guardaste',
     dayOfWeek: 'Dia',
     time: 'Hora',
     selectDay: 'Selecionar dia',
     selectTime: 'Selecionar hora',
-    weeklySummaryEnabled: 'Resumo semanal ativado',
-    weeklySummaryDisabled: 'Resumo semanal desativado',
-    weeklySummaryTitle: 'Memor.ia - Resumo Semanal',
-    weeklySummaryBody: 'Tens links e notas guardados para rever!',
     daySaved: 'Dia guardado',
     notificationPermissionRequired: 'Ativa as notificações nas definições do dispositivo para receberes resumos semanais.',
     expoGoNotSupported: 'As notificações não estão disponíveis no Expo Go. Por favor, usa a app publicada para ativar esta funcionalidade.',
@@ -539,7 +519,6 @@ export const translations = {
     start: 'Iniciar',
     stop: 'Detener',
     autoSaved: 'Guardado automáticamente',
-    smartClipboardDeactivated: 'Captura inteligente desactivada',
     deleteFolderConfirmSimple: '¿Estás seguro de que quieres eliminar esta carpeta?',
     
     // Links
@@ -553,9 +532,6 @@ export const translations = {
     clipboardPlaceholder: 'Pega tu texto aquí...',
     noClipboardItems: 'Todavía no hay nada aquí',
     chars: 'caracteres',
-    smartClipboard: 'Captura Inteligente',
-    smartClipboardInfo: 'Guarda automáticamente todo lo que copies durante 2 minutos.',
-    smartClipboardActivated: 'Captura inteligente activada',
     activate: 'Activar',
     deactivate: 'Desactivar',
     timeRemaining: 'restante',
@@ -635,14 +611,10 @@ export const translations = {
     
     // Notifications
     notifications: 'Notificaciones',
-    weeklySummary: 'Resumen Semanal',
-    weeklySummaryInfo: 'Recibe un recordatorio semanal para revisar lo que has guardado',
     dayOfWeek: 'Día',
     time: 'Hora',
     selectDay: 'Seleccionar día',
     selectTime: 'Seleccionar hora',
-    weeklySummaryEnabled: 'Resumen semanal activado',
-    weeklySummaryDisabled: 'Resumen semanal desactivado',
     notificationPermissionRequired: 'Activa las notificaciones en los ajustes del dispositivo para recibir resúmenes semanales.',
     expoGoNotSupported: 'Las notificaciones no están disponibles en Expo Go. Por favor, usa la app publicada para activar esta función.',
     notificationError: 'No se pudieron activar las notificaciones. Inténtalo de nuevo más tarde.',
@@ -736,7 +708,6 @@ export const translations = {
     start: 'Démarrer',
     stop: 'Arrêter',
     autoSaved: 'Sauvegardé automatiquement',
-    smartClipboardDeactivated: 'Capture intelligente désactivée',
     deleteFolderConfirmSimple: 'Êtes-vous sûr de vouloir supprimer ce dossier ?',
     
     // Links
@@ -750,9 +721,6 @@ export const translations = {
     clipboardPlaceholder: 'Collez votre texte ici...',
     noClipboardItems: 'Rien ici pour le moment',
     chars: 'caractères',
-    smartClipboard: 'Capture Intelligente',
-    smartClipboardInfo: 'Enregistre automatiquement tout ce que vous copiez pendant 2 minutes.',
-    smartClipboardActivated: 'Capture intelligente activée',
     activate: 'Activer',
     deactivate: 'Désactiver',
     timeRemaining: 'restant',
@@ -832,14 +800,10 @@ export const translations = {
     
     // Notifications
     notifications: 'Notifications',
-    weeklySummary: 'Récapitulatif Hebdomadaire',
-    weeklySummaryInfo: 'Recevez un rappel hebdomadaire pour revoir ce que vous avez enregistré',
     dayOfWeek: 'Jour',
     time: 'Heure',
     selectDay: 'Choisir le jour',
     selectTime: 'Choisir l\'heure',
-    weeklySummaryEnabled: 'Récapitulatif hebdomadaire activé',
-    weeklySummaryDisabled: 'Récapitulatif hebdomadaire désactivé',
     notificationPermissionRequired: 'Veuillez activer les notifications dans les réglages de votre appareil pour recevoir les récapitulatifs hebdomadaires.',
     expoGoNotSupported: 'Les notifications ne sont pas disponibles dans Expo Go. Veuillez utiliser l\'application publiée pour activer cette fonctionnalité.',
     notificationError: 'Impossible d\'activer les notifications. Veuillez réessayer plus tard.',
@@ -933,7 +897,6 @@ export const translations = {
     start: 'Starten',
     stop: 'Stoppen',
     autoSaved: 'Automatisch gespeichert',
-    smartClipboardDeactivated: 'Intelligente Zwischenablage deaktiviert',
     deleteFolderConfirmSimple: 'Bist du sicher, dass du diesen Ordner löschen möchtest?',
     
     // Links
@@ -947,9 +910,6 @@ export const translations = {
     clipboardPlaceholder: 'Text hier einfügen...',
     noClipboardItems: 'Noch nichts hier',
     chars: 'Zeichen',
-    smartClipboard: 'Intelligente Erfassung',
-    smartClipboardInfo: 'Speichert automatisch alles, was du kopierst, für 2 Minuten.',
-    smartClipboardActivated: 'Intelligente Erfassung aktiviert',
     activate: 'Aktivieren',
     deactivate: 'Deaktivieren',
     timeRemaining: 'verbleibend',
@@ -1029,14 +989,10 @@ export const translations = {
     
     // Notifications
     notifications: 'Benachrichtigungen',
-    weeklySummary: 'Wöchentliche Zusammenfassung',
-    weeklySummaryInfo: 'Erhalte eine wöchentliche Erinnerung, um deine gespeicherten Inhalte zu überprüfen',
     dayOfWeek: 'Tag',
     time: 'Uhrzeit',
     selectDay: 'Tag wählen',
     selectTime: 'Uhrzeit wählen',
-    weeklySummaryEnabled: 'Wöchentliche Zusammenfassung aktiviert',
-    weeklySummaryDisabled: 'Wöchentliche Zusammenfassung deaktiviert',
     notificationPermissionRequired: 'Bitte aktiviere Benachrichtigungen in deinen Geräteeinstellungen, um wöchentliche Zusammenfassungen zu erhalten.',
     expoGoNotSupported: 'Benachrichtigungen sind in Expo Go nicht verfügbar. Bitte verwende die veröffentlichte App, um diese Funktion zu aktivieren.',
     notificationError: 'Benachrichtigungen konnten nicht aktiviert werden. Bitte versuche es später erneut.',
@@ -1130,7 +1086,6 @@ export const translations = {
     start: 'Avvia',
     stop: 'Ferma',
     autoSaved: 'Salvato automaticamente',
-    smartClipboardDeactivated: 'Appunti intelligenti disattivati',
     deleteFolderConfirmSimple: 'Sei sicuro di voler eliminare questa cartella?',
     
     // Links
@@ -1144,9 +1099,6 @@ export const translations = {
     clipboardPlaceholder: 'Incolla il testo qui...',
     noClipboardItems: 'Ancora niente qui',
     chars: 'caratteri',
-    smartClipboard: 'Cattura Intelligente',
-    smartClipboardInfo: 'Salva automaticamente tutto ciò che copi per 2 minuti.',
-    smartClipboardActivated: 'Cattura intelligente attivata',
     activate: 'Attiva',
     deactivate: 'Disattiva',
     timeRemaining: 'rimanente',
@@ -1226,14 +1178,10 @@ export const translations = {
     
     // Notifications
     notifications: 'Notifiche',
-    weeklySummary: 'Riepilogo Settimanale',
-    weeklySummaryInfo: 'Ricevi un promemoria settimanale per rivedere i contenuti salvati',
     dayOfWeek: 'Giorno',
     time: 'Ora',
     selectDay: 'Seleziona giorno',
     selectTime: 'Seleziona ora',
-    weeklySummaryEnabled: 'Riepilogo settimanale attivato',
-    weeklySummaryDisabled: 'Riepilogo settimanale disattivato',
     notificationPermissionRequired: 'Attiva le notifiche nelle impostazioni del dispositivo per ricevere i riepiloghi settimanali.',
     expoGoNotSupported: 'Le notifiche non sono disponibili in Expo Go. Per favore, usa l\'app pubblicata per attivare questa funzionalità.',
     notificationError: 'Impossibile attivare le notifiche. Riprova più tardi.',
