@@ -361,7 +361,12 @@ export default function LinksScreen({ language, userId, refreshKey }) {
       <View style={[styles.container, { paddingBottom: insets.bottom + 16 }]}>
         <View style={styles.searchContainer}>
           <Ionicons name="search" size={20} color="#8E8E93" />
-          <TextInput style={styles.searchInput} placeholder={t.search} placeholderTextColor="#8E8E93" value={searchQuery} onChangeText={setSearchQuery} onBlur={() => setSearchQuery('')} />
+          <TextInput style={styles.searchInput} placeholder={t.search} placeholderTextColor="#8E8E93" value={searchQuery} onChangeText={setSearchQuery} />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => { Keyboard.dismiss(); setSearchQuery(''); }}>
+              <Ionicons name="close-circle" size={18} color="#8E8E93" />
+            </TouchableOpacity>
+          )}
         </View>
         
         <View style={styles.addContainer}>

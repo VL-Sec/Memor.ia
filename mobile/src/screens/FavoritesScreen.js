@@ -216,8 +216,12 @@ export default function FavoritesScreen({ language, userId, refreshKey }) {
             placeholderTextColor="#8E8E93" 
             value={searchQuery} 
             onChangeText={setSearchQuery}
-            onBlur={() => setSearchQuery('')}
           />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => { Keyboard.dismiss(); setSearchQuery(''); }}>
+              <Ionicons name="close-circle" size={18} color="#8E8E93" />
+            </TouchableOpacity>
+          )}
         </View>
 
         <View style={styles.filterWrapper}>
