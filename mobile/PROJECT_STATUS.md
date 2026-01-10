@@ -132,16 +132,20 @@ Stack.Navigator (raiz)
 
 **Ficheiro:** `/app/mobile/src/lib/i18n.js`
 
-| Idioma | Código | Tabs | Smart Clipboard |
-|--------|--------|------|-----------------|
-| 🇬🇧 English | en | Links, Clipboard, Notes, Favorites | Smart Capture |
-| 🇵🇹 Português | pt | Links, Clipboard, Notas, Favoritos | Captura Inteligente |
-| 🇪🇸 Español | es | Enlaces, Portapapeles, Notas, Favoritos | Captura Inteligente |
-| 🇫🇷 Français | fr | Liens, Presse-papiers, Notes, Favoris | Capture Intelligente |
-| 🇩🇪 Deutsch | de | Links, Zwischenablage, Notizen, Favoriten | Intelligente Erfassung |
-| 🇮🇹 Italiano | it | Link, Appunti, Note, Preferiti | Cattura Intelligente |
+| Idioma | Código | Tabs |
+|--------|--------|------|
+| 🇬🇧 English | en | Links, Clipboard, Notes, Favorites |
+| 🇵🇹 Português | pt | Links, Clipboard, Notas, Favoritos |
+| 🇪🇸 Español | es | Links, Clipboard, Notas, Favoritos |
+| 🇫🇷 Français | fr | Links, Clipboard, Notes, Favoris |
+| 🇩🇪 Deutsch | de | Links, Clipboard, Notizen, Favoriten |
+| 🇮🇹 Italiano | it | Links, Clipboard, Note, Preferiti |
 
-**Botões:** Ativar/Desativar traduzidos corretamente (não Iniciar/Parar)
+**🔒 Termos FIXOS (NUNCA traduzir):**
+- `Links` - igual em todos os idiomas
+- `Clipboard` - igual em todos os idiomas
+
+**🌍 Termos adaptáveis:** Notes, Favorites, ações, mensagens
 
 ---
 
