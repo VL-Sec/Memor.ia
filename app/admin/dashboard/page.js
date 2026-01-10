@@ -79,22 +79,51 @@ export default function AdminDashboard() {
 
   // Create new code
   const handleCreateCode = async () => {
+    if (!newInfluencerName.trim()) {
+      toast({
+        title: 'Erro',
+        description: 'Nome do influencer é obrigatório',
+        variant: 'destructive'
+      })
+      return
+    }
+
     setCreating(true)
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        toast({
+          title: 'Erro',
+          description: 'Sessão expirada. Faça login novamente.',
+          variant: 'destructive'
+        })
+        router.push('/admin')
+        return
+      }
+
       const code = generateActivationCode()
-      const id = `code_${Date.now()}`
+      const id = `code_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
+
+      const newCodeData = {
+        id,
+        code,
+        influencer_name: newInfluencerName.trim(),
+        notes: newNote.trim() || null,
+        is_used: false,
+        created_at: new Date().toISOString()
+      }
 
       const { error } = await supabase
         .from('activation_codes')
-        .insert([{
-          id,
-          code,
-          influencer_name: newInfluencerName || null,
-          notes: newNote || null,
-          is_used: false
-        }])
+        .insert([newCodeData])
 
-      if (error) throw error
+      if (error) {
+        console.error('Create code error details:', error)
+        throw error
+      }
+
+      // Update local state immediately
+      setCodes(prevCodes => [newCodeData, ...prevCodes])
 
       toast({
         title: 'Sucesso',
@@ -104,12 +133,11 @@ export default function AdminDashboard() {
       setNewInfluencerName('')
       setNewNote('')
       setIsCreateDialogOpen(false)
-      fetchData()
     } catch (error) {
       console.error('Error creating code:', error)
       toast({
         title: 'Erro',
-        description: 'Falha ao criar código',
+        description: error.message || 'Falha ao criar código. Verifique as permissões.',
         variant: 'destructive'
       })
     } finally {
