@@ -310,13 +310,13 @@ eas build --platform ios --profile preview
 
 # ✅ ESTADO ATUAL
 
-**Data:** Janeiro 2025
-**Estado:** ✅ Funcional e Estável
+**Data:** Junho 2025
+**Estado:** ✅ Funcional e Estável - UX Consistente
 **Pronto para:** Build de produção
 
 ---
 
-# 🎯 CORREÇÕES APLICADAS (Janeiro 2025 - Sessão Atual)
+# 🎯 CORREÇÕES APLICADAS (Junho 2025 - Sessão Atual)
 
 1. ✅ Tab Bar com traduções dinâmicas (`t.tabLinks`, `t.tabNotes`, etc.)
 2. ✅ Tab Bar com `tabBarItemStyle: { flex: 1 }` para distribuição uniforme
@@ -329,7 +329,7 @@ eas build --platform ios --profile preview
 9. ❌ **REMOVIDO Smart Clipboard** - limitação técnica JS (sem eventos de cópia)
 10. ✅ **Favoritos:** Datas só aparecem para Notas (Links e Clipboard sem data)
 
-## 🔧 CORREÇÕES UX COMPLETAS (Janeiro 2025)
+## 🔧 CORREÇÕES UX COMPLETAS (Junho 2025)
 
 ### Aplicado em ClipboardScreen e LinksScreen:
 
