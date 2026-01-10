@@ -409,15 +409,19 @@ eas build --platform ios --profile preview
 - ✅ Sem conteúdo "vazado"
 
 **7. Search Bar (padrão ouro):**
-- ✅ Removido `onBlur={() => setSearchQuery('')}` (comportamento surpreendente)
-- ✅ Adicionado botão ❌ (`close-circle`) para limpar pesquisa
+- ✅ Botão ❌ (`close-circle`) para limpar pesquisa
 - ✅ Botão só aparece quando há texto (`searchQuery.length > 0`)
 - ✅ Ao clicar no ❌: `Keyboard.dismiss()` + limpa pesquisa
+- ✅ Pesquisa ignora acentos e maiúsculas (função `normalize()`)
 
 **8. Input de texto multiline (Clipboard):**
 - ✅ `minHeight: 44` para área mínima de toque
 - ✅ `maxHeight: 120` (sweet spot para expansão)
 - ✅ `scrollEnabled` no TextInput
+
+**9. NotesScreen - Modal de edição:**
+- ✅ `KeyboardAvoidingView` adicionado
+- ✅ `keyboardShouldPersistTaps="handled"` no ScrollView
 
 ### Concluído:
 - ✅ LinksScreen - todas as correções UX aplicadas
