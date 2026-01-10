@@ -280,7 +280,7 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <CustomHeader title={t.tabNotes || 'Notas'} />
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingBottom: insets.bottom + 16 }]}>
         {/* Search */}
         <View style={styles.searchContainer}>
           <Ionicons name="search" size={20} color="#8E8E93" />
