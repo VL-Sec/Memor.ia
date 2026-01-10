@@ -411,6 +411,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
         <KeyboardAvoidingView 
           style={{ flex: 1 }} 
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={insets.top + 24}
         >
           <TouchableWithoutFeedback onPress={closeEditModal}>
             <View style={styles.modalOverlay}>
@@ -541,6 +542,7 @@ export default function LinksScreen({ language, userId, refreshKey }) {
         <KeyboardAvoidingView 
           style={{ flex: 1 }} 
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={insets.top + 24}
         >
           <TouchableWithoutFeedback onPress={closeFolderModal}>
             <View style={styles.folderModalOverlay}>

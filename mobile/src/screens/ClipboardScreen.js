@@ -461,7 +461,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
           <KeyboardAvoidingView 
             style={{ flex: 1 }} 
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+            keyboardVerticalOffset={insets.top + 24}
           >
             <TouchableWithoutFeedback onPress={closeEditModal}>
               <View style={styles.modalOverlay}>
@@ -567,7 +567,7 @@ export default function ClipboardScreen({ language, userId, refreshKey, triggerR
           <KeyboardAvoidingView 
             style={{ flex: 1 }} 
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+            keyboardVerticalOffset={insets.top + 24}
           >
             <TouchableWithoutFeedback onPress={closeFolderModal}>
               <View style={styles.folderModalOverlay}>
