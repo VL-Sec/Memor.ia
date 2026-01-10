@@ -351,6 +351,13 @@ eas build --platform ios --profile preview
 
 ## 🔧 CORREÇÕES UX DETALHADAS
 
+**1. Safe Area / Safe Space (todas as telas):**
+- ✅ `useSafeAreaInsets` implementado em todas as telas
+- ✅ `paddingBottom: insets.bottom + 16` nos containers principais
+- ✅ `paddingBottom: insets.bottom + 20` nos modais
+- ✅ `edges={['top']}` no SafeAreaView
+- ✅ FolderModal posicionado em `flex-end` (fica acima do teclado)
+
 ### Aplicado em ClipboardScreen e LinksScreen:
 
 **1. Fechar teclado após ações:**
