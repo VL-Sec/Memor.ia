@@ -22,6 +22,7 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
   const [activating, setActivating] = useState(false);
   const [cloudBackupEnabled, setCloudBackupEnabled] = useState(false);
 
+  const insets = useSafeAreaInsets();
   const t = translations[language] || translations.en;
 
   useEffect(() => {
