@@ -1,5 +1,5 @@
 # 📱 Memor.ia - ESTADO COMPLETO DO PROJETO
-## Última Atualização: Janeiro 2025
+## Última Atualização: Junho 2025
 
 ---
 
@@ -369,9 +369,11 @@ eas build --platform ios --profile preview
 - ✅ Modal fecha
 - ✅ Sem conteúdo "vazado"
 
-### Pendente:
-- ⏳ FavoritesScreen - aplicar mesmas correções
-- ⏳ NotesScreen - verificar consistência
+### Concluído:
+- ✅ LinksScreen - todas as correções UX aplicadas
+- ✅ ClipboardScreen - todas as correções UX aplicadas
+- ✅ FavoritesScreen - correções UX aplicadas (Safe Area, keyboard handling)
+- ✅ NotesScreen - referência base (já consistente)
 
 ---
 
