@@ -113,7 +113,7 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
         <Text style={styles.headerTitle}>{t.tabSettings || 'Definições'}</Text>
         <View style={styles.headerSpacer} />
       </View>
-      <ScrollView style={styles.container}>
+      <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}>
         {/* Premium Card */}
         <View style={[styles.premiumCard, premiumStatus?.isPremiumActivated && styles.premiumCardActive, premiumStatus?.isTrialActive && !premiumStatus?.isPremiumActivated && styles.premiumCardTrial, !premiumStatus?.hasPremium && styles.premiumCardExpired]}>
           <View style={styles.premiumIcon}>
