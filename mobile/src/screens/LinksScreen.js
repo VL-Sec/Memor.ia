@@ -9,6 +9,13 @@ import { supabase, generateId } from '../lib/supabase';
 import { translations } from '../lib/i18n';
 import CustomHeader from '../components/CustomHeader';
 
+// Normalizar texto (remover acentos + minúsculas) para pesquisa
+const normalize = (text = '') =>
+  text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
 export default function LinksScreen({ language, userId, refreshKey }) {
   const [links, setLinks] = useState([]);
   const [folders, setFolders] = useState([]);
@@ -291,7 +298,9 @@ export default function LinksScreen({ language, userId, refreshKey }) {
 
   const filteredLinks = links.filter(link => {
     const matchesFolder = selectedFolder === 'all' || link.folderId === selectedFolder;
-    const matchesSearch = !searchQuery || link.title?.toLowerCase().includes(searchQuery.toLowerCase()) || link.url?.toLowerCase().includes(searchQuery.toLowerCase());
+    if (!searchQuery) return matchesFolder;
+    const q = normalize(searchQuery);
+    const matchesSearch = normalize(link.title).includes(q) || normalize(link.url).includes(q);
     return matchesFolder && matchesSearch;
   });
 
