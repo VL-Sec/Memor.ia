@@ -657,7 +657,7 @@ const styles = StyleSheet.create({
   addFolderChip: { backgroundColor: '#2C2C2E', width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#3A3A3C' },
   
   // List
-  listContent: { padding: 16, paddingTop: 8, paddingBottom: 20 },
+  listContent: { padding: 16, paddingTop: 8, paddingBottom: 32 },
   
   // Note cards
   noteCard: { backgroundColor: '#1C1C1E', borderRadius: 12, marginBottom: 10, flexDirection: 'row', overflow: 'hidden' },

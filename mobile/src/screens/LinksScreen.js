@@ -618,7 +618,7 @@ const styles = StyleSheet.create({
   folderChipText: { color: '#FFFFFF', fontSize: 14, fontWeight: '500' },
   folderChipTextActive: { color: '#FFFFFF' },
   addFolderChip: { backgroundColor: '#2C2C2E', width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#3A3A3C' },
-  listContent: { padding: 16, paddingTop: 8, paddingBottom: 20 },
+  listContent: { padding: 16, paddingTop: 8, paddingBottom: 32 },
   linkCard: { backgroundColor: '#1C1C1E', borderRadius: 16, marginBottom: 12, flexDirection: 'row', overflow: 'hidden' },
   linkTouchable: { flex: 1, flexDirection: 'row' },
   linkImage: { width: 80, height: 80 },

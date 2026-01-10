@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
   filterChipActive: { backgroundColor: '#007AFF', borderColor: '#007AFF' },
   filterChipText: { color: '#FFFFFF', fontSize: 14, fontWeight: '500' },
   filterChipTextActive: { color: '#FFFFFF' },
-  listContent: { paddingHorizontal: 16, paddingBottom: 20 },
+  listContent: { paddingHorizontal: 16, paddingBottom: 32 },
   card: { 
     backgroundColor: '#1C1C1E', 
     borderRadius: 16, 
