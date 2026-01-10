@@ -695,8 +695,8 @@ const styles = StyleSheet.create({
   folderOptionName: { flex: 1, color: '#FFFFFF', fontSize: 16 },
   
   // Folder modal
-  folderModalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.8)', justifyContent: 'center', alignItems: 'center', padding: 20 },
-  folderModalContent: { backgroundColor: '#1C1C1E', borderRadius: 20, width: '100%', maxWidth: 400, padding: 20 },
+  folderModalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.8)', justifyContent: 'flex-end', padding: 20 },
+  folderModalContent: { backgroundColor: '#1C1C1E', borderRadius: 20, width: '100%', padding: 20, marginBottom: 20 },
   folderModalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
   folderModalTitle: { color: '#FFFFFF', fontSize: 20, fontWeight: '700' },
   folderNameInput: { backgroundColor: '#000000', borderRadius: 12, padding: 16, color: '#FFFFFF', fontSize: 16, marginBottom: 20 },
