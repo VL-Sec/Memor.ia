@@ -499,9 +499,9 @@ export const translations = {
   // ============================================
   es: {
     // Tabs
-    tabLinks: 'Enlaces',
+    tabLinks: 'Links',
     tabNotes: 'Notas',
-    tabClipboard: 'Portapapeles',
+    tabClipboard: 'Clipboard',
     tabFavorites: 'Favoritos',
     tabSettings: 'Ajustes',
     
