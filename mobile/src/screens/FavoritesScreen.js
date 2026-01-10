@@ -204,7 +204,7 @@ export default function FavoritesScreen({ language, userId, refreshKey }) {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <CustomHeader title={t.tabFavorites || 'Favoritos'} />
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingBottom: insets.bottom + 16 }]}>
         <View style={styles.searchContainer}>
           <Ionicons name="search" size={20} color="#8E8E93" />
           <TextInput 
@@ -224,16 +224,17 @@ export default function FavoritesScreen({ language, userId, refreshKey }) {
             contentContainerStyle={styles.filterContainer}
             keyboardShouldPersistTaps="handled"
           >
-            <FilterChip value="all" currentFilter={filter} label={t.all || 'Todos'} onPress={setFilter} />
-            <FilterChip value="links" currentFilter={filter} label="Links" onPress={setFilter} />
-            <FilterChip value="notes" currentFilter={filter} label={t.tabNotes || 'Notas'} onPress={setFilter} />
-            <FilterChip value="clipboard" currentFilter={filter} label="Clipboard" onPress={setFilter} />
+            <FilterChip value="all" currentFilter={filter} label={t.all || 'Todos'} onPress={(v) => { Keyboard.dismiss(); setFilter(v); }} />
+            <FilterChip value="links" currentFilter={filter} label="Links" onPress={(v) => { Keyboard.dismiss(); setFilter(v); }} />
+            <FilterChip value="notes" currentFilter={filter} label={t.tabNotes || 'Notas'} onPress={(v) => { Keyboard.dismiss(); setFilter(v); }} />
+            <FilterChip value="clipboard" currentFilter={filter} label="Clipboard" onPress={(v) => { Keyboard.dismiss(); setFilter(v); }} />
           </ScrollView>
         </View>
 
         {filteredFavorites.length === 0 ? (
           <ScrollView 
             style={{ flex: 1 }} 
+            keyboardShouldPersistTaps="handled"
             refreshControl={
               <RefreshControl 
                 refreshing={refreshing} 
@@ -255,7 +256,8 @@ export default function FavoritesScreen({ language, userId, refreshKey }) {
             data={filteredFavorites} 
             keyExtractor={(item) => item.id} 
             renderItem={renderItem} 
-            contentContainerStyle={styles.listContent} 
+            contentContainerStyle={[styles.listContent, { paddingBottom: 20 }]}
+            keyboardShouldPersistTaps="handled"
             refreshControl={
               <RefreshControl 
                 refreshing={refreshing} 
