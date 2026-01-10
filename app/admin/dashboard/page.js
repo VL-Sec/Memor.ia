@@ -122,26 +122,44 @@ export default function AdminDashboard() {
     if (!window.confirm(`Apagar o código ${codeName}?`)) return
     
     try {
+      // First check if user is authenticated
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        toast({
+          title: 'Erro',
+          description: 'Sessão expirada. Faça login novamente.',
+          variant: 'destructive'
+        })
+        router.push('/admin')
+        return
+      }
+
       const { error } = await supabase
         .from('activation_codes')
         .delete()
         .eq('id', codeId)
 
-      if (error) throw error
+      if (error) {
+        console.error('Delete error details:', error)
+        throw error
+      }
 
+      // Update local state immediately for better UX
+      setCodes(prevCodes => prevCodes.filter(c => c.id !== codeId))
+      
       toast({
         title: 'Sucesso',
         description: 'Código apagado'
       })
-      
-      fetchData()
     } catch (error) {
       console.error('Error deleting code:', error)
       toast({
         title: 'Erro',
-        description: 'Falha ao apagar código',
+        description: error.message || 'Falha ao apagar código. Verifique as permissões RLS.',
         variant: 'destructive'
       })
+      // Refresh data to ensure UI is in sync
+      fetchData()
     }
   }
 
