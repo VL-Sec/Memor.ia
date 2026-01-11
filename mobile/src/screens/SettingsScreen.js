@@ -12,7 +12,7 @@ const TERMS_URL = 'https://www.notion.so/Terms-of-Service-Memor-ia-2e3f9fe156fc8
 const PRIVACY_URL = 'https://www.notion.so/Privacy-Policy-Memor-ia-2e3f9fe156fc80edb1d2e6d0bd5f91e7';
 
 // Store URLs - Update these with your actual store URLs when published
-const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.memoria.app';
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.getmemoria.app';
 const APP_STORE_URL = 'https://apps.apple.com/app/memoria/id000000000';
 
 export default function SettingsScreen({ language, setLanguage, premiumStatus, setPremiumStatus, userId }) {

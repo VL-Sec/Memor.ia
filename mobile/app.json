@@ -17,7 +17,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.memoria.app",
+      "bundleIdentifier": "com.getmemoria.app",
       "infoPlist": {
         "NSUserTrackingUsageDescription": "This app does not track you. This permission is not used."
       }
@@ -27,7 +27,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
-      "package": "com.memoria.app",
+      "package": "com.getmemoria.app",
       "permissions": [
         "INTERNET"
       ]
