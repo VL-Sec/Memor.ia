@@ -876,6 +876,7 @@ export const translations = {
     copy: 'Kopieren',
     open: 'Öffnen',
     search: 'Suchen...',
+    pasteHere: 'Text einfügen oder schreiben...',
     all: 'Alle',
     done: 'Fertig',
     confirm: 'Bestätigen',
