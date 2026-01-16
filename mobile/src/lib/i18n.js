@@ -34,6 +34,7 @@ export const translations = {
     copy: 'Copy',
     open: 'Open',
     search: 'Search...',
+    pasteHere: 'Paste or type text...',
     all: 'All',
     done: 'Done',
     confirm: 'Confirm',
