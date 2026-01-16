@@ -124,34 +124,21 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
   };
 
   const loadNotes = async () => {
-    if (!userId) {
-      console.log('⚠️ loadNotes: No userId, skipping');
-      return;
-    }
-    
-    console.log('🔄 loadNotes: Starting for userId:', userId);
+    if (!userId) return;
     
     try {
-      // First, try to migrate local notes
-      await migrateLocalNotes();
-
       // Load from Supabase
-      console.log('📥 Fetching notes from Supabase...');
       const { data, error } = await supabase
         .from('notes')
         .select('*')
         .eq('userId', userId)
         .order('createdAt', { ascending: false });
 
-      console.log('📥 Supabase response - count:', data?.length, 'error:', error);
-
       if (error) throw error;
 
       setNotes(data || []);
-      console.log('✅ Notes loaded:', data?.length || 0);
     } catch (error) {
-      console.error('❌ Error loading notes:', error);
-      Toast.show({ type: 'error', text1: t.error || 'Erro ao carregar notas' });
+      console.error('Error loading notes:', error);
     } finally {
       setLoading(false);
       setRefreshing(false);
