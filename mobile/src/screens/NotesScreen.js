@@ -253,31 +253,17 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
   const handleToggleFavorite = async (item, e) => {
     if (e) e.stopPropagation();
     Keyboard.dismiss();
-    
-    const newFavoriteState = !item.isFavorite;
-    
     try {
-      const { error } = await supabase
-        .from('notes')
-        .update({ isFavorite: newFavoriteState })
-        .eq('id', item.id);
-
-      if (error) throw error;
-
-      // Update local state using functional update
-      setNotes(prevNotes => prevNotes.map(n =>
-        n.id === item.id ? { ...n, isFavorite: newFavoriteState } : n
-      ));
-      
+      const newValue = !item.isFavorite;
+      await supabase.from('notes').update({ isFavorite: newValue }).eq('id', item.id);
+      setNotes(notes.map(n => n.id === item.id ? { ...n, isFavorite: newValue } : n));
       Toast.show({ 
         type: 'success', 
-        text1: newFavoriteState ? (t.addedToFavorites || 'Adicionado aos favoritos') : (t.removedFromFavorites || 'Removido dos favoritos')
+        text1: newValue ? (t.addedToFavorites || 'Adicionado aos favoritos') : (t.removedFromFavorites || 'Removido dos favoritos')
       });
-      
       if (triggerRefresh) triggerRefresh();
     } catch (error) {
       console.error('Error toggling favorite:', error);
-      Toast.show({ type: 'error', text1: t.error });
     }
   };
 
@@ -295,28 +281,16 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
   const handleTogglePin = async (item, e) => {
     if (e) e.stopPropagation();
     Keyboard.dismiss();
-    
-    const newPinnedState = !item.isPinned;
-    
     try {
-      const { error } = await supabase
-        .from('notes')
-        .update({ isPinned: newPinnedState })
-        .eq('id', item.id);
-
-      if (error) throw error;
-
-      setNotes(prevNotes => prevNotes.map(n =>
-        n.id === item.id ? { ...n, isPinned: newPinnedState } : n
-      ));
-      
+      const newValue = !item.isPinned;
+      await supabase.from('notes').update({ isPinned: newValue }).eq('id', item.id);
+      setNotes(notes.map(n => n.id === item.id ? { ...n, isPinned: newValue } : n));
       Toast.show({ 
         type: 'success', 
-        text1: newPinnedState ? (t.pinned || 'Fixado') : (t.unpinned || 'Desafixado')
+        text1: newValue ? (t.pinned || 'Fixado') : (t.unpinned || 'Desafixado')
       });
     } catch (error) {
       console.error('Error toggling pin:', error);
-      Toast.show({ type: 'error', text1: t.error });
     }
   };
 
