@@ -292,23 +292,22 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
     }
   };
 
-  const handleTogglePin = async (noteId, e) => {
+  const handleTogglePin = async (item, e) => {
     if (e) e.stopPropagation();
-    const note = notes.find(n => n.id === noteId);
-    if (!note) return;
+    Keyboard.dismiss();
     
-    const newPinnedState = !note.isPinned;
+    const newPinnedState = !item.isPinned;
     
     try {
       const { error } = await supabase
         .from('notes')
         .update({ isPinned: newPinnedState })
-        .eq('id', noteId);
+        .eq('id', item.id);
 
       if (error) throw error;
 
-      setNotes(notes.map(n =>
-        n.id === noteId ? { ...n, isPinned: newPinnedState } : n
+      setNotes(prevNotes => prevNotes.map(n =>
+        n.id === item.id ? { ...n, isPinned: newPinnedState } : n
       ));
       
       Toast.show({ 
