@@ -35,6 +35,8 @@ export const translations = {
     open: 'Open',
     search: 'Search...',
     pasteHere: 'Paste or type text...',
+    pasted: 'Pasted from clipboard',
+    clipboardEmpty: 'Clipboard is empty',
     all: 'All',
     done: 'Done',
     confirm: 'Confirm',
