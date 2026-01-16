@@ -261,6 +261,8 @@ const styles = StyleSheet.create({
   premiumContent: { flex: 1, marginLeft: 16 },
   premiumTitle: { color: '#FFFFFF', fontSize: 20, fontWeight: '700' },
   premiumSubtitle: { color: '#8E8E93', fontSize: 14, marginTop: 4 },
+  logoCard: { alignItems: 'center', justifyContent: 'center', margin: 16, padding: 20, borderRadius: 20, backgroundColor: '#1C1C1E' },
+  logoImage: { width: 80, height: 80, borderRadius: 16 },
   activateButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#2C2C2E', marginHorizontal: 16, marginBottom: 16, padding: 16, borderRadius: 16, gap: 8 },
   activateButtonText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
   subscribeButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#34C759', marginHorizontal: 16, marginBottom: 12, padding: 16, borderRadius: 16, gap: 8 },
