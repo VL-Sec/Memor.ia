@@ -420,6 +420,33 @@ eas build --platform ios --profile preview
 
 # 🎯 CORREÇÕES APLICADAS (Junho 2025)
 
+## ✅ MIGRAÇÃO NOTAS PARA SUPABASE (NOVA)
+
+**Ficheiros alterados:**
+- `NotesScreen.js` - Agora usa Supabase para todas as operações CRUD
+- `FavoritesScreen.js` - Busca notas favoritas do Supabase
+
+**Funcionalidades:**
+- ✅ Criar, editar, eliminar notas na cloud
+- ✅ Favoritos e Pin sincronizados com Supabase
+- ✅ Migração automática: notas locais → cloud (uma vez)
+- ✅ Pesquisa local nos dados carregados
+- ✅ Cores personalizadas (8 opções)
+- ✅ Testado com 100% de sucesso em todos os cenários
+
+**Tabela `notes` no Supabase:**
+```
+id (text) - Primary Key
+userId (text) - ID do dispositivo
+title (text)
+content (text)
+color (text) - default: 'default'
+isPinned (boolean) - default: false
+isFavorite (boolean) - default: false
+createdAt (timestamp)
+updatedAt (timestamp)
+```
+
 ## ✅ MANTIDO 
 
 **Pesquisa Melhorada (todas as telas):**
