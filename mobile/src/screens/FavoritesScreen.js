@@ -4,7 +4,6 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
 import { supabase } from '../lib/supabase';
 import { translations } from '../lib/i18n';
@@ -44,9 +43,6 @@ export default function FavoritesScreen({ language, userId, refreshKey }) {
 
   const insets = useSafeAreaInsets();
   const t = translations[language] || translations.en;
-  
-  // Dynamic storage key based on userId
-  const getNotesStorageKey = () => `memoria-notes-${userId || 'default'}`;
 
   // Reload when screen is focused
   useFocusEffect(
