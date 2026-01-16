@@ -198,7 +198,7 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
               <Ionicons name="information-circle-outline" size={24} color="#8E8E93" />
               <Text style={styles.settingLabel}>{t.version || 'Version'}</Text>
             </View>
-            <Text style={styles.settingValue}>1.0.0</Text>
+            <Text style={styles.settingValue}>1.0.4</Text>
           </View>
         </View>
 
