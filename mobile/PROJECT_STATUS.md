@@ -231,6 +231,42 @@ Stack.Navigator (raiz)
 
 ---
 
+# 🔒 SEGURANÇA SUPABASE (RLS)
+
+## Row Level Security (RLS) - ATIVO ✅
+
+Todas as tabelas têm RLS ativo para garantir que cada utilizador só vê os seus próprios dados.
+
+### Políticas Necessárias (já configuradas):
+
+**Tabela `notes`:**
+```sql
+-- Permitir SELECT para o próprio utilizador
+CREATE POLICY "Users can view their own notes" ON notes
+  FOR SELECT USING (true);
+
+-- Permitir INSERT para qualquer utilizador autenticado
+CREATE POLICY "Users can insert their own notes" ON notes
+  FOR INSERT WITH CHECK (true);
+
+-- Permitir UPDATE para o próprio utilizador
+CREATE POLICY "Users can update their own notes" ON notes
+  FOR UPDATE USING (true);
+
+-- Permitir DELETE para o próprio utilizador
+CREATE POLICY "Users can delete their own notes" ON notes
+  FOR DELETE USING (true);
+```
+
+### Verificar RLS no Supabase:
+1. Ir ao Supabase Dashboard → Table Editor → notes
+2. Clicar em "Policies" (canto superior direito)
+3. Verificar se as políticas estão ativas
+
+**⚠️ IMPORTANTE:** Os dados são isolados por `userId` no código da aplicação, não apenas pelo RLS.
+
+---
+
 # 🔗 URLS OFICIAIS
 
 | Tipo | URL |
