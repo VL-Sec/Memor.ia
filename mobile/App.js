@@ -7,7 +7,6 @@ import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity } from 'rea
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
-import * as Notifications from 'expo-notifications';
 
 import LinksScreen from './src/screens/LinksScreen';
 import NotesScreen from './src/screens/NotesScreen';
@@ -18,15 +17,6 @@ import SettingsScreen from './src/screens/SettingsScreen';
 import { translations, getStoredLanguage } from './src/lib/i18n';
 import { getPremiumStatus } from './src/lib/premium';
 import { getUserId } from './src/lib/userManager';
-
-// Configure notifications (only once)
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
 
 // Create navigators (only once)
 const Tab = createBottomTabNavigator();
