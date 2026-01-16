@@ -257,47 +257,70 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
   });
 
   const renderNote = ({ item }) => {
-    const noteColor = getColorById(item.color);
-    const isDefaultColor = item.color === 'default' || !item.color;
+    const noteColorValue = getColorById(item.color);
 
     return (
-      <TouchableOpacity
-        style={[
-          styles.noteCard,
-          !isDefaultColor && { borderLeftWidth: 4, borderLeftColor: noteColor }
-        ]}
-        onPress={() => openEditNote(item)}
-        activeOpacity={0.7}
-      >
-        <View style={styles.noteHeader}>
-          {item.isPinned && (
-            <Ionicons name="pin" size={14} color="#FFD60A" style={styles.pinnedIcon} />
-          )}
-          <Text style={styles.noteTitle} numberOfLines={1}>
-            {item.title || t.untitled || 'Sem título'}
-          </Text>
-        </View>
-        {item.content ? (
-          <Text style={styles.noteContent} numberOfLines={3}>{item.content}</Text>
-        ) : null}
-        <View style={styles.noteFooter}>
-          <Text style={styles.noteDate}>{formatDateLocale(item.createdAt)}</Text>
-          <View style={styles.noteActions}>
-            <TouchableOpacity onPress={(e) => handleCopyNote(item.content || item.title, e)} style={styles.actionBtn}>
-              <Ionicons name="copy-outline" size={18} color="#8E8E93" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={(e) => handleToggleFavorite(item, e)} style={styles.actionBtn}>
-              <Ionicons name={item.isFavorite ? "heart" : "heart-outline"} size={18} color={item.isFavorite ? "#FF3B30" : "#8E8E93"} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={(e) => handleTogglePin(item, e)} style={styles.actionBtn}>
-              <Ionicons name="pin" size={18} color={item.isPinned ? "#FFD60A" : "#8E8E93"} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleDeleteNote(item.id)} style={styles.actionBtn}>
-              <Ionicons name="trash-outline" size={18} color="#FF3B30" />
-            </TouchableOpacity>
+      <View style={[styles.noteCard, { borderLeftColor: noteColorValue, borderLeftWidth: 4 }]}>
+        <TouchableOpacity 
+          style={styles.noteMainContent}
+          onPress={() => openEditNote(item)}
+          activeOpacity={0.7}
+        >
+          <View style={styles.noteHeader}>
+            {item.title ? (
+              <Text style={styles.noteTitle} numberOfLines={1}>{item.title}</Text>
+            ) : null}
           </View>
+
+          <Text style={styles.noteContent} numberOfLines={4}>
+            {item.content || ''}
+          </Text>
+
+          <View style={styles.noteMetaRow}>
+            <Text style={styles.noteDate}>
+              {formatDateLocale(item.updatedAt || item.createdAt)}
+            </Text>
+          </View>
+        </TouchableOpacity>
+
+        <View style={styles.noteActionsColumn}>
+          <TouchableOpacity
+            onPress={(e) => handleCopyNote(item.content || item.title, e)}
+            style={styles.actionButton}
+          >
+            <Ionicons name="copy-outline" size={18} color="#8E8E93" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={(e) => handleToggleFavorite(item, e)}
+            style={styles.actionButton}
+          >
+            <Ionicons
+              name={item.isFavorite ? 'heart' : 'heart-outline'}
+              size={18}
+              color={item.isFavorite ? '#FF3B30' : '#8E8E93'}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={(e) => handleTogglePin(item, e)}
+            style={styles.actionButton}
+          >
+            <Ionicons
+              name="pin"
+              size={18}
+              color={item.isPinned ? '#FFD60A' : '#8E8E93'}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => handleDeleteNote(item.id)}
+            style={styles.actionButton}
+          >
+            <Ionicons name="trash-outline" size={18} color="#FF3B30" />
+          </TouchableOpacity>
         </View>
-      </TouchableOpacity>
+      </View>
     );
   };
 
