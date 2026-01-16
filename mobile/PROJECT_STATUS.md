@@ -146,10 +146,11 @@ Stack.Navigator (raiz)
 
 ## 4. NotesScreen.js
 - ✅ Criar, editar, eliminar notas
-- ✅ Cores personalizadas
+- ✅ Cores personalizadas (8 cores disponíveis)
 - ✅ Favoritos e Pin
-- ✅ Armazenamento LOCAL (AsyncStorage)
-- ✅ Pesquisa
+- ✅ **Armazenamento CLOUD (Supabase)** - Migrado em Junho 2025
+- ✅ Migração automática de notas locais para cloud
+- ✅ Pesquisa (ignora acentos e maiúsculas)
 - ✅ Permite guardar só com título OU só com conteúdo
 - ✅ Mostra data de criação
 - ❌ REMOVIDO: Lembretes
