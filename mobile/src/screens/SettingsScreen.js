@@ -117,7 +117,7 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
         {/* Premium Card */}
         <View style={[styles.premiumCard, premiumStatus?.isPremiumActivated && styles.premiumCardActive, premiumStatus?.isTrialActive && !premiumStatus?.isPremiumActivated && styles.premiumCardTrial, !premiumStatus?.hasPremium && styles.premiumCardExpired]}>
           <View style={styles.premiumIcon}>
-            <Ionicons name={premiumStatus?.isPremiumActivated ? 'trophy' : premiumStatus?.isTrialActive ? 'sparkles' : 'lock-closed'} size={32} color={premiumStatus?.isPremiumActivated ? '#FFD700' : premiumStatus?.isTrialActive ? '#007AFF' : '#FF3B30'} />
+            <Image source={require('../../assets/icon.png')} style={styles.premiumLogo} />
           </View>
           <View style={styles.premiumContent}>
             <Text style={styles.premiumTitle}>{premiumStatus?.isPremiumActivated ? (t.premiumActive || 'Premium Ativo') : premiumStatus?.isTrialActive ? (t.trialActive || 'Período de Teste') : (t.trialExpired || 'Período Expirado')}</Text>
