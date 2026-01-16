@@ -191,8 +191,13 @@ def test_delete_note():
         print("❌ FAILED: Could not connect to Supabase")
         return False
     
-    if response.status_code == 204:
+    if response.status_code in [200, 204]:
         print("✅ SUCCESS: Note deleted successfully")
+        # Check if response contains the deleted record (Supabase returns 200 with data)
+        if response.status_code == 200:
+            result = response.json()
+            if isinstance(result, list) and len(result) > 0:
+                print(f"   Deleted note ID: {result[0].get('id')}")
         return True
     elif response.status_code == 404:
         print("⚠️  WARNING: Note not found for deletion (might not exist)")
