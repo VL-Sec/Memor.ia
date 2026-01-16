@@ -501,6 +501,8 @@ export const translations = {
     open: 'Abrir',
     search: 'Buscar...',
     pasteHere: 'Pegar o escribir texto...',
+    pasted: 'Pegado del portapapeles',
+    clipboardEmpty: 'Portapapeles vacío',
     all: 'Todo',
     done: 'Hecho',
     confirm: 'Confirmar',
