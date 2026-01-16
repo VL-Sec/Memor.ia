@@ -371,10 +371,10 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
             <TouchableOpacity onPress={(e) => handleCopyNote(item.content || item.title, e)} style={styles.actionBtn}>
               <Ionicons name="copy-outline" size={18} color="#8E8E93" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={(e) => handleToggleFavorite(item.id, e)} style={styles.actionBtn}>
+            <TouchableOpacity onPress={(e) => handleToggleFavorite(item, e)} style={styles.actionBtn}>
               <Ionicons name={item.isFavorite ? "heart" : "heart-outline"} size={18} color={item.isFavorite ? "#FF3B30" : "#8E8E93"} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={(e) => handleTogglePin(item.id, e)} style={styles.actionBtn}>
+            <TouchableOpacity onPress={(e) => handleTogglePin(item, e)} style={styles.actionBtn}>
               <Ionicons name="pin" size={18} color={item.isPinned ? "#FFD60A" : "#8E8E93"} />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => handleDeleteNote(item.id)} style={styles.actionBtn}>
