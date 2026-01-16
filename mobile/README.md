@@ -95,7 +95,7 @@ eas submit --platform ios
 - Uso único
 
 ### Admin Dashboard
-- URL: https://memor-app-fix.preview.emergentagent.com/admin
+- URL: https://memoria-safer-app.preview.emergentagent.com/admin
 - Criar e gerir códigos de influencers
 
 ## 📁 Estrutura
