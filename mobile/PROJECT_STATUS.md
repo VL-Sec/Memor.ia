@@ -377,6 +377,7 @@ eas build --platform ios --profile preview
 
 **Data:** Junho 2025
 **Estado:** ✅ Funcional e Estável - UX Consistente
+**Notas Supabase:** ✅ Migração Completa e Testada
 **Pronto para:** Build de produção
 
 ---
