@@ -72,15 +72,12 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
         .order('createdAt', { ascending: false });
 
       if (error) {
-        alert('Erro Supabase: ' + JSON.stringify(error));
         throw error;
       }
 
-      alert('Notas carregadas: ' + (data?.length || 0));
       setNotes(data || []);
     } catch (error) {
       console.error('Error loading notes:', error);
-      alert('Erro catch: ' + error.message);
     } finally {
       setLoading(false);
       setRefreshing(false);
