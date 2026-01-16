@@ -265,6 +265,7 @@ export const translations = {
     copy: 'Copiar',
     open: 'Abrir',
     search: 'Pesquisar...',
+    pasteHere: 'Colar ou escrever texto...',
     all: 'Todos',
     done: 'Concluído',
     confirm: 'Confirmar',
