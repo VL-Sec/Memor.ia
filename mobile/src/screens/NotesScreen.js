@@ -65,64 +65,6 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
     }
   }, [refreshKey]);
 
-  // Migrate local notes to Supabase (one-time)
-  const migrateLocalNotes = async () => {
-    try {
-      const migrated = await AsyncStorage.getItem(getMigratedKey());
-      console.log('🔄 Migration status:', migrated);
-      
-      if (migrated === 'true') {
-        console.log('✅ Already migrated, skipping...');
-        return; // Already migrated
-      }
-
-      const localData = await AsyncStorage.getItem(getStorageKey());
-      console.log('📦 Local data found:', localData ? 'YES' : 'NO');
-      
-      if (localData) {
-        const localNotes = JSON.parse(localData);
-        console.log(`📝 Found ${localNotes.length} local notes to migrate`);
-        
-        if (localNotes.length > 0) {
-          // Add userId to each note and insert to Supabase
-          const notesToMigrate = localNotes.map(note => ({
-            id: note.id,
-            userId: userId,
-            title: note.title || '',
-            content: note.content || '',
-            color: note.color || 'default',
-            isPinned: note.isPinned || false,
-            isFavorite: note.isFavorite || false,
-            createdAt: note.createdAt || new Date().toISOString(),
-            updatedAt: note.updatedAt || new Date().toISOString(),
-          }));
-
-          // Insert notes one by one to handle duplicates
-          for (const note of notesToMigrate) {
-            console.log('📤 Migrating note:', note.title);
-            const { error } = await supabase
-              .from('notes')
-              .upsert([note], { onConflict: 'id' });
-            
-            if (error) {
-              console.error('❌ Error migrating note:', error);
-            } else {
-              console.log('✅ Note migrated successfully');
-            }
-          }
-
-          Toast.show({ type: 'success', text1: t.notesMigrated || 'Notas sincronizadas com a cloud' });
-        }
-      }
-
-      // Mark as migrated
-      await AsyncStorage.setItem(getMigratedKey(), 'true');
-      console.log('✅ Migration complete, flag set');
-    } catch (error) {
-      console.error('❌ Error migrating notes:', error);
-    }
-  };
-
   const loadNotes = async () => {
     if (!userId) return;
     
