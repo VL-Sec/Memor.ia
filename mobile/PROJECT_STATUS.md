@@ -158,8 +158,9 @@ Stack.Navigator (raiz)
 ## 5. FavoritesScreen.js
 - ✅ Mostra todos os favoritos (links, notas, clipboard)
 - ✅ Filtros por tipo
-- ✅ Pesquisa (limpa ao perder foco)
+- ✅ Pesquisa (ignora acentos e maiúsculas)
 - ✅ Datas só aparecem para Notas (Links e Clipboard sem data)
+- ✅ **Busca notas favoritas do Supabase** (Junho 2025)
 
 ## 6. SettingsScreen.js
 - ✅ Seleção de idioma (6 idiomas)
