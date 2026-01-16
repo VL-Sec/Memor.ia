@@ -68,25 +68,26 @@ export default function FavoritesScreen({ language, userId, refreshKey }) {
     if (!userId) return;
     
     try {
-      // Fetch from Supabase (links and clipboard items)
-      const { data: supabaseData } = await supabase
+      // Fetch links and clipboard items from Supabase
+      const { data: linksData } = await supabase
         .from('links')
         .select('*')
         .eq('userId', userId)
         .eq('isFavorite', true)
         .order('createdAt', { ascending: false });
       
-      // Fetch local notes with userId-specific key
-      const localNotesStr = await AsyncStorage.getItem(getNotesStorageKey());
-      const localNotes = localNotesStr ? JSON.parse(localNotesStr) : [];
-      const favoriteNotes = localNotes
-        .filter(n => n.isFavorite === true)
-        .map(n => ({ ...n, contentType: 'note', source: 'local' }));
+      // Fetch notes from Supabase
+      const { data: notesData } = await supabase
+        .from('notes')
+        .select('*')
+        .eq('userId', userId)
+        .eq('isFavorite', true)
+        .order('createdAt', { ascending: false });
       
       // Combine all favorites
       const allFavorites = [
-        ...(supabaseData || []).map(item => ({ ...item, source: 'supabase' })),
-        ...favoriteNotes
+        ...(linksData || []).map(item => ({ ...item, source: 'supabase' })),
+        ...(notesData || []).map(item => ({ ...item, contentType: 'note', source: 'supabase' }))
       ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       
       setFavorites(allFavorites);
