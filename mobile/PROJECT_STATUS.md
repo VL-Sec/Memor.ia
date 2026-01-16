@@ -201,22 +201,31 @@ Stack.Navigator (raiz)
 
 # 💾 ARMAZENAMENTO
 
-## Supabase (Cloud)
+## Supabase (Cloud) ☁️
 | Tabela | Campos Importantes |
 |--------|-------------------|
 | `links` | id, userId, url, title, contentType, isFavorite, isPinned, folderId, createdAt |
 | `folders` | id, userId, name, icon, isDefault, folderType, createdAt |
+| `notes` | id, userId, title, content, color, isPinned, isFavorite, createdAt, updatedAt |
 
 **⚠️ NOTA:** Campo `reminderAt` NÃO existe na tabela - não usar!
+
+### ✅ MIGRAÇÃO NOTAS PARA SUPABASE (Junho 2025)
+- **Status:** ✅ COMPLETA E TESTADA
+- As notas agora são guardadas na cloud (Supabase)
+- Migração automática: notas locais são movidas para Supabase na primeira execução
+- **RLS (Row Level Security):** Ativo - utilizadores só veem as suas próprias notas
 
 ## AsyncStorage (Local)
 | Chave | Descrição |
 |-------|-----------|
 | `@memoria_user_id` | ID único do dispositivo |
-| `memoria-notes-{userId}` | Notas do utilizador |
+| `memoria-notes-migrated-{userId}` | Flag de migração concluída |
 | `memoria-cloud-backup-enabled` | Preferência backup |
 | `memoria-premium` | Status premium |
 | `memoria-language` | Idioma selecionado |
+
+**⚠️ NOTA:** `memoria-notes-{userId}` já não é usado - notas estão no Supabase
 
 ---
 
