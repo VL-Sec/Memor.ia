@@ -885,6 +885,8 @@ export const translations = {
     open: 'Öffnen',
     search: 'Suchen...',
     pasteHere: 'Text einfügen oder schreiben...',
+    pasted: 'Aus Zwischenablage eingefügt',
+    clipboardEmpty: 'Zwischenablage leer',
     all: 'Alle',
     done: 'Fertig',
     confirm: 'Bestätigen',
