@@ -686,6 +686,7 @@ export const translations = {
     copy: 'Copier',
     open: 'Ouvrir',
     search: 'Rechercher...',
+    pasteHere: 'Coller ou écrire du texte...',
     all: 'Tout',
     done: 'Terminé',
     confirm: 'Confirmer',
