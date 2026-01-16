@@ -250,24 +250,23 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
     );
   };
 
-  const handleToggleFavorite = async (noteId, e) => {
+  const handleToggleFavorite = async (item, e) => {
     if (e) e.stopPropagation();
-    const note = notes.find(n => n.id === noteId);
-    if (!note) return;
+    Keyboard.dismiss();
     
-    const newFavoriteState = !note.isFavorite;
+    const newFavoriteState = !item.isFavorite;
     
     try {
       const { error } = await supabase
         .from('notes')
         .update({ isFavorite: newFavoriteState })
-        .eq('id', noteId);
+        .eq('id', item.id);
 
       if (error) throw error;
 
-      // Update local state
-      setNotes(notes.map(n =>
-        n.id === noteId ? { ...n, isFavorite: newFavoriteState } : n
+      // Update local state using functional update
+      setNotes(prevNotes => prevNotes.map(n =>
+        n.id === item.id ? { ...n, isFavorite: newFavoriteState } : n
       ));
       
       Toast.show({ 
