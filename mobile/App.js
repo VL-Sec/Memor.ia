@@ -257,11 +257,6 @@ export default function App() {
         setLanguage(lang);
         const status = await getPremiumStatus();
         setPremiumStatus(status);
-        
-        const { status: notifStatus } = await Notifications.requestPermissionsAsync();
-        if (notifStatus !== 'granted') {
-          console.log('Notification permissions not granted');
-        }
       } catch (e) {
         console.error('Init error:', e);
         setError(e.message);
