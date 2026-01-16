@@ -71,14 +71,21 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
   const migrateLocalNotes = async () => {
     try {
       const migrated = await AsyncStorage.getItem(getMigratedKey());
-      if (migrated === 'true') return; // Already migrated
+      console.log('🔄 Migration status:', migrated);
+      
+      if (migrated === 'true') {
+        console.log('✅ Already migrated, skipping...');
+        return; // Already migrated
+      }
 
       const localData = await AsyncStorage.getItem(getStorageKey());
+      console.log('📦 Local data found:', localData ? 'YES' : 'NO');
+      
       if (localData) {
         const localNotes = JSON.parse(localData);
+        console.log(`📝 Found ${localNotes.length} local notes to migrate`);
+        
         if (localNotes.length > 0) {
-          console.log(`Migrating ${localNotes.length} local notes to Supabase...`);
-          
           // Add userId to each note and insert to Supabase
           const notesToMigrate = localNotes.map(note => ({
             id: note.id,
@@ -94,12 +101,15 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
 
           // Insert notes one by one to handle duplicates
           for (const note of notesToMigrate) {
+            console.log('📤 Migrating note:', note.title);
             const { error } = await supabase
               .from('notes')
               .upsert([note], { onConflict: 'id' });
             
             if (error) {
-              console.error('Error migrating note:', error);
+              console.error('❌ Error migrating note:', error);
+            } else {
+              console.log('✅ Note migrated successfully');
             }
           }
 
@@ -109,8 +119,9 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
 
       // Mark as migrated
       await AsyncStorage.setItem(getMigratedKey(), 'true');
+      console.log('✅ Migration complete, flag set');
     } catch (error) {
-      console.error('Error migrating notes:', error);
+      console.error('❌ Error migrating notes:', error);
     }
   };
 
