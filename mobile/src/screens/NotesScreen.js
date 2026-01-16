@@ -5,6 +5,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { supabase, generateId } from '../lib/supabase';
 import { translations } from '../lib/i18n';
 import CustomHeader from '../components/CustomHeader';
 
@@ -35,6 +36,7 @@ const formatDateLocale = (dateStr) => {
 export default function NotesScreen({ language, userId, refreshKey, triggerRefresh }) {
   const [notes, setNotes] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingNote, setEditingNote] = useState(null);
   const [noteTitle, setNoteTitle] = useState('');
@@ -45,47 +47,96 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
   const insets = useSafeAreaInsets();
   const t = translations[language] || translations.en;
   
-  // Dynamic storage key based on userId
+  // Dynamic storage key for migration check
   const getStorageKey = () => `memoria-notes-${userId || 'default'}`;
+  const getMigratedKey = () => `memoria-notes-migrated-${userId || 'default'}`;
 
-  // Load notes when screen is focused (for sync with Favorites)
+  // Load notes when screen is focused
   useFocusEffect(
     useCallback(() => {
-      loadNotes();
+      if (userId) {
+        loadNotes();
+      }
     }, [userId])
   );
 
   // Also reload when refreshKey changes
   useEffect(() => {
-    if (refreshKey > 0) {
+    if (refreshKey > 0 && userId) {
       loadNotes();
     }
   }, [refreshKey]);
 
-  const loadNotes = async () => {
+  // Migrate local notes to Supabase (one-time)
+  const migrateLocalNotes = async () => {
     try {
-      const data = await AsyncStorage.getItem(getStorageKey());
-      if (data) {
-        const parsedNotes = JSON.parse(data);
-        setNotes(parsedNotes);
-      } else {
-        setNotes([]);
+      const migrated = await AsyncStorage.getItem(getMigratedKey());
+      if (migrated === 'true') return; // Already migrated
+
+      const localData = await AsyncStorage.getItem(getStorageKey());
+      if (localData) {
+        const localNotes = JSON.parse(localData);
+        if (localNotes.length > 0) {
+          console.log(`Migrating ${localNotes.length} local notes to Supabase...`);
+          
+          // Add userId to each note and insert to Supabase
+          const notesToMigrate = localNotes.map(note => ({
+            id: note.id,
+            userId: userId,
+            title: note.title || '',
+            content: note.content || '',
+            color: note.color || 'default',
+            isPinned: note.isPinned || false,
+            isFavorite: note.isFavorite || false,
+            createdAt: note.createdAt || new Date().toISOString(),
+            updatedAt: note.updatedAt || new Date().toISOString(),
+          }));
+
+          // Insert notes one by one to handle duplicates
+          for (const note of notesToMigrate) {
+            const { error } = await supabase
+              .from('notes')
+              .upsert([note], { onConflict: 'id' });
+            
+            if (error) {
+              console.error('Error migrating note:', error);
+            }
+          }
+
+          Toast.show({ type: 'success', text1: t.notesMigrated || 'Notas sincronizadas com a cloud' });
+        }
       }
+
+      // Mark as migrated
+      await AsyncStorage.setItem(getMigratedKey(), 'true');
     } catch (error) {
-      console.error('Error loading notes:', error);
-    } finally {
-      setRefreshing(false);
+      console.error('Error migrating notes:', error);
     }
   };
 
-  const saveNotes = async (newNotes) => {
+  const loadNotes = async () => {
+    if (!userId) return;
+    
     try {
-      await AsyncStorage.setItem(getStorageKey(), JSON.stringify(newNotes));
-      setNotes(newNotes);
-      // Trigger refresh on other screens
-      if (triggerRefresh) triggerRefresh();
+      // First, try to migrate local notes
+      await migrateLocalNotes();
+
+      // Load from Supabase
+      const { data, error } = await supabase
+        .from('notes')
+        .select('*')
+        .eq('userId', userId)
+        .order('createdAt', { ascending: false });
+
+      if (error) throw error;
+
+      setNotes(data || []);
     } catch (error) {
-      console.error('Error saving notes:', error);
+      console.error('Error loading notes:', error);
+      Toast.show({ type: 'error', text1: t.error || 'Erro ao carregar notas' });
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -114,30 +165,58 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
 
     const now = new Date().toISOString();
     
-    if (editingNote) {
-      const updatedNotes = notes.map(n => 
-        n.id === editingNote.id 
-          ? { ...n, title: noteTitle, content: noteContent, color: noteColor, updatedAt: now }
-          : n
-      );
-      await saveNotes(updatedNotes);
-    } else {
-      const newNote = {
-        id: `note_${Date.now()}`,
-        title: noteTitle,
-        content: noteContent,
-        color: noteColor,
-        isPinned: false,
-        isFavorite: false,
-        order: 0,
-        createdAt: now,
-        updatedAt: now,
-      };
-      await saveNotes([newNote, ...notes]);
-    }
+    try {
+      if (editingNote) {
+        // Update existing note
+        const updateData = {
+          title: noteTitle.trim(),
+          content: noteContent.trim(),
+          color: noteColor,
+          updatedAt: now,
+        };
 
-    setShowModal(false);
-    Toast.show({ type: 'success', text1: t.saved });
+        const { error } = await supabase
+          .from('notes')
+          .update(updateData)
+          .eq('id', editingNote.id);
+
+        if (error) throw error;
+
+        // Update local state
+        setNotes(notes.map(n => 
+          n.id === editingNote.id ? { ...n, ...updateData } : n
+        ));
+      } else {
+        // Create new note
+        const newNote = {
+          id: generateId(),
+          userId: userId,
+          title: noteTitle.trim(),
+          content: noteContent.trim(),
+          color: noteColor,
+          isPinned: false,
+          isFavorite: false,
+          createdAt: now,
+          updatedAt: now,
+        };
+
+        const { error } = await supabase
+          .from('notes')
+          .insert([newNote]);
+
+        if (error) throw error;
+
+        // Update local state
+        setNotes([newNote, ...notes]);
+      }
+
+      setShowModal(false);
+      Toast.show({ type: 'success', text1: t.saved });
+      if (triggerRefresh) triggerRefresh();
+    } catch (error) {
+      console.error('Error saving note:', error);
+      Toast.show({ type: 'error', text1: t.error || 'Erro ao guardar nota' });
+    }
   };
 
   const handleDeleteNote = (noteId) => {
@@ -150,28 +229,25 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
           text: t.delete,
           style: 'destructive',
           onPress: async () => {
-            const filteredNotes = notes.filter(n => n.id !== noteId);
-            await saveNotes(filteredNotes);
-            Toast.show({ type: 'success', text1: t.deleted });
+            try {
+              const { error } = await supabase
+                .from('notes')
+                .delete()
+                .eq('id', noteId);
+
+              if (error) throw error;
+
+              setNotes(notes.filter(n => n.id !== noteId));
+              Toast.show({ type: 'success', text1: t.deleted });
+              if (triggerRefresh) triggerRefresh();
+            } catch (error) {
+              console.error('Error deleting note:', error);
+              Toast.show({ type: 'error', text1: t.error });
+            }
           },
         },
       ]
     );
-  };
-
-  // Action handlers - prevent event propagation
-  const handleTogglePin = async (noteId, e) => {
-    if (e) e.stopPropagation();
-    const note = notes.find(n => n.id === noteId);
-    const newPinState = !note.isPinned;
-    const updatedNotes = notes.map(n =>
-      n.id === noteId ? { ...n, isPinned: newPinState } : n
-    );
-    await saveNotes(updatedNotes);
-    Toast.show({ 
-      type: 'success', 
-      text1: newPinState ? (t.pinned || 'Fixado no topo') : (t.unpinned || 'Desafixado')
-    });
   };
 
   const handleToggleFavorite = async (noteId, e) => {
@@ -180,20 +256,30 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
     if (!note) return;
     
     const newFavoriteState = !note.isFavorite;
-    const updatedNotes = notes.map(n =>
-      n.id === noteId ? { ...n, isFavorite: newFavoriteState } : n
-    );
     
-    // Update state first for immediate UI feedback
-    setNotes(updatedNotes);
-    
-    // Then save to AsyncStorage
-    await saveNotes(updatedNotes);
-    
-    Toast.show({ 
-      type: 'success', 
-      text1: newFavoriteState ? (t.addedToFavorites || 'Adicionado aos favoritos') : (t.removedFromFavorites || 'Removido dos favoritos')
-    });
+    try {
+      const { error } = await supabase
+        .from('notes')
+        .update({ isFavorite: newFavoriteState })
+        .eq('id', noteId);
+
+      if (error) throw error;
+
+      // Update local state
+      setNotes(notes.map(n =>
+        n.id === noteId ? { ...n, isFavorite: newFavoriteState } : n
+      ));
+      
+      Toast.show({ 
+        type: 'success', 
+        text1: newFavoriteState ? (t.addedToFavorites || 'Adicionado aos favoritos') : (t.removedFromFavorites || 'Removido dos favoritos')
+      });
+      
+      if (triggerRefresh) triggerRefresh();
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      Toast.show({ type: 'error', text1: t.error });
+    }
   };
 
   const handleCopyNote = async (content, e) => {
@@ -207,80 +293,97 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
     }
   };
 
-  const handleDeleteAction = (noteId, e) => {
+  const handleTogglePin = async (noteId, e) => {
     if (e) e.stopPropagation();
-    handleDeleteNote(noteId);
+    const note = notes.find(n => n.id === noteId);
+    if (!note) return;
+    
+    const newPinnedState = !note.isPinned;
+    
+    try {
+      const { error } = await supabase
+        .from('notes')
+        .update({ isPinned: newPinnedState })
+        .eq('id', noteId);
+
+      if (error) throw error;
+
+      setNotes(notes.map(n =>
+        n.id === noteId ? { ...n, isPinned: newPinnedState } : n
+      ));
+      
+      Toast.show({ 
+        type: 'success', 
+        text1: newPinnedState ? (t.pinned || 'Fixado') : (t.unpinned || 'Desafixado')
+      });
+    } catch (error) {
+      console.error('Error toggling pin:', error);
+      Toast.show({ type: 'error', text1: t.error });
+    }
   };
 
   const getColorById = (id) => {
-    return NOTE_COLORS.find(c => c.id === id)?.color || '#1C1C1E';
+    const color = NOTE_COLORS.find(c => c.id === id);
+    return color ? color.color : '#1C1C1E';
   };
 
+  // Filter and sort notes
   const filteredNotes = notes.filter(note => {
     if (!searchQuery) return true;
     const q = normalize(searchQuery);
     return normalize(note.title).includes(q) || normalize(note.content).includes(q);
   });
 
-  // Sort: pinned items first, then by date
   const sortedNotes = [...filteredNotes].sort((a, b) => {
+    // Pinned notes first
     if (a.isPinned && !b.isPinned) return -1;
     if (!a.isPinned && b.isPinned) return 1;
+    // Then by date
     return new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt);
   });
 
-  const renderNoteItem = ({ item }) => {
+  const renderNote = ({ item }) => {
+    const noteColor = getColorById(item.color);
+    const isDefaultColor = item.color === 'default' || !item.color;
+
     return (
-      <View style={[styles.noteCard, { borderLeftColor: getColorById(item.color), borderLeftWidth: 4 }]}>
-        {/* Main content area - opens edit modal */}
-        <TouchableOpacity 
-          style={styles.noteMainContent}
-          onPress={() => openEditNote(item)}
-          activeOpacity={0.7}
-        >
-          <View style={styles.noteHeader}>
-            {item.title ? (
-              <Text style={styles.noteTitle} numberOfLines={1}>{item.title}</Text>
-            ) : null}
-          </View>
-          <Text style={styles.noteContent} numberOfLines={4}>{item.content || ''}</Text>
-          <View style={styles.noteMetaRow}>
-            <Text style={styles.noteDate}>{formatDateLocale(item.updatedAt || item.createdAt)}</Text>
-          </View>
-        </TouchableOpacity>
-        
-        {/* Action buttons - separate touch zone */}
-        <View style={styles.noteActionsColumn}>
-          <TouchableOpacity 
-            onPress={(e) => handleCopyNote(item.content || '', e)} 
-            style={styles.actionButton}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Ionicons name="copy-outline" size={18} color="#8E8E93" />
-          </TouchableOpacity>
-          <TouchableOpacity 
-            onPress={(e) => handleToggleFavorite(item.id, e)} 
-            style={styles.actionButton}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Ionicons name={item.isFavorite ? "heart" : "heart-outline"} size={18} color={item.isFavorite ? "#FF3B30" : "#8E8E93"} />
-          </TouchableOpacity>
-          <TouchableOpacity 
-            onPress={(e) => handleTogglePin(item.id, e)} 
-            style={styles.actionButton}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Ionicons name="pin" size={18} color={item.isPinned ? "#FFD60A" : "#8E8E93"} />
-          </TouchableOpacity>
-          <TouchableOpacity 
-            onPress={(e) => handleDeleteAction(item.id, e)} 
-            style={styles.actionButton}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Ionicons name="trash-outline" size={18} color="#FF3B30" />
-          </TouchableOpacity>
+      <TouchableOpacity
+        style={[
+          styles.noteCard,
+          !isDefaultColor && { borderLeftWidth: 4, borderLeftColor: noteColor }
+        ]}
+        onPress={() => openEditNote(item)}
+        activeOpacity={0.7}
+      >
+        <View style={styles.noteHeader}>
+          {item.isPinned && (
+            <Ionicons name="pin" size={14} color="#FFD60A" style={styles.pinnedIcon} />
+          )}
+          <Text style={styles.noteTitle} numberOfLines={1}>
+            {item.title || t.untitled || 'Sem título'}
+          </Text>
         </View>
-      </View>
+        {item.content ? (
+          <Text style={styles.noteContent} numberOfLines={3}>{item.content}</Text>
+        ) : null}
+        <View style={styles.noteFooter}>
+          <Text style={styles.noteDate}>{formatDateLocale(item.createdAt)}</Text>
+          <View style={styles.noteActions}>
+            <TouchableOpacity onPress={(e) => handleCopyNote(item.content || item.title, e)} style={styles.actionBtn}>
+              <Ionicons name="copy-outline" size={18} color="#8E8E93" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={(e) => handleToggleFavorite(item.id, e)} style={styles.actionBtn}>
+              <Ionicons name={item.isFavorite ? "heart" : "heart-outline"} size={18} color={item.isFavorite ? "#FF3B30" : "#8E8E93"} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={(e) => handleTogglePin(item.id, e)} style={styles.actionBtn}>
+              <Ionicons name="pin" size={18} color={item.isPinned ? "#FFD60A" : "#8E8E93"} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleDeleteNote(item.id)} style={styles.actionBtn}>
+              <Ionicons name="trash-outline" size={18} color="#FF3B30" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </TouchableOpacity>
     );
   };
 
@@ -308,42 +411,38 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
 
         {/* Notes List */}
         {sortedNotes.length === 0 ? (
-          <ScrollView 
+          <ScrollView
             style={styles.scrollView}
             refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={() => { setRefreshing(true); loadNotes(); }}
-                tintColor="#007AFF"
-              />
+              <RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadNotes(); }} tintColor="#007AFF" />
             }
+            keyboardShouldPersistTaps="handled"
           >
             <View style={styles.emptyState}>
               <Ionicons name="document-text-outline" size={64} color="#8E8E93" />
-              <Text style={styles.emptyText}>{t.noNotes}</Text>
-          </View>
-        </ScrollView>
-      ) : (
-        <FlatList
-          data={sortedNotes}
-          keyExtractor={(item) => item.id}
-          renderItem={renderNoteItem}
-          contentContainerStyle={styles.listContent}
-          keyboardShouldPersistTaps="handled"
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={() => { setRefreshing(true); loadNotes(); }}
-              tintColor="#007AFF"
-            />
-          }
-        />
-      )}
+              <Text style={styles.emptyText}>{searchQuery ? (t.noResults || 'Sem resultados') : (t.noNotes || 'Sem notas')}</Text>
+              {!searchQuery && (
+                <Text style={styles.emptySubtext}>{t.createFirstNote || 'Cria a tua primeira nota'}</Text>
+              )}
+            </View>
+          </ScrollView>
+        ) : (
+          <FlatList
+            data={sortedNotes}
+            keyExtractor={(item) => item.id}
+            renderItem={renderNote}
+            contentContainerStyle={styles.listContent}
+            keyboardShouldPersistTaps="handled"
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadNotes(); }} tintColor="#007AFF" />
+            }
+          />
+        )}
 
-      {/* FAB - New Note */}
-      <TouchableOpacity style={styles.fab} onPress={openNewNote}>
-        <Ionicons name="add" size={28} color="#FFFFFF" />
-      </TouchableOpacity>
+        {/* FAB */}
+        <TouchableOpacity style={styles.fab} onPress={openNewNote}>
+          <Ionicons name="add" size={28} color="#FFFFFF" />
+        </TouchableOpacity>
 
       {/* Note Modal */}
       <Modal
@@ -420,35 +519,33 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#000000' },
   container: { flex: 1, backgroundColor: '#000000' },
-  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1C1C1E', margin: 16, marginBottom: 8, paddingHorizontal: 12, borderRadius: 12, height: 44 },
+  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1C1C1E', marginHorizontal: 16, marginTop: 16, marginBottom: 8, paddingHorizontal: 12, borderRadius: 12, height: 44 },
   searchInput: { flex: 1, marginLeft: 8, color: '#FFFFFF', fontSize: 16 },
-  scrollView: { flex: 1, paddingHorizontal: 16 },
+  scrollView: { flex: 1 },
   listContent: { paddingHorizontal: 16, paddingBottom: 32 },
-  // Note card with separate touch zones
-  noteCard: { backgroundColor: '#1C1C1E', borderRadius: 12, marginBottom: 10, flexDirection: 'row', overflow: 'hidden' },
-  noteMainContent: { flex: 1, padding: 16 },
-  noteHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  noteTitle: { color: '#FFFFFF', fontSize: 18, fontWeight: '600', flex: 1 },
-  noteContent: { color: '#CCCCCC', fontSize: 15, lineHeight: 22 },
-  noteMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#2C2C2E' },
-  noteDate: { color: '#8E8E93', fontSize: 12 },
-  // Actions column - separate touch zone
-  noteActionsColumn: { justifyContent: 'center', alignItems: 'center', paddingHorizontal: 8, gap: 4, backgroundColor: '#1C1C1E', borderLeftWidth: 1, borderLeftColor: '#2C2C2E' },
-  actionButton: { padding: 8 },
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 100 },
   emptyText: { color: '#8E8E93', fontSize: 16, marginTop: 16 },
-  fab: { position: 'absolute', bottom: 24, right: 24, width: 56, height: 56, borderRadius: 28, backgroundColor: '#007AFF', justifyContent: 'center', alignItems: 'center', shadowColor: '#007AFF', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 8 },
-  // Modal styles with proper safe area
+  emptySubtext: { color: '#636366', fontSize: 14, marginTop: 8 },
+  noteCard: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 16, marginBottom: 12 },
+  noteHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  pinnedIcon: { marginRight: 6 },
+  noteTitle: { flex: 1, color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
+  noteContent: { color: '#AEAEB2', fontSize: 14, lineHeight: 20, marginBottom: 12 },
+  noteFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  noteDate: { color: '#8E8E93', fontSize: 12 },
+  noteActions: { flexDirection: 'row', gap: 4 },
+  actionBtn: { padding: 6 },
+  fab: { position: 'absolute', bottom: 24, right: 24, width: 56, height: 56, borderRadius: 28, backgroundColor: '#007AFF', justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 8 },
   modalContainer: { flex: 1, backgroundColor: '#000000' },
-  modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#2C2C2E', minHeight: 56 },
-  modalHeaderButton: { padding: 4, minWidth: 60 },
+  modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: '#2C2C2E' },
+  modalHeaderButton: { padding: 4 },
   modalTitle: { color: '#FFFFFF', fontSize: 18, fontWeight: '600' },
-  saveText: { color: '#007AFF', fontSize: 17, fontWeight: '600', textAlign: 'right' },
+  saveText: { color: '#007AFF', fontSize: 17, fontWeight: '600' },
   modalBody: { flex: 1, padding: 16 },
-  titleInput: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 16, color: '#FFFFFF', fontSize: 18, fontWeight: '600', marginBottom: 12 },
-  contentInput: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 16, color: '#FFFFFF', fontSize: 16, minHeight: 200, marginBottom: 20 },
-  colorLabel: { color: '#8E8E93', fontSize: 14, marginBottom: 12, textTransform: 'uppercase' },
-  colorPicker: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 20 },
-  colorOption: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center' },
-  colorOptionSelected: { borderWidth: 3, borderColor: '#FFFFFF' },
+  titleInput: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 16, color: '#FFFFFF', fontSize: 18, fontWeight: '600', marginBottom: 16 },
+  contentInput: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 16, color: '#FFFFFF', fontSize: 16, minHeight: 200, marginBottom: 16 },
+  colorLabel: { color: '#8E8E93', fontSize: 14, textTransform: 'uppercase', marginBottom: 12 },
+  colorPicker: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  colorOption: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: 'transparent' },
+  colorOptionSelected: { borderColor: '#FFFFFF' },
 });
