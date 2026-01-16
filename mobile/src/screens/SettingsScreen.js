@@ -119,27 +119,6 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
           <Image source={require('../../assets/icon.png')} style={styles.logoImage} />
         </View>
 
-        {/* Subscribe Button - Show when trial expired */}
-        {!premiumStatus?.hasPremium && (
-          <TouchableOpacity 
-            style={styles.subscribeButton} 
-            onPress={() => {
-              const storeUrl = Platform.OS === 'ios' ? APP_STORE_URL : PLAY_STORE_URL;
-              Linking.openURL(storeUrl);
-            }}
-          >
-            <Ionicons name="card-outline" size={24} color="#FFFFFF" />
-            <Text style={styles.subscribeButtonText}>{t.subscribePremium || 'Subscrever Premium'}</Text>
-          </TouchableOpacity>
-        )}
-
-        {!premiumStatus?.isPremiumActivated && (
-          <TouchableOpacity style={styles.activateButton} onPress={() => setShowActivationModal(true)}>
-            <Ionicons name="ticket" size={24} color="#FFFFFF" />
-            <Text style={styles.activateButtonText}>{t.enterActivationCode || 'Inserir código de ativação'}</Text>
-          </TouchableOpacity>
-        )}
-
         {/* Cloud Backup Section - Simple Switch */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t.backup || 'Cópia de Segurança'}</Text>
