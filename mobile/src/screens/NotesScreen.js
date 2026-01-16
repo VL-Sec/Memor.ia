@@ -177,11 +177,19 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
   const handleToggleFavorite = async (noteId, e) => {
     if (e) e.stopPropagation();
     const note = notes.find(n => n.id === noteId);
+    if (!note) return;
+    
     const newFavoriteState = !note.isFavorite;
     const updatedNotes = notes.map(n =>
       n.id === noteId ? { ...n, isFavorite: newFavoriteState } : n
     );
+    
+    // Update state first for immediate UI feedback
+    setNotes(updatedNotes);
+    
+    // Then save to AsyncStorage
     await saveNotes(updatedNotes);
+    
     Toast.show({ 
       type: 'success', 
       text1: newFavoriteState ? (t.addedToFavorites || 'Adicionado aos favoritos') : (t.removedFromFavorites || 'Removido dos favoritos')
