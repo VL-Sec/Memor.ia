@@ -200,9 +200,15 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
           updatedAt: now,
         };
 
-        const { error } = await supabase
+        console.log('📝 Creating new note:', JSON.stringify(newNote));
+        console.log('👤 userId:', userId);
+
+        const { data, error } = await supabase
           .from('notes')
-          .insert([newNote]);
+          .insert([newNote])
+          .select();
+
+        console.log('📤 Supabase response - data:', data, 'error:', error);
 
         if (error) throw error;
 
@@ -214,7 +220,7 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
       Toast.show({ type: 'success', text1: t.saved });
       if (triggerRefresh) triggerRefresh();
     } catch (error) {
-      console.error('Error saving note:', error);
+      console.error('❌ Error saving note:', error);
       Toast.show({ type: 'error', text1: t.error || 'Erro ao guardar nota' });
     }
   };
