@@ -15,19 +15,19 @@ headers = {
 user_ids = ["user_20a9c1bbc07a4846", "user_76f9dbc4798f416a"]
 
 print("=" * 60)
-print("📝 CRIAR NOTAS DE TESTE PARA AMBOS OS UTILIZADORES")
+print("CRIAR NOTAS DE TESTE PARA AMBOS OS UTILIZADORES")
 print("=" * 60)
 
 timestamp = int(datetime.now().timestamp())
 
 for user_id in user_ids:
-    print(f"\n👤 Criar nota para: {user_id}")
+    print(f"\nCriar nota para: {user_id}")
     
     test_note = {
         "id": f"test_{user_id}_{timestamp}",
         "userId": user_id,
-        "title": f"🧪 TESTE - {user_id[-8:]}",
-        "content": "Se vês esta nota, o carregamento funciona!",
+        "title": f"TESTE - {user_id[-8:]}",
+        "content": "Se ves esta nota, o carregamento funciona!",
         "color": "green",
         "isPinned": False,
         "isFavorite": True,
@@ -42,12 +42,12 @@ for user_id in user_ids:
     )
     
     if response.status_code == 201:
-        print(f"   ✅ Nota criada: {test_note['title']}")
+        print(f"   OK - Nota criada: {test_note['title']}")
     else:
-        print(f"   ❌ Erro: {response.text}")
+        print(f"   ERRO: {response.text}")
 
 print("\n" + "=" * 60)
-print("📋 TODAS AS NOTAS NO SUPABASE AGORA:")
+print("TODAS AS NOTAS NO SUPABASE AGORA:")
 print("=" * 60)
 
 response = requests.get(
@@ -58,7 +58,12 @@ if response.status_code == 200:
     data = response.json()
     print(f"Total: {len(data)} notas\n")
     for note in data:
-        print(f"   [{note['userId)}] {note['title']}")
-        print(f"      ID: {note['id']}")
-        print(f"      isFavorite: {note['isFavorite']}")
+        uid = note.get('userId', 'N/A')
+        title = note.get('title', 'Sem titulo')
+        fav = note.get('isFavorite', False)
+        nid = note.get('id', 'N/A')
+        print(f"   User: {uid}")
+        print(f"   Title: {title}")
+        print(f"   ID: {nid}")
+        print(f"   Favorito: {fav}")
         print()
