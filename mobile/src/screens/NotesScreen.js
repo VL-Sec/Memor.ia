@@ -266,18 +266,7 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
     Keyboard.dismiss();
     try {
       const newValue = !item.isFavorite;
-      console.log('❤️ Toggle favorite - item:', item.id, 'newValue:', newValue);
-      
-      const { data, error } = await supabase
-        .from('notes')
-        .update({ isFavorite: newValue })
-        .eq('id', item.id)
-        .select();
-      
-      console.log('📤 Supabase response - data:', data, 'error:', error);
-      
-      if (error) throw error;
-      
+      await supabase.from('notes').update({ isFavorite: newValue }).eq('id', item.id);
       setNotes(notes.map(n => n.id === item.id ? { ...n, isFavorite: newValue } : n));
       Toast.show({ 
         type: 'success', 
@@ -285,8 +274,7 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
       });
       if (triggerRefresh) triggerRefresh();
     } catch (error) {
-      console.error('❌ Error toggling favorite:', error);
-      Toast.show({ type: 'error', text1: t.error || 'Erro' });
+      console.error('Error toggling favorite:', error);
     }
   };
 
