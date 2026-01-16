@@ -113,16 +113,11 @@ export default function FavoritesScreen({ language, userId, refreshKey }) {
   const handleRemoveFavorite = async (item) => {
     Keyboard.dismiss();
     try {
-      if (item.source === 'local') {
-        // Update local notes
-        const localNotesStr = await AsyncStorage.getItem(getNotesStorageKey());
-        const localNotes = localNotesStr ? JSON.parse(localNotesStr) : [];
-        const updatedNotes = localNotes.map(n => 
-          n.id === item.id ? { ...n, isFavorite: false } : n
-        );
-        await AsyncStorage.setItem(getNotesStorageKey(), JSON.stringify(updatedNotes));
+      if (item.contentType === 'note') {
+        // Update notes table in Supabase
+        await supabase.from('notes').update({ isFavorite: false }).eq('id', item.id);
       } else {
-        // Update Supabase
+        // Update links table in Supabase (links and clipboard items)
         await supabase.from('links').update({ isFavorite: false }).eq('id', item.id);
       }
       
@@ -136,7 +131,8 @@ export default function FavoritesScreen({ language, userId, refreshKey }) {
 
   const getItemType = (item) => {
     if (item.contentType === 'link') return 'link';
-    if (item.contentType === 'note' || item.source === 'local') return 'note';
+    if (item.contentType === 'note') return 'note';
+    if (item.contentType === 'text') return 'clipboard';
     return 'clipboard';
   };
 
