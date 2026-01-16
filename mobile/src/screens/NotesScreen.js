@@ -46,11 +46,6 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
   const insets = useSafeAreaInsets();
   const t = translations[language] || translations.en;
 
-  // DEBUG - verificar se o componente carrega
-  useEffect(() => {
-    alert('NotesScreen carregou! userId=' + userId);
-  }, []);
-
   // Load notes when screen is focused
   useFocusEffect(
     useCallback(() => {
