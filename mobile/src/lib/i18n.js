@@ -1077,6 +1077,8 @@ export const translations = {
     open: 'Apri',
     search: 'Cerca...',
     pasteHere: 'Incolla o scrivi testo...',
+    pasted: 'Incollato dagli appunti',
+    clipboardEmpty: 'Appunti vuoti',
     all: 'Tutto',
     done: 'Fatto',
     confirm: 'Conferma',
