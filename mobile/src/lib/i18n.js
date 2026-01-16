@@ -693,6 +693,8 @@ export const translations = {
     open: 'Ouvrir',
     search: 'Rechercher...',
     pasteHere: 'Coller ou écrire du texte...',
+    pasted: 'Collé du presse-papiers',
+    clipboardEmpty: 'Presse-papiers vide',
     all: 'Tout',
     done: 'Terminé',
     confirm: 'Confirmer',
