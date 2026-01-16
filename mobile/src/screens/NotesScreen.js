@@ -54,15 +54,13 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
   // Load notes when screen is focused
   useFocusEffect(
     useCallback(() => {
-      if (userId) {
-        loadNotes();
-      }
+      loadNotes();
     }, [userId])
   );
 
   // Also reload when refreshKey changes
   useEffect(() => {
-    if (refreshKey > 0 && userId) {
+    if (refreshKey > 0) {
       loadNotes();
     }
   }, [refreshKey]);
