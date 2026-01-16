@@ -45,10 +45,6 @@ export default function NotesScreen({ language, userId, refreshKey, triggerRefre
   
   const insets = useSafeAreaInsets();
   const t = translations[language] || translations.en;
-  
-  // Dynamic storage key for migration check
-  const getStorageKey = () => `memoria-notes-${userId || 'default'}`;
-  const getMigratedKey = () => `memoria-notes-migrated-${userId || 'default'}`;
 
   // Load notes when screen is focused
   useFocusEffect(
