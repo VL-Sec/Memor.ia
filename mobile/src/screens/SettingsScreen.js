@@ -114,15 +114,9 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
         <View style={styles.headerSpacer} />
       </View>
       <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}>
-        {/* Premium Card */}
-        <View style={[styles.premiumCard, premiumStatus?.isPremiumActivated && styles.premiumCardActive, premiumStatus?.isTrialActive && !premiumStatus?.isPremiumActivated && styles.premiumCardTrial, !premiumStatus?.hasPremium && styles.premiumCardExpired]}>
-          <View style={styles.premiumIcon}>
-            <Image source={require('../../assets/icon.png')} style={styles.premiumLogo} />
-          </View>
-          <View style={styles.premiumContent}>
-            <Text style={styles.premiumTitle}>{premiumStatus?.isPremiumActivated ? (t.premiumActive || 'Premium Ativo') : premiumStatus?.isTrialActive ? (t.trialActive || 'Período de Teste') : (t.trialExpired || 'Período Expirado')}</Text>
-            <Text style={styles.premiumSubtitle}>{premiumStatus?.isPremiumActivated ? `✅ ${premiumStatus.activatedCode}` : premiumStatus?.isTrialActive ? `${premiumStatus.trialDaysRemaining} ${t.trialDaysLeft || 'dias restantes'}` : (t.subscribeToUnlock || 'Subscreva para desbloquear')}</Text>
-          </View>
+        {/* Logo Card */}
+        <View style={styles.logoCard}>
+          <Image source={require('../../assets/icon.png')} style={styles.logoImage} />
         </View>
 
         {/* Subscribe Button - Show when trial expired */}
