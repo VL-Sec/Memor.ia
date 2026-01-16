@@ -116,7 +116,7 @@ export default function SettingsScreen({ language, setLanguage, premiumStatus, s
       <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}>
         {/* Logo Card */}
         <View style={styles.logoCard}>
-          <Image source={require('../../assets/icon.png')} style={styles.logoImage} />
+          <Image source={require('../../assets/icon.png')} style={styles.logoImage} resizeMode="contain" />
         </View>
 
         {/* Cloud Backup Section - Simple Switch */}
