@@ -268,6 +268,8 @@ export const translations = {
     open: 'Abrir',
     search: 'Pesquisar...',
     pasteHere: 'Colar ou escrever texto...',
+    pasted: 'Colado do clipboard',
+    clipboardEmpty: 'Clipboard vazio',
     all: 'Todos',
     done: 'Concluído',
     confirm: 'Confirmar',
