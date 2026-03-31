@@ -95,7 +95,7 @@ eas submit --platform ios
 - Uso único
 
 ### Admin Dashboard
-- URL: https://quickmemoria.preview.emergentagent.com/admin
+- URL: https://mobile-memoria-prod.preview.emergentagent.com/admin
 - Criar e gerir códigos de influencers
 
 ## 📁 Estrutura

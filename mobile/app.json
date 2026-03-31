@@ -2,7 +2,7 @@
   "expo": {
     "name": "Memor.ia",
     "slug": "memoria",
-    "version": "1.0.0",
+    "version": "1.0.8",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -35,7 +35,7 @@
         "backgroundColor": "#000000"
       },
       "package": "com.memoria.app",
-      "versionCode": 1,
+      "versionCode": 8,
       "allowBackup": true,
       "permissions": [
         "INTERNET"
