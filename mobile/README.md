@@ -95,7 +95,7 @@ eas submit --platform ios
 - Uso único
 
 ### Admin Dashboard
-- URL: https://mobile-memoria-prod.preview.emergentagent.com/admin
+- URL: https://memsub-system.preview.emergentagent.com/admin
 - Criar e gerir códigos de influencers
 
 ## 📁 Estrutura

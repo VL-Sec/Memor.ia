@@ -79,22 +79,51 @@ export default function AdminDashboard() {
 
   // Create new code
   const handleCreateCode = async () => {
+    if (!newInfluencerName.trim()) {
+      toast({
+        title: 'Erro',
+        description: 'Nome do influencer é obrigatório',
+        variant: 'destructive'
+      })
+      return
+    }
+
     setCreating(true)
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        toast({
+          title: 'Erro',
+          description: 'Sessão expirada. Faça login novamente.',
+          variant: 'destructive'
+        })
+        router.push('/admin')
+        return
+      }
+
       const code = generateActivationCode()
-      const id = `code_${Date.now()}`
+      const id = `code_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
+
+      const newCodeData = {
+        id,
+        code,
+        influencer_name: newInfluencerName.trim(),
+        notes: newNote.trim() || null,
+        is_used: false,
+        created_at: new Date().toISOString()
+      }
 
       const { error } = await supabase
         .from('activation_codes')
-        .insert([{
-          id,
-          code,
-          influencer_name: newInfluencerName || null,
-          notes: newNote || null,
-          is_used: false
-        }])
+        .insert([newCodeData])
 
-      if (error) throw error
+      if (error) {
+        console.error('Create code error details:', error)
+        throw error
+      }
+
+      // Update local state immediately
+      setCodes(prevCodes => [newCodeData, ...prevCodes])
 
       toast({
         title: 'Sucesso',
@@ -104,12 +133,11 @@ export default function AdminDashboard() {
       setNewInfluencerName('')
       setNewNote('')
       setIsCreateDialogOpen(false)
-      fetchData()
     } catch (error) {
       console.error('Error creating code:', error)
       toast({
         title: 'Erro',
-        description: 'Falha ao criar código',
+        description: error.message || 'Falha ao criar código. Verifique as permissões.',
         variant: 'destructive'
       })
     } finally {
@@ -122,64 +150,126 @@ export default function AdminDashboard() {
     if (!window.confirm(`Apagar o código ${codeName}?`)) return
     
     try {
+      // First check if user is authenticated
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        toast({
+          title: 'Erro',
+          description: 'Sessão expirada. Faça login novamente.',
+          variant: 'destructive'
+        })
+        router.push('/admin')
+        return
+      }
+
       const { error } = await supabase
         .from('activation_codes')
         .delete()
         .eq('id', codeId)
 
-      if (error) throw error
+      if (error) {
+        console.error('Delete error details:', error)
+        throw error
+      }
 
+      // Update local state immediately for better UX
+      setCodes(prevCodes => prevCodes.filter(c => c.id !== codeId))
+      
       toast({
         title: 'Sucesso',
         description: 'Código apagado'
       })
-      
-      fetchData()
     } catch (error) {
       console.error('Error deleting code:', error)
       toast({
         title: 'Erro',
-        description: 'Falha ao apagar código',
+        description: error.message || 'Falha ao apagar código. Verifique as permissões RLS.',
         variant: 'destructive'
       })
+      // Refresh data to ensure UI is in sync
+      fetchData()
     }
   }
 
-  // Deactivate code (mark as used without actual use)
+  // Toggle code status (activate/deactivate)
   const handleDeactivateCode = async (codeId) => {
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        toast({
+          title: 'Erro',
+          description: 'Sessão expirada. Faça login novamente.',
+          variant: 'destructive'
+        })
+        router.push('/admin')
+        return
+      }
+
+      // Find current code state
+      const currentCode = codes.find(c => c.id === codeId)
+      const newStatus = !currentCode?.is_used
+
       const { error } = await supabase
         .from('activation_codes')
-        .update({ is_used: true, used_at: new Date().toISOString() })
+        .update({ 
+          is_used: newStatus, 
+          used_at: newStatus ? new Date().toISOString() : null 
+        })
         .eq('id', codeId)
 
-      if (error) throw error
+      if (error) {
+        console.error('Toggle status error details:', error)
+        throw error
+      }
+
+      // Update local state immediately
+      setCodes(prevCodes => prevCodes.map(c => 
+        c.id === codeId ? { ...c, is_used: newStatus, used_at: newStatus ? new Date().toISOString() : null } : c
+      ))
 
       toast({
         title: 'Sucesso',
-        description: 'Código desativado'
+        description: newStatus ? 'Código desativado' : 'Código reativado'
       })
-      
-      fetchData()
     } catch (error) {
-      console.error('Error deactivating code:', error)
+      console.error('Error toggling code status:', error)
       toast({
         title: 'Erro',
-        description: 'Falha ao desativar código',
+        description: error.message || 'Falha ao alterar estado do código',
         variant: 'destructive'
       })
+      fetchData()
     }
   }
 
   // Save note
   const handleSaveNote = async (codeId) => {
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        toast({
+          title: 'Erro',
+          description: 'Sessão expirada. Faça login novamente.',
+          variant: 'destructive'
+        })
+        router.push('/admin')
+        return
+      }
+
       const { error } = await supabase
         .from('activation_codes')
         .update({ notes: editNote })
         .eq('id', codeId)
 
-      if (error) throw error
+      if (error) {
+        console.error('Save note error details:', error)
+        throw error
+      }
+
+      // Update local state immediately
+      setCodes(prevCodes => prevCodes.map(c => 
+        c.id === codeId ? { ...c, notes: editNote } : c
+      ))
 
       toast({
         title: 'Sucesso',
@@ -188,12 +278,11 @@ export default function AdminDashboard() {
       
       setEditingCodeId(null)
       setEditNote('')
-      fetchData()
     } catch (error) {
       console.error('Error saving note:', error)
       toast({
         title: 'Erro',
-        description: 'Falha ao guardar nota',
+        description: error.message || 'Falha ao guardar nota',
         variant: 'destructive'
       })
     }
@@ -482,28 +571,27 @@ export default function AdminDashboard() {
                             </td>
                             <td className="px-4 py-3">
                               <div className="flex items-center justify-end gap-1">
-                                {!code.is_used && (
-                                  <>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => copyCode(code.code)}
-                                      className="h-8 w-8 p-0 rounded-full hover:bg-[#007AFF]/10"
-                                      title="Copiar"
-                                    >
-                                      <Copy className="w-4 h-4" />
-                                    </Button>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => handleDeactivateCode(code.id)}
-                                      className="h-8 w-8 p-0 rounded-full hover:bg-orange-500/10 text-orange-500"
-                                      title="Desativar"
-                                    >
-                                      <XCircle className="w-4 h-4" />
-                                    </Button>
-                                  </>
-                                )}
+                                {/* Copiar - sempre visível */}
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => copyCode(code.code)}
+                                  className="h-8 w-8 p-0 rounded-full hover:bg-[#007AFF]/10"
+                                  title="Copiar"
+                                >
+                                  <Copy className="w-4 h-4" />
+                                </Button>
+                                {/* Desativar - sempre visível para bloquear utilizadores */}
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleDeactivateCode(code.id)}
+                                  className={`h-8 w-8 p-0 rounded-full ${code.is_used ? 'hover:bg-green-500/10 text-green-500' : 'hover:bg-orange-500/10 text-orange-500'}`}
+                                  title={code.is_used ? "Reativar" : "Desativar"}
+                                >
+                                  {code.is_used ? <CheckCircle className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+                                </Button>
+                                {/* Editar nota - sempre visível */}
                                 <Button
                                   variant="ghost"
                                   size="sm"
@@ -513,6 +601,7 @@ export default function AdminDashboard() {
                                 >
                                   <Edit2 className="w-4 h-4" />
                                 </Button>
+                                {/* Eliminar - sempre visível */}
                                 <Button
                                   variant="ghost"
                                   size="sm"

@@ -3,9 +3,10 @@
     "name": "Memor.ia",
     "slug": "memoria",
     "version": "1.0.8",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -16,41 +17,35 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.memoria.app",
-      "buildNumber": "1",
+      "bundleIdentifier": "com.getmemoria.app",
       "infoPlist": {
-        "NSUbiquitousContainers": {
-          "iCloud.com.memoria.app": {
-            "NSUbiquitousContainerIsDocumentScopePublic": true,
-            "NSUbiquitousContainerSupportedFolderLevels": "Any",
-            "NSUbiquitousContainerName": "Memor.ia"
-          }
-        }
-      },
-      "usesIcloudStorage": true
+        "NSUserTrackingUsageDescription": "This app does not track you. This permission is not used."
+      }
     },
     "android": {
+      "versionCode": 8,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
-      "package": "com.memoria.app",
-      "versionCode": 8,
-      "allowBackup": true,
+      "package": "com.getmemoria.app",
       "permissions": [
-        "INTERNET"
+        "INTERNET",
+        "com.android.vending.BILLING"
       ]
     },
     "plugins": [
       "expo-secure-store",
-      "expo-localization"
+      "expo-localization",
+      "expo-font"
     ],
     "extra": {
       "eas": {
-        "projectId": "memoria-app"
+        "projectId": "5859e410-54f0-4917-bfc6-ae55b8968dd3"
       },
       "supabaseUrl": "https://vczmygfrsmxzkyzzckfu.supabase.co",
-      "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjem15Z2Zyc214emt5enpja2Z1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc2MTA5ODQsImV4cCI6MjA4MzE4Njk4NH0.qj0kSBcZpdLYxCLWY-fKchxLKJeBhUBoOAe13Sk4I2Q"
+      "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjem15Z2Zyc214emt5enpja2Z1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc2MTA5ODQsImV4cCI6MjA4MzE4Njk4NH0.qj0kSBcZpdLYxCLWY-fKchxLKJeBhUBoOAe13Sk4I2Q",
+      "revenueCatApiKey": "goog_grtYQITtVshRaRcrqCNRQMcmdgO"
     }
   }
 }
